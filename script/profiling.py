@@ -3,15 +3,16 @@ import os
 from ydata_profiling import ProfileReport
 
 
-def profiling(input_df, save_path):
+def profiling(input_df, save_path, save_format):
     """create profiling for raw data
 
     Args:
-        input_df (dataframe): _description_
-        save_path (_type_): _description_
+        input_df (dataframe): the input dataframe to be profiled
+        save_path (string): path to save the result
+        save_format (string): "html" or "json"
 
     Returns:
-        _type_: _description_
+        None
     """
     datetime_column = input_df["Datetime"]
     input_df = input_df.drop(columns=["Datetime"])
@@ -48,13 +49,22 @@ def profiling(input_df, save_path):
         temp_df = pd.concat([datetime_column, temp_df], axis=1)
         index = list[0].split("-")
         
-        profile = ProfileReport(
+        if save_format == "html":
+            profile = ProfileReport(
                 temp_df,
                 tsmode=True,
                 sortby="Datetime",
                 title="Time-Series EDA for City " + index[0] + " District " + index[1],
-        )
-        profile.to_file(profile_dir + "City-" + index[0] + "-" + "District-" + index[1] + ".html")
-    
+            )
+            profile.to_file(profile_dir + "html/" + "City-" + index[0] + "-" + "District-" + index[1] + ".html")
+        
+        elif save_format == "json":
+            profile = ProfileReport(
+                temp_df,
+                tsmode=True,
+                sortby="Datetime",
+                title="Time-Series EDA for City " + index[0] + " District " + index[1],
+            )
+            profile.to_json(profile_dir + "json/" + "City-" + index[0] + "-" + "District-" + index[1] + ".json")
     
     return None

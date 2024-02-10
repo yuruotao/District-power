@@ -4,7 +4,7 @@ import os
 
 
 
-def imputation(input_df, save_path):
+def imputation(input_df, imputation_method, save_path):
     
     
     

@@ -251,6 +251,6 @@ if __name__ == "__main__":
     meta_df = pd.read_excel(meta_path)
     
     #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
-    profiling.profiling(raw_data_df, "./result/profile/raw")
+    profiling.profiling(raw_data_df, "./result/profile/raw", "json")
 
     

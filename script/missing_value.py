@@ -3,7 +3,8 @@ import os
 import missingno as msno
 import matplotlib.pyplot as plt
 import numpy as np
-
+import seaborn as sns
+sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
 
 def missing_value_visualization(input_df, save_path):
     """visualize the missing data in both bar and matrix format
