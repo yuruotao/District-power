@@ -253,5 +253,5 @@ if __name__ == "__main__":
     
     #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
     #profiling.profiling(raw_data_df, "./result/profile/raw", "json")
-    basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/raw")
-    
+    #basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/raw")
+    imputation.imputation(raw_data_df, save_path="./result/imputation", imputation_method="MICE")
