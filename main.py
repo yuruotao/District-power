@@ -6,9 +6,11 @@ import missingno as msno
 import seaborn as sns
 from ydata_profiling import ProfileReport
 
+# Import modules
 import script.analysis as analysis
 import script.imputation as imputation
 import script.missing_value as missing_value
+
 
 def time_series_dataframe_create(start_time, stop_time, time_interval):
     """create a dataframe with a column containing a time series, which is the return value
@@ -17,13 +19,31 @@ def time_series_dataframe_create(start_time, stop_time, time_interval):
         start_time (string): the start time of the time series
         stop_time (string): the stop time of the time series
         time_interval (string): the time interval of the time series
+
+    Returns:
+        _dataframe_: dataframe containing a column of time series
     """
+
     time_index = pd.date_range(start=start_time, end=stop_time, freq=time_interval)
     # Create a DataFrame with the time series column
     time_series_df = pd.DataFrame({'Datetime': time_index})
     return time_series_df
 
-def separate_by_district(input_xlsx, output_path):
+def separate_by_city(input_df, meta_df, output_path):
+    """separate the dataframe by city, into individual xlsx files
+
+    Args:
+        input_df (dataframe): the input dataframe to be separated
+        meta_df (dataframe): the dataframe containing information about input_df
+        output_path (string): the folder to contain the output xlsx files
+
+    Returns:
+        None
+    """
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    
     
     
     
@@ -240,6 +260,7 @@ def raw_data_file_create(district_df, meta_df):
 
 
 if __name__ == "__main__":
+    # Import raw data and meta data
     raw_data_path = "./data/raw_data.xlsx"
     meta_path = "./data/meta.xlsx"
     
