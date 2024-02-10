@@ -44,18 +44,17 @@ def profiling(input_df, save_path):
 
     for list in result_list:
         sorted_list = sorted(list, key=lambda x: int(x.split('-')[2]))
-        if int(list[0][0]) > 5:
-            temp_df = input_df[sorted_list]
-            temp_df = pd.concat([datetime_column, temp_df], axis=1)
-            index = list[0].split("-")
+        temp_df = input_df[sorted_list]
+        temp_df = pd.concat([datetime_column, temp_df], axis=1)
+        index = list[0].split("-")
         
-            profile = ProfileReport(
+        profile = ProfileReport(
                 temp_df,
                 tsmode=True,
                 sortby="Datetime",
                 title="Time-Series EDA for City " + index[0] + " District " + index[1],
-            )
-            profile.to_file(profile_dir + "City-" + index[0] + "-" + "District-" + index[1] + ".html")
+        )
+        profile.to_file(profile_dir + "City-" + index[0] + "-" + "District-" + index[1] + ".html")
     
     
     return None
