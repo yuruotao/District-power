@@ -65,6 +65,6 @@ def profiling(input_df, save_path, save_format):
                 sortby="Datetime",
                 title="Time-Series EDA for City " + index[0] + " District " + index[1],
             )
-            profile.to_json(profile_dir + "json/" + "City-" + index[0] + "-" + "District-" + index[1] + ".json")
+            profile.to_file(profile_dir + "json/" + "City-" + index[0] + "-" + "District-" + index[1] + ".json")
     
     return None
