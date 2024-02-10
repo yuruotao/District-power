@@ -2,14 +2,15 @@ import pandas as pd
 import os
 import time
 import matplotlib.pyplot as plt
-import missingno as msno
+
 import seaborn as sns
-from ydata_profiling import ProfileReport
+
 
 # Import modules
 import script.analysis as analysis
 import script.imputation as imputation
 import script.missing_value as missing_value
+import script.profiling as profiling
 
 
 def time_series_dataframe_create(start_time, stop_time, time_interval):
@@ -21,7 +22,7 @@ def time_series_dataframe_create(start_time, stop_time, time_interval):
         time_interval (string): the time interval of the time series
 
     Returns:
-        _dataframe_: dataframe containing a column of time series
+        _datafra_: dataframe containing a column of time series
     """
 
     time_index = pd.date_range(start=start_time, end=stop_time, freq=time_interval)
@@ -217,25 +218,7 @@ def raw_data_file_create(district_df, meta_df):
         power_2022_TQMC_df = power_2022_TQMC_df.drop(['Datetime'], axis=1)
         print(power_2022_TQMC_df)
         
-        # Missing value visualization for districts
-        missing_dir_matrix = "./result/district/missing_value/matrix/"
-        missing_dir_heatmap = "./result/district/missing_value/heatmap/"
-        missing_dir_bar = "./result/district/missing_value/bar/"
-
-        # Matrix plot
-        #msno.matrix(power_2022_TQMC_df)
-        #plt.savefig(missing_dir_matrix + 'District-'+ str(district_num) +'-matrix.png', dpi=600)
-        #plt.clf()
         
-        # Bar plot
-        #msno.bar(power_2022_TQMC_df)
-        #plt.savefig(missing_dir_bar + 'District-'+ str(district_num) +'-bar.png', dpi=600)
-        #plt.clf()
-        
-        # Heatmap plot
-        #msno.heatmap(power_2022_TQMC_df)
-        #plt.savefig(missing_dir_heatmap + 'District-'+ str(district_num) +'-heatmap.png', dpi=600)
-        #plt.clf()
         
         print(str(district_num) + " Done")
 
@@ -267,7 +250,7 @@ if __name__ == "__main__":
     raw_data_df = pd.read_excel(raw_data_path)
     meta_df = pd.read_excel(meta_path)
     
-    
-
+    #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
+    profiling.profiling(raw_data_df, "./result/profile/raw")
 
     
