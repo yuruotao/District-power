@@ -11,6 +11,7 @@ import script.analysis as analysis
 import script.imputation as imputation
 import script.missing_value as missing_value
 import script.profiling as profiling
+import script.basic_statistics as basic_statistics
 
 
 def time_series_dataframe_create(start_time, stop_time, time_interval):
@@ -251,6 +252,6 @@ if __name__ == "__main__":
     meta_df = pd.read_excel(meta_path)
     
     #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
-    profiling.profiling(raw_data_df, "./result/profile/raw", "json")
-    
+    #profiling.profiling(raw_data_df, "./result/profile/raw", "json")
+    basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/raw")
     

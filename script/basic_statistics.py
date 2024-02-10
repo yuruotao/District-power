@@ -1,35 +1,36 @@
 import pandas as pd
 import os
+import missingno as msno
+import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
 
-def basic_statistics(input_df, output_path):
 
+def basic_statistics(input_df, save_path):
+    datetime_column = input_df["Datetime"]
+    input_df = input_df.drop(columns=["Datetime"])
+    column_list = input_df.columns.values.tolist()
 
-filepath = 'Electricity Consumption/'
-dirs = os.listdir(filepath)
-dirs.sort()
-dirs = dirs[1:]
+    stats_dir = save_path + "/"
+    
+    if not os.path.exists(stats_dir):
+        os.makedirs(stats_dir)
 
-    STA = pd.DataFrame(index = dirs, 
-                   columns = ['Mean',
-                              'Standard deviation',
-                              'Skew','Kurtosis',
-                              '0th percentile',
-                              '2.5th percentile',
-                              '50th percentile',
-                              '97.5th percentile',
-                              '100th percentile'],
+    STA_df = pd.DataFrame({'Mean':input_df.mean(), 
+                           'Standard deviation':input_df.std(),
+                           'Skew':input_df.skew(),
+                           'Kurtosis':input_df.kurtosis(),
+                           '0th percentile':input_df.quantile(q=0),
+                           '2.5th percentile':input_df.quantile(q=0.025),
+                           '50th percentile':input_df.quantile(q=0.5),
+                           '97.5th percentile':input_df.quantile(q=0.975),
+                           '100th percentile':input_df.quantile(q=1)
+                           },
                    dtype = 'float')
 
-
-    STA.loc[file,'Mean'] = data['Value'].mean(axis=0)
-    STA.loc[file,'Standard deviation'] = data['Value'].std(axis=0)
-    STA.loc[file,'Skew'] = data['Value'].skew(axis=0)
-    STA.loc[file,'Kurtosis'] = data['Value'].kurtosis(axis=0)
-    STA.loc[file,'0th percentile'] = data['Value'].quantile(q=0)
-    STA.loc[file,'2.5th percentile'] = data['Value'].quantile(q=0.025)
-    STA.loc[file,'50th percentile'] = data['Value'].quantile(q=0.5)
-    STA.loc[file,'97.5th percentile'] = data['Value'].quantile(q=0.975)
-    STA.loc[file,'100th percentile'] = data['Value'].quantile(q=1)#np.round(,2)
-    STA = STA.round(2)
-    STA.to_csv('/basic_statistics.csv', float_format='%.2f')
+    STA_df = STA_df.round(2)
+    print(STA_df)
+    STA_df.to_excel(stats_dir + '/basic_statistics.xlsx', float_format='%.2f')
+    
+    return None
