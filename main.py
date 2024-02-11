@@ -11,7 +11,7 @@ import script.imputation as imputation
 import script.missing_value as missing_value
 import script.profiling as profiling
 import script.basic_statistics as basic_statistics
-
+import script.resample as resample
 
 def time_series_dataframe_create(start_time, stop_time, time_interval):
     """create a dataframe with a column containing a time series, which is the return value
@@ -247,16 +247,16 @@ if __name__ == "__main__":
     raw_data_path = "./data/raw_data.xlsx"
     meta_path = "./data/meta.xlsx"
     
-    raw_data_df = pd.read_excel(raw_data_path)
-    meta_df = pd.read_excel(meta_path)
+    #raw_data_df = pd.read_excel(raw_data_path)
+    #meta_df = pd.read_excel(meta_path)
     
     # Define the time interval
     start_time = '2022-01-01 00:00:00'
     end_time = '2023-11-10 08:00:00'
 
     # Create a new DataFrame based on the time interval
-    raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
-    raw_data_df = raw_data_df.reset_index()
+    #raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
+    #raw_data_df = raw_data_df.reset_index()
     #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
     #profiling.profiling(raw_data_df, "./result/profile/raw", "json")
     #profiling.profiling(raw_data_df, "./result/profile/raw", "html")
@@ -293,10 +293,11 @@ if __name__ == "__main__":
     #imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
     #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
     
-    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="FEDOT")
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_FEDOT.xlsx")
-    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/FEDOT")
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="FEDOT")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_FEDOT.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/FEDOT")
     
-
+    resample_df_list = resample.resample(raw_data_adjusted_df, output_path="./result/resample", freq_list=['D','W'])
+    
 
     

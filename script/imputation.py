@@ -7,6 +7,7 @@ from sklearn.impute import IterativeImputer
 from sklearn.ensemble import RandomForestRegressor
 from sktime.forecasting.arima import ARIMA
 import numpy as np
+import seaborn as sns
 
 
 def imputation(input_df, imputation_method, save_path):
@@ -20,7 +21,7 @@ def imputation(input_df, imputation_method, save_path):
 
     if imputation_method == "MICE":
         # Initialize IterativeImputer with RandomForestRegressor as the estimator
-        imputer = IterativeImputer(estimator=RandomForestRegressor(n_estimators=50, max_depth=10, min_samples_split=2), 
+        imputer = IterativeImputer(estimator=RandomForestRegressor(n_estimators=10, max_depth=8, min_samples_split=2), 
                                    max_iter=10, tol=0.001)
         # Impute missing values
         imputed_data = imputer.fit_transform(input_df)
@@ -49,21 +50,29 @@ def imputation(input_df, imputation_method, save_path):
         from fedot.core.pipelines.node import PrimaryNode, SecondaryNode
         from fedot.core.pipelines.pipeline import Pipeline
         
-        input_data = InputData.from_dataframe(input_df, task=Task(TaskTypesEnum.imputation))
+        imputed_df = pd.DataFrame()
+        for column in input_df.columns:
+            features = input_df[column]
+            target = input_df[column]
 
-        # Define a Fedot pipeline for imputation
-        node_imputation = PrimaryNode('imputation', nodes_from=[PrimaryNode('ridge')])  # Example imputation method
-        node_main = SecondaryNode('ridge', nodes_from=[node_imputation])
-        pipeline = Pipeline(node_main)
+            # Create InputData object
+            input_data = InputData(idx=features.index, features=features.values, target=target.values)
 
-        # Fit the pipeline
-        pipeline.fit(input_data)
+            # Define a Fedot pipeline for imputation
+            node_imputation = PrimaryNode('imputation', nodes_from=[PrimaryNode('ridge')])  # Example imputation method
+            node_main = SecondaryNode('ridge', nodes_from=[node_imputation])
+            pipeline = Pipeline(node_main)
 
-        # Transform the data
-        imputed_data = pipeline.predict(input_data)
+            # Fit the pipeline
+            pipeline.fit(input_data)
+
+            # Transform the data
+            imputed_data = pipeline.predict(input_data)
         
-        # Convert imputed data back to DataFrame
-        imputed_df = imputed_data.features
+            # Convert imputed data back to DataFrame
+            temp_imputed_df = imputed_data.features
+            imputed_df = pd.concat([imputed_df, temp_imputed_df], axis=1)
+            
           
     elif imputation_method == "Forward-Backward":
         forward_df = input_df.shift(-7*24)
@@ -166,6 +175,7 @@ def imputation(input_df, imputation_method, save_path):
 
 def imputation_visualization(start_time, end_time, method_list, column, save_path):
     
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     time_index = pd.date_range(start=start_time, end=end_time, freq="h")
     # Create a DataFrame with the time series column
     time_series_df = pd.DataFrame({'Datetime': time_index})
