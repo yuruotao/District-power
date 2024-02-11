@@ -269,9 +269,9 @@ if __name__ == "__main__":
     raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
     #basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/adjusted")
     
-    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Linear")
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_Linear.xlsx")
-    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Linear")
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Linear")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Linear.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Linear")
     
     #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Forward")
     #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward.xlsx")
@@ -289,18 +289,17 @@ if __name__ == "__main__":
     #imputed_df = pd.read_excel("./result/imputation/imputed_data_Average.xlsx")
     #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Average")
     
-    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="MICE")
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_MICE.xlsx")
-    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/MICE")
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="MICE")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_MICE.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/MICE")
     
     imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
     imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
     basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
     
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="FEDOT")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_FEDOT.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/FEDOT")
-    
+    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="AutoML")
+    imputed_df = pd.read_excel("./result/imputation/imputed_data_AutoML.xlsx")
+    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/AutoML")
     
     #resample_df_list = resample.resample(raw_data_adjusted_df, output_path="./result/resample", freq_list=['D','W'])
     

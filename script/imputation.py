@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sktime.forecasting.arima import ARIMA
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
+from autoimpute.imputations import SingleImputer
 import numpy as np
 import seaborn as sns
 
@@ -56,42 +57,12 @@ def imputation(input_df, imputation_method, save_path):
         # Convert the result back to a DataFrame
         imputed_df = pd.DataFrame(imputed_data, columns=input_df.columns, index=input_df.index)
         
-    elif imputation_method == "FEDOT":
-        temp_df = pd.concat([datetime_column, input_df], axis=1)
-        # Pipeline and nodes
-        from fedot.core.pipelines.node import PrimaryNode, SecondaryNode
-        from fedot.core.pipelines.pipeline import Pipeline
-        # Data
-        from fedot.core.repository.dataset_types import DataTypesEnum
-        from fedot.core.data.data import InputData
-        from fedot.core.data.data_split import train_test_data_setup
-        # Tasks
-        from fedot.core.repository.tasks import TaskTypesEnum, Task, TsForecastingParams
-        #Tuning
-        from fedot.core.pipelines.tuning.search_space import PipelineSearchSpace
-        from golem.core.tuning.simultaneous import SimultaneousTuner
-        import warnings
-        warnings.filterwarnings('ignore')
-        import logging
-        logging.raiseExceptions = False
-        
-        # Specify forecast length
-        len_forecast = 3600
+    elif imputation_method == "AutoML":
+        # Create a SingleImputer object
+        imputer = SingleImputer()
 
-        # Got univariate time series as numpy array
-        time_series = np.array(temp_df['Datetime'])
-
-        # Wrapp data into InputData
-        task = Task(TaskTypesEnum.ts_forecasting, TsForecastingParams(forecast_length=len_forecast))
-
-        # Split data into train and test
-        train_input, predict_input = train_test_data_setup(InputData(idx=range(len(time_series)),
-                                                                 features=time_series,
-                                                                 target=time_series,
-                                                                 task=Task(TaskTypesEnum.ts_forecasting,
-                                                                           TsForecastingParams(forecast_length=len_forecast)),
-                                                                 data_type=DataTypesEnum.ts))
-        
+        # Fit the imputer to your data and transform it
+        imputed_df = imputer.fit_transform(input_df)
             
           
     elif imputation_method == "Forward-Backward":
