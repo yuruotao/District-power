@@ -34,3 +34,21 @@ def basic_statistics(input_df, save_path):
     STA_df.to_excel(stats_dir + '/basic_statistics.xlsx', float_format='%.2f')
     
     return None
+
+def power_scatter_plot(input_df, save_path):
+    sns.set_theme(style="whitegrid")
+    
+    datetime_column = input_df["Datetime"]
+    input_df = input_df.drop(columns=["Datetime"])
+    column_list = input_df.columns.values.tolist()
+
+    stats_dir = save_path + "/"
+    
+    if not os.path.exists(stats_dir):
+        os.makedirs(stats_dir)
+    
+    for column in column_list:
+        pass
+    
+    
+    return None

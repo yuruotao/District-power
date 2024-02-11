@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import time
 import matplotlib.pyplot as plt
-
 import seaborn as sns
 
 
@@ -257,13 +256,47 @@ if __name__ == "__main__":
 
     # Create a new DataFrame based on the time interval
     raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
-    
+    raw_data_df = raw_data_df.reset_index()
     #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
     #profiling.profiling(raw_data_df, "./result/profile/raw", "json")
-    profiling.profiling(raw_data_df, "./result/profile/raw", "html")
-    basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/raw")
+    #profiling.profiling(raw_data_df, "./result/profile/raw", "html")
+    #basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/raw")
     
-    # Delete the columns whose missing value is more than 20%
+    
+    # Delete the columns whose missing value takes up more than 20%
     raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
     raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
-    #imputation.imputation(raw_data_df, save_path="./result/imputation", imputation_method="MICE")
+    raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
+    #basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/adjusted")
+    
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Forward")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Forward")
+    
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Backward")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Backward.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Backward")
+
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Forward-Backward")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Forward-Backward")
+    
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Average")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Average.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Average")
+    
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="MICE")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_MICE.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/MICE")
+    
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
+    
+    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="FEDOT")
+    imputed_df = pd.read_excel("./result/imputation/imputed_data_FEDOT.xlsx")
+    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/FEDOT")
+    
+
+
+    
