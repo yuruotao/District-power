@@ -6,11 +6,25 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.ensemble import RandomForestRegressor
 from sktime.forecasting.arima import ARIMA
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
 import numpy as np
 import seaborn as sns
 
 
 def imputation(input_df, imputation_method, save_path):
+    """carry out the imputation for raw data with missing values
+
+    Args:
+        input_df (dataframe): the dataframe containing raw data
+        imputation_method (string): specify the method of imputation
+        save_path (string): specify the folder to save the imputed data
+
+    Returns:
+        dataframe: dataframe containing the imputed data
+    """
+    
+    print("Imputation begin")
     datetime_column = input_df["Datetime"]
     input_df = input_df.drop(columns=["Datetime"])
     
@@ -18,11 +32,14 @@ def imputation(input_df, imputation_method, save_path):
     
     if not os.path.exists(imputation_dir):
         os.makedirs(imputation_dir)
+        
+    if imputation_method == "Linear":
+        imputed_df = input_df.interpolate(method='linear')
+        imputed_df = imputed_df.drop(columns=["index"])
 
     if imputation_method == "MICE":
         # Initialize IterativeImputer with RandomForestRegressor as the estimator
-        imputer = IterativeImputer(estimator=RandomForestRegressor(n_estimators=10, max_depth=8, min_samples_split=2), 
-                                   max_iter=10, tol=0.001)
+        imputer = IterativeImputer(estimator=RandomForestRegressor())
         # Impute missing values
         imputed_data = imputer.fit_transform(input_df)
         # Convert imputed data back to DataFrame
@@ -33,45 +50,48 @@ def imputation(input_df, imputation_method, save_path):
         imputer = BiScaler()  # BiScaler transformation
         df_imputed = pd.DataFrame(imputer.fit_transform(input_df.values), columns=input_df.columns, index=input_df.index)  # Transform DataFrame
 
-        imputer = IterativeImputer(estimator=RandomForestRegressor(n_estimators=50, max_depth=10, min_samples_split=2), 
-                                   max_iter=10, tol=0.001)  # Imputation method after BiScaler
+        imputer = IterativeImputer(estimator=RandomForestRegressor())  # Imputation method after BiScaler
         imputed_data = imputer.fit_transform(df_imputed)  # Impute missing values
 
         # Convert the result back to a DataFrame
         imputed_df = pd.DataFrame(imputed_data, columns=input_df.columns, index=input_df.index)
         
     elif imputation_method == "FEDOT":
-        from fedot.core.repository.tasks import Task, TaskTypesEnum
-        from fedot.core.data.data import InputData
-        from fedot.core.data.data_split import train_test_data_setup
-        from fedot.core.data.multi_modal import MultiModalData
-        from fedot.core.repository.dataset_types import DataTypesEnum
-        from fedot.core.repository.quality_metrics_repository import MetricsRepository
+        temp_df = pd.concat([datetime_column, input_df], axis=1)
+        # Pipeline and nodes
         from fedot.core.pipelines.node import PrimaryNode, SecondaryNode
         from fedot.core.pipelines.pipeline import Pipeline
+        # Data
+        from fedot.core.repository.dataset_types import DataTypesEnum
+        from fedot.core.data.data import InputData
+        from fedot.core.data.data_split import train_test_data_setup
+        # Tasks
+        from fedot.core.repository.tasks import TaskTypesEnum, Task, TsForecastingParams
+        #Tuning
+        from fedot.core.pipelines.tuning.search_space import PipelineSearchSpace
+        from golem.core.tuning.simultaneous import SimultaneousTuner
+        import warnings
+        warnings.filterwarnings('ignore')
+        import logging
+        logging.raiseExceptions = False
         
-        imputed_df = pd.DataFrame()
-        for column in input_df.columns:
-            features = input_df[column]
-            target = input_df[column]
+        # Specify forecast length
+        len_forecast = 3600
 
-            # Create InputData object
-            input_data = InputData(idx=features.index, features=features.values, target=target.values)
+        # Got univariate time series as numpy array
+        time_series = np.array(temp_df['Datetime'])
 
-            # Define a Fedot pipeline for imputation
-            node_imputation = PrimaryNode('imputation', nodes_from=[PrimaryNode('ridge')])  # Example imputation method
-            node_main = SecondaryNode('ridge', nodes_from=[node_imputation])
-            pipeline = Pipeline(node_main)
+        # Wrapp data into InputData
+        task = Task(TaskTypesEnum.ts_forecasting, TsForecastingParams(forecast_length=len_forecast))
 
-            # Fit the pipeline
-            pipeline.fit(input_data)
-
-            # Transform the data
-            imputed_data = pipeline.predict(input_data)
+        # Split data into train and test
+        train_input, predict_input = train_test_data_setup(InputData(idx=range(len(time_series)),
+                                                                 features=time_series,
+                                                                 target=time_series,
+                                                                 task=Task(TaskTypesEnum.ts_forecasting,
+                                                                           TsForecastingParams(forecast_length=len_forecast)),
+                                                                 data_type=DataTypesEnum.ts))
         
-            # Convert imputed data back to DataFrame
-            temp_imputed_df = imputed_data.features
-            imputed_df = pd.concat([imputed_df, temp_imputed_df], axis=1)
             
           
     elif imputation_method == "Forward-Backward":
@@ -186,7 +206,5 @@ def imputation_visualization(start_time, end_time, method_list, column, save_pat
         temp_df = temp_df.rename({column:method})
         time_series_df = pd.merge(time_series_df, temp_df, on='Datetime', how="left")
     
-    
-        
     
     return None
