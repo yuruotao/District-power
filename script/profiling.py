@@ -48,6 +48,7 @@ def profiling(input_df, save_path, save_format):
         temp_df = input_df[sorted_list]
         temp_df = pd.concat([datetime_column, temp_df], axis=1)
         index = list[0].split("-")
+        print(temp_df)
         
         if save_format == "html":
             profile = ProfileReport(

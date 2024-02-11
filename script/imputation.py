@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from datetime import timedelta, datetime
 from fancyimpute import IterativeImputer
-
+from sklearn.impute import SimpleImputer
 
 
 def imputation(input_df, imputation_method, save_path):
@@ -15,11 +15,14 @@ def imputation(input_df, imputation_method, save_path):
         os.makedirs(imputation_dir)
 
     if imputation_method == "MICE":
-        imputer = IterativeImputer()
+        imputer = IterativeImputer(max_iter=1000)
         imputed_data = imputer.fit_transform(input_df)
         print(imputed_data)
         # Convert the result back to a DataFrame
         imputed_df = pd.DataFrame(imputed_data, columns=input_df.columns, index=input_df.index)
+    elif imputation_method == "":
+        print("")
+        
     
     print(imputed_df)
     imputed_df = pd.concat([datetime_column, imputed_df], axis=1)

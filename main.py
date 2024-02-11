@@ -251,7 +251,19 @@ if __name__ == "__main__":
     raw_data_df = pd.read_excel(raw_data_path)
     meta_df = pd.read_excel(meta_path)
     
+    # Define the time interval
+    start_time = '2022-01-01 00:00:00'
+    end_time = '2023-11-10 08:00:00'
+
+    # Create a new DataFrame based on the time interval
+    raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
+    
     #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
     #profiling.profiling(raw_data_df, "./result/profile/raw", "json")
-    #basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/raw")
-    imputation.imputation(raw_data_df, save_path="./result/imputation", imputation_method="MICE")
+    profiling.profiling(raw_data_df, "./result/profile/raw", "html")
+    basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/raw")
+    
+    # Delete the columns whose missing value is more than 20%
+    raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
+    raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
+    #imputation.imputation(raw_data_df, save_path="./result/imputation", imputation_method="MICE")
