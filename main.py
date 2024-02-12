@@ -325,8 +325,9 @@ if __name__ == "__main__":
     
     #district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
-    #analysis.seasonality_decomposition(imputed_df)
+    
     resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
     resample.resample_visualization(imputed_df, resample_df_list, "0-0-0", "./result/resample/")
 
-    
+    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/", 24)
+    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/", 24*7)
