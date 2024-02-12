@@ -4,9 +4,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import seasonal_decompose
 import os
+import calplot
 
-sns.set_theme(style="whitegrid")
-sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+#sns.set_theme(style="whitegrid")
+#sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
 
 
 def average_load_profile():
@@ -35,8 +36,10 @@ def diversity_factor_all(input_df, output_path):
     
     # Calculate total load for each hour by summing across all transformers
     total_load_per_hour = temp_df.sum(axis=1)
+    print(total_load_per_hour)
     # Calculate maximum load across all hours
     max_load = total_load_per_hour.max()
+    print(max_load)
     # Calculate diversity factor for each hour
     diversity_factor = total_load_per_hour / max_load
     diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
@@ -125,6 +128,35 @@ def diversity_heatmap(input_df_list, output_path):
         plt.close()
     
     return None
+
+def year_DF_heatmap(input_df, output_path):
+    
+    datetime_column = input_df["Datetime"]
+    temp_df = input_df.drop(["Datetime"], axis=1)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    # Calculate total load for each day by summing across all transformers
+    total_load_per_day = temp_df.sum(axis=1)
+    print(total_load_per_day)
+    # Calculate maximum load across all days
+    max_load = total_load_per_day.max()
+    print(max_load)
+    # Calculate diversity factor for each day
+    diversity_factor = total_load_per_day / max_load
+    diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
+    diversity_factor_df = pd.concat([datetime_column, diversity_factor_df], axis=1)
+    
+    print(diversity_factor_df)
+    diversity_factor_df.to_excel(output_path + "DF_daily_all_transformers.xlsx", index=False)
+    
+    diversity_factor_df = diversity_factor_df.set_index("Datetime")
+    calplot.calplot(diversity_factor_df["Diversity Factor"])
+    plt.show()
+    
+    return None
+    
 
 def clustering():
     
