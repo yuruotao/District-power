@@ -54,12 +54,13 @@ def resample_visualization(input_df, resample_df_list, output_path):
         
     start_time = '2022-01-01 00:00:00'
     end_time = '2022-07-31 23:00:00'
+    temp_df = input_df.drop(["Datetime"], axis=1)
     
     input_df = input_df.loc[(input_df['Datetime'] >= start_time) & (input_df['Datetime'] <= end_time)]
     resample_df_list[0] = resample_df_list[0].loc[(resample_df_list[0]['Datetime'] >= start_time) & (resample_df_list[0]['Datetime'] <= end_time)]
     resample_df_list[1] = resample_df_list[1].loc[(resample_df_list[1]['Datetime'] >= start_time) & (resample_df_list[1]['Datetime'] <= end_time)]
     
-    for column in input_df.columns:
+    for column in temp_df.columns:
         # Plotting
         fig, axes = plt.subplots(3, 1, figsize=(20, 7))
 
@@ -87,5 +88,6 @@ def resample_visualization(input_df, resample_df_list, output_path):
         plt.tight_layout()
         # Show the plot
         plt.savefig(output_path + "resample_" + column + ".png", dpi=600)
+        plt.close()
     
     return None
