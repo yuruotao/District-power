@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sktime.forecasting.arima import ARIMA
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
-from autoimpute.imputations import SingleImputer
+from autoimpute.imputations import SingleImputer, MultipleImputer
 import numpy as np
 import seaborn as sns
 
@@ -59,7 +59,7 @@ def imputation(input_df, imputation_method, save_path):
         
     elif imputation_method == "AutoML":
         # Create a SingleImputer object
-        imputer = SingleImputer()
+        imputer = MultipleImputer()
 
         # Fit the imputer to your data and transform it
         imputed_df = imputer.fit_transform(input_df)

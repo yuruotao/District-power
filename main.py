@@ -50,6 +50,47 @@ def separate_by_city(input_df, meta_df, output_path):
     
     return None
 
+def district_aggregate(input_df, level, output_path):
+    """aggregate the data by different levels
+
+    Args:
+        input_df (dataframe): the input dataframe containing data
+        level (int): level for aggregation, 1 for city level, 2 for district level
+        output_path (string): the output directory to save the intermediate file
+
+    Returns:
+        dataframe: the aggregated dataframe
+    """
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    datetime_column = input_df["Datetime"]
+    input_df = input_df.drop(columns=["Datetime"])
+    
+    if level == 2:
+        name = "district"
+        # Step 1: Extract common prefix
+        common_prefix = input_df.columns.str.split('-').str[:2].str.join('-')
+        # Step 2 and 3: Group and sum
+        df_grouped = input_df.groupby(common_prefix, axis=1).sum()
+        # Step 4: Rename columns
+        df_grouped.columns = common_prefix.unique()
+        
+    elif level == 1:
+        name = "city"
+        # Step 1: Extract 'a' part from column names
+        a_part = input_df.columns.str.split('-').str[0]
+        # Step 2 and 3: Group and sum
+        df_grouped = input_df.groupby(a_part, axis=1).sum()
+        # Step 4: Rename columns (optional, if you want)
+        df_grouped.columns = a_part.unique()
+        
+    df_grouped = df_grouped.reindex(sorted(df_grouped.columns), axis=1)
+    output_df = df_grouped
+    output_df = pd.concat([datetime_column, output_df], axis=1)
+    output_df.to_excel(output_path + name + ".xlsx", index=False)
+    
+    return output_df
+
 
 # Separate data into districts
 def raw_data(district_df):
@@ -264,44 +305,28 @@ if __name__ == "__main__":
     
     
     # Delete the columns whose missing value takes up more than 20%
-    raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
-    raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
-    raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
+    #raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
+    #raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
+    #raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
     #basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/adjusted")
     
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Linear")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Linear.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Linear")
+    #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
+    #for method in imputation_methods:
+        #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method=method)
+        #imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")
+        #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/" + method)
     
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Forward")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Forward")
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="AutoML")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_AutoML.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/AutoML")
     
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Backward")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Backward.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Backward")
-
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Forward-Backward")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Forward-Backward")
     
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="Average")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Average.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/Average")
+    imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
     
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="MICE")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_MICE.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/MICE")
-    
-    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
-    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
-    
-    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="AutoML")
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_AutoML.xlsx")
-    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/AutoML")
-    
-    #resample_df_list = resample.resample(raw_data_adjusted_df, output_path="./result/resample", freq_list=['D','W'])
-    
+    #district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
+    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #analysis.seasonality_decomposition(imputed_df)
+    resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
+    resample.resample_visualization(imputed_df, resample_df_list, "0-0-0", "./result/resample/")
 
     
