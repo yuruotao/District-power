@@ -157,7 +157,6 @@ def imputation(input_df, imputation_method, save_path):
         temp_df = temp_df.reset_index()
         imputed_df = temp_df.drop(columns=["Datetime"])
         
-
     print(imputed_df)
     imputed_df = pd.concat([datetime_column, imputed_df], axis=1)
     imputed_df.to_excel(imputation_dir + "/" + "imputed_data_" + imputation_method + ".xlsx", index=False)

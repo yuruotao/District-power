@@ -289,7 +289,7 @@ if __name__ == "__main__":
     meta_path = "./data/meta.xlsx"
     
     #raw_data_df = pd.read_excel(raw_data_path)
-    #meta_df = pd.read_excel(meta_path)
+    meta_df = pd.read_excel(meta_path)
     
     # Define the time interval
     start_time = '2022-01-01 00:00:00'
@@ -323,7 +323,7 @@ if __name__ == "__main__":
     
     imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
     
-    #district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
+    district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     
     #resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
@@ -332,4 +332,7 @@ if __name__ == "__main__":
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
     
-    analysis.diversity_factor(imputed_df, "./result/diversity_factor")
+    DF_all_list = analysis.diversity_factor_all(imputed_df, "./result/diversity_factor/")
+    analysis.diversity_heatmap(DF_all_list, "./result/diversity_factor/")
+    #analysis.diversity_factor(imputed_df, "./result/diversity_factor/districts/")
+    

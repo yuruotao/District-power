@@ -17,24 +17,112 @@ def average_load_profile():
     
     return None
 
-def diversity_factor(input_df, output_path):
-    
+def diversity_factor_all(input_df, output_path):
+    """calculate the diversity factor for all transformers
+
+    Args:
+        input_df (dataframe): the dataframe containing all transformers' load profile
+        output_path (string): path to store the output xlsx
+
+    Returns:
+        list: containing the DF dataframe of input dataframe
+    """
     datetime_column = input_df["Datetime"]
-    temp_df = input_df.set_index(["Datetime"])
+    temp_df = input_df.drop(["Datetime"], axis=1)
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     
-    # Calculate total load for each time step
-    total_load = temp_df.drop(columns=[datetime_column]).sum(axis=1)
+    # Calculate total load for each hour by summing across all transformers
+    total_load_per_hour = temp_df.sum(axis=1)
+    # Calculate maximum load across all hours
+    max_load = total_load_per_hour.max()
+    # Calculate diversity factor for each hour
+    diversity_factor = total_load_per_hour / max_load
+    diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
+    diversity_factor_df = pd.concat([datetime_column, diversity_factor_df], axis=1)
     
-    # Calculate maximum load
-    max_load = total_load.max()
+    print(diversity_factor_df)
+    diversity_factor_df.to_excel(output_path + "DF_all_transformers.xlsx", index=False)
     
-    # Calculate diversity factor
-    diversity_factor = total_load / max_load
+    return [diversity_factor_df]
+
+def diversity_factor(input_df, output_path):
+    """calculate the diversity factor for all transformers in the same district
+
+    Args:
+        input_df (dataframe): the dataframe containing all transformers' load profile
+        output_path (string): path to store the output xlsx
+
+
+    Returns:
+        list: containing the DF dataframes for each district
+    """
+    datetime_column = input_df["Datetime"]
+    temp_df = input_df.drop(["Datetime"], axis=1)
     
-    print(diversity_factor)
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    # Group columns by the first two parts of the column names
+    grouped = temp_df.groupby(temp_df.columns.str.split('-', expand=True).map(lambda x: '-'.join(x[:2])), axis=1)
+    # Extract sub-DataFrames with the same 'a' and 'b' values
+    sub_dataframes = [sub_df for _, sub_df in grouped]
+
+    return_list = []
+    # Print sub-DataFrames
+    for i, sub_df in enumerate(sub_dataframes, 1):
+        name = sub_df.columns[0].rsplit('-', 1)[0]
+        print("Sub-DataFrame ", name)
+        
+        # Calculate total load for each hour by summing across all transformers
+        total_load_per_hour = sub_df.sum(axis=1)
+        # Calculate maximum load across all hours
+        max_load = total_load_per_hour.max()
+        # Calculate diversity factor for each hour
+        diversity_factor = total_load_per_hour / max_load
+        diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
+        diversity_factor_df = pd.concat([datetime_column, diversity_factor_df], axis=1)
+        return_list.append(diversity_factor_df)
+        print(diversity_factor_df)
+        diversity_factor_df.to_excel(output_path + "DF_" + name + ".xlsx", index=False)
+    
+    return return_list
+
+def diversity_heatmap(input_df_list, output_path):
+    """plot the heatmap of diversity factor
+
+    Args:
+        input_df_list (list): list containing dataframes of diversity factor
+        output_path (string): folder to store the heatmap plot
+
+    Returns:
+        None
+    """
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    start_time = '2022-01-01 00:00:00'
+    end_time = '2022-01-31 23:00:00'
+    
+        
+    for df in input_df_list:
+        name = df.columns[1].rsplit('-', 1)[0]
+        df = df.loc[(df['Datetime'] >= start_time) & (df['Datetime'] <= end_time)]
+        
+        df['hour'] = df['Datetime'].dt.hour
+        df['date'] = df['Datetime'].dt.date
+        df_pivot = df.pivot_table(index='date', columns='hour', values='Diversity Factor', aggfunc='mean')
+
+        # Plot heatmap
+        f, ax = plt.subplots()
+        htmap = sns.heatmap(df_pivot, cmap="crest", annot=True, ax=ax)
+        htmap.set(xlabel=None)
+        htmap.set(ylabel=None)
+        
+        plt.tight_layout()
+        plt.savefig(output_path + "DF_" + name + ".png", dpi=600)
+        plt.close()
     
     return None
 
