@@ -332,4 +332,4 @@ if __name__ == "__main__":
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
     
-    
+    analysis.diversity_factor(imputed_df, "./result/diversity_factor")
