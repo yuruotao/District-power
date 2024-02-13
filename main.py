@@ -305,10 +305,10 @@ if __name__ == "__main__":
     
     
     # Delete the columns whose missing value takes up more than 20%
-    #raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
-    #raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
-    #raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
-    #basic_statistics.basic_statistics(raw_data_df, "./result/basic_statistics/adjusted")
+    raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
+    raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
+    raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
+    basic_statistics.basic_statistics(raw_data_adjusted_df, "./result/basic_statistics/adjusted")
     
     #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
     #for method in imputation_methods:
@@ -319,6 +319,7 @@ if __name__ == "__main__":
     #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="AutoML")
     #imputed_df = pd.read_excel("./result/imputation/imputed_data_AutoML.xlsx")
     #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/AutoML")
+
     
     
     imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
@@ -328,14 +329,20 @@ if __name__ == "__main__":
     #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     
     resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
-    #resample.resample_visualization(imputed_df, resample_df_list, "./result/resample/figure/")
-    daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
+    resample.resample_visualization(imputed_df, resample_df_list, "./result/resample/figure/")
+    #daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
 
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
     
-    #DF_all_list = analysis.diversity_factor_all(imputed_df, "./result/diversity_factor/")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
+    
+    #DF_all_list = analysis.diversity_factor_all(imputed_df, meta_df, "./result/diversity_factor/", "")
     #analysis.diversity_heatmap(DF_all_list, "./result/diversity_factor/")
-    #analysis.diversity_factor(imputed_df, "./result/diversity_factor/districts/")
-    analysis.year_DF_heatmap(daily_df, "./result/diversity_factor/")
+    #analysis.diversity_factor(imputed_df, meta_df, "./result/diversity_factor/districts/", "")
+    #analysis.year_DF_heatmap(daily_df, meta_df, "./result/diversity_factor/", "")
+    
+    
+    
     

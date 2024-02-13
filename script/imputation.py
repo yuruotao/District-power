@@ -62,25 +62,29 @@ def imputation(input_df, imputation_method, save_path):
         imputer = MultipleImputer()
 
         # Fit the imputer to your data and transform it
-        imputed_df = imputer.fit_transform(input_df)
+        imputed_data = imputer.fit_transform(input_df)
+        imputed_data_list = list(imputed_data)
+
+        # Access individual imputed DataFrames
+        for idx, df_imputed in enumerate(imputed_data_list):
+            print(f"Imputed DataFrame {idx+1}:")
+            print(df_imputed)
             
           
     elif imputation_method == "Forward-Backward":
         forward_df = input_df.shift(-7*24)
         backward_df = input_df.shift(-7*24)
-        for column in input_df.columns:
-            # Create a mask to identify positions where either df2 or df3 has a non-NaN value
-            mask = ~(forward_df[column].isna() & backward_df[column].isna())
-            # Calculate the sum of corresponding values in df2 and df3, ignoring NaN values
-            sum_values = forward_df[column].add(backward_df[column], fill_value=0)
-            # Count the number of non-missing values in df2 and df3
-            count_values = forward_df[column].notna().astype(int) + backward_df[column].notna().astype(int)
-            # Calculate the average, using available values if one of the values is missing
-            average_values = sum_values / count_values.where(count_values > 0, 1)
-            # Fill missing values in df1 with the calculated average only where the mask is True
-            input_df[column] = input_df[column].where(mask, average_values)
+        
+        # Assuming df1 and df2 are your DataFrames
+        result_df = forward_df.copy()  # Initialize result_df with df2's values
 
-        temp_df = input_df
+        # Divide by 2 where both elements are not NaN
+        result_df[(backward_df.notna()) & (forward_df.notna())] = (backward_df[(backward_df.notna()) & (forward_df.notna())] + forward_df[(backward_df.notna()) & (forward_df.notna())]) / 2
+
+        # Fill NaN values conditionally based on the presence of NaNs in backward_df and forward_df
+        result_df[backward_df.notna()] = backward_df[backward_df.notna()]  # Fill non-NaN values from backward_df to result_df
+        temp_df = input_df.fillna(result_df)
+
         temp_df = pd.concat([datetime_column, temp_df], axis=1)
         temp_df.set_index('Datetime', inplace=True)
         # Set Datetime column as index
@@ -93,13 +97,52 @@ def imputation(input_df, imputation_method, save_path):
             df_grouped['time'] = df_grouped['Datetime'].dt.time
             # Group by day of the week and time of day, then calculate the mean
             mean_values = df_grouped.groupby(['dayofweek', 'time'])[column].mean().reset_index()
-            # Map the mean values to the corresponding missing values
-            temp_df[column] = temp_df.index.map(lambda x: mean_values.loc[(mean_values['dayofweek'] == x.dayofweek) & (mean_values['time'] == x.time()), column].values[0])
+            
+            # Function to fill missing values in a column based on datetime index
+            def fill_missing_values(index_value, column, mean_values):
+                if pd.isnull(temp_df.loc[index_value, column]):
+                    # Find the corresponding mean value based on datetime index
+                    mean_value = mean_values.loc[(mean_values['dayofweek'] == index_value.dayofweek) & (mean_values['time'] == index_value.time()), column].values[0]
+                    return mean_value
+                else:
+                    return temp_df.loc[index_value, column]
+            temp_df[column] = temp_df.apply(lambda row: fill_missing_values(row.name, column, mean_values), axis=1)
+
         temp_df = temp_df.reset_index()
-        imputed_df = temp_df.drop(columns=["Datetime"])
+        imputed_df = temp_df.drop(columns=["Datetime", "index"])
 
     elif imputation_method == "Forward":
         imputed_df = input_df.fillna(input_df.shift(-7*24))
+        temp_df = imputed_df
+        
+        temp_df = pd.concat([datetime_column, temp_df], axis=1)
+        temp_df.set_index('Datetime', inplace=True)
+        # Set Datetime column as index
+
+        for column in temp_df.columns:
+            print(column)
+            # Create a new DataFrame with day of the week and time of day as columns
+            df_grouped = temp_df[column].reset_index()
+            df_grouped['dayofweek'] = df_grouped['Datetime'].dt.dayofweek
+            df_grouped['time'] = df_grouped['Datetime'].dt.time
+            # Group by day of the week and time of day, then calculate the mean
+            mean_values = df_grouped.groupby(['dayofweek', 'time'])[column].mean().reset_index()
+            
+            # Function to fill missing values in a column based on datetime index
+            def fill_missing_values(index_value, column, mean_values):
+                if pd.isnull(temp_df.loc[index_value, column]):
+                    # Find the corresponding mean value based on datetime index
+                    mean_value = mean_values.loc[(mean_values['dayofweek'] == index_value.dayofweek) & (mean_values['time'] == index_value.time()), column].values[0]
+                    return mean_value
+                else:
+                    return temp_df.loc[index_value, column]
+            temp_df[column] = temp_df.apply(lambda row: fill_missing_values(row.name, column, mean_values), axis=1)
+
+        temp_df = temp_df.reset_index()
+        imputed_df = temp_df.drop(columns=["Datetime", "index"])
+        
+    elif imputation_method == "Backward":
+        imputed_df = input_df.fillna(input_df.shift(7*24))
         temp_df = imputed_df
         temp_df = pd.concat([datetime_column, temp_df], axis=1)
         temp_df.set_index('Datetime', inplace=True)
@@ -117,26 +160,6 @@ def imputation(input_df, imputation_method, save_path):
             temp_df[column] = temp_df.index.map(lambda x: mean_values.loc[(mean_values['dayofweek'] == x.dayofweek) & (mean_values['time'] == x.time()), column].values[0])
         temp_df = temp_df.reset_index()
         imputed_df = temp_df.drop(columns=["Datetime", "index"])
-        
-    elif imputation_method == "Backward":
-        imputed_df = input_df.fillna(input_df.shift(7*24))
-        temp_df = input_df
-        temp_df = pd.concat([datetime_column, temp_df], axis=1)
-        temp_df.set_index('Datetime', inplace=True)
-        # Set Datetime column as index
-
-        for column in temp_df.columns:
-            print(column)
-            # Create a new DataFrame with day of the week and time of day as columns
-            df_grouped = temp_df[column].reset_index()
-            df_grouped['dayofweek'] = df_grouped['Datetime'].dt.dayofweek
-            df_grouped['time'] = df_grouped['Datetime'].dt.time
-            # Group by day of the week and time of day, then calculate the mean
-            mean_values = df_grouped.groupby(['dayofweek', 'time'])[column].mean().reset_index()
-            # Map the mean values to the corresponding missing values
-            temp_df[column] = temp_df.index.map(lambda x: mean_values.loc[(mean_values['dayofweek'] == x.dayofweek) & (mean_values['time'] == x.time()), column].values[0])
-        temp_df = temp_df.reset_index()
-        imputed_df = temp_df.drop(columns=["Datetime"])
     
     elif imputation_method == "Average":
         temp_df = input_df
@@ -152,10 +175,19 @@ def imputation(input_df, imputation_method, save_path):
             df_grouped['time'] = df_grouped['Datetime'].dt.time
             # Group by day of the week and time of day, then calculate the mean
             mean_values = df_grouped.groupby(['dayofweek', 'time'])[column].mean().reset_index()
-            # Map the mean values to the corresponding missing values
-            temp_df[column] = temp_df.index.map(lambda x: mean_values.loc[(mean_values['dayofweek'] == x.dayofweek) & (mean_values['time'] == x.time()), column].values[0])
+            
+            # Function to fill missing values in a column based on datetime index
+            def fill_missing_values(index_value, column, mean_values):
+                if pd.isnull(temp_df.loc[index_value, column]):
+                    # Find the corresponding mean value based on datetime index
+                    mean_value = mean_values.loc[(mean_values['dayofweek'] == index_value.dayofweek) & (mean_values['time'] == index_value.time()), column].values[0]
+                    return mean_value
+                else:
+                    return temp_df.loc[index_value, column]
+            temp_df[column] = temp_df.apply(lambda row: fill_missing_values(row.name, column, mean_values), axis=1)
+
         temp_df = temp_df.reset_index()
-        imputed_df = temp_df.drop(columns=["Datetime"])
+        imputed_df = temp_df.drop(columns=["Datetime", "index"])
         
     print(imputed_df)
     imputed_df = pd.concat([datetime_column, imputed_df], axis=1)

@@ -18,12 +18,14 @@ def average_load_profile():
     
     return None
 
-def diversity_factor_all(input_df, output_path):
+def diversity_factor_all(input_df, meta_df, output_path, type):
     """calculate the diversity factor for all transformers
 
     Args:
         input_df (dataframe): the dataframe containing all transformers' load profile
+        meta_df (dataframe): the dataframe containing rated capacity for transformers
         output_path (string): path to store the output xlsx
+        type (string): specify the definition of max_load. "Rated_capacity" for meta.xlsx reference
 
     Returns:
         list: containing the DF dataframe of input dataframe
@@ -37,9 +39,14 @@ def diversity_factor_all(input_df, output_path):
     # Calculate total load for each hour by summing across all transformers
     total_load_per_hour = temp_df.sum(axis=1)
     print(total_load_per_hour)
-    # Calculate maximum load across all hours
-    max_load = total_load_per_hour.max()
-    print(max_load)
+    
+    if type == "Rated_capacity":
+        max_load = meta_df["YXRL"].sum()
+        
+    else:
+        # Calculate maximum load across all hours
+        max_load = total_load_per_hour.max()
+    
     # Calculate diversity factor for each hour
     diversity_factor = total_load_per_hour / max_load
     diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
@@ -50,13 +57,14 @@ def diversity_factor_all(input_df, output_path):
     
     return [diversity_factor_df]
 
-def diversity_factor(input_df, output_path):
+def diversity_factor(input_df, meta_df, output_path, type):
     """calculate the diversity factor for all transformers in the same district
 
     Args:
         input_df (dataframe): the dataframe containing all transformers' load profile
+        meta_df (dataframe): the dataframe containing rated capacity for transformers
         output_path (string): path to store the output xlsx
-
+        type (string): specify the definition of max_load. "Rated_capacity" for meta.xlsx reference
 
     Returns:
         list: containing the DF dataframes for each district
@@ -77,11 +85,21 @@ def diversity_factor(input_df, output_path):
     for i, sub_df in enumerate(sub_dataframes, 1):
         name = sub_df.columns[0].rsplit('-', 1)[0]
         print("Sub-DataFrame ", name)
+        index = name.split("-")
+        city_num = int(index[0])
+        district_num = int(index[1])
         
         # Calculate total load for each hour by summing across all transformers
-        total_load_per_hour = sub_df.sum(axis=1)
+        total_load_per_hour = sub_df.sum(axis=0)
+        
         # Calculate maximum load across all hours
-        max_load = total_load_per_hour.max()
+        if type == "Rated_capacity":
+            meta_df_temp = meta_df.loc[meta_df['City'] == city_num and meta_df['District'] == district_num]
+            max_load = meta_df_temp["YXRL"].sum()
+        else:
+            # Calculate maximum load across all hours
+            max_load = total_load_per_hour.max()
+        
         # Calculate diversity factor for each hour
         diversity_factor = total_load_per_hour / max_load
         diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
@@ -129,7 +147,7 @@ def diversity_heatmap(input_df_list, output_path):
     
     return None
 
-def year_DF_heatmap(input_df, output_path):
+def year_DF_heatmap(input_df, meta_df, output_path, type):
     
     datetime_column = input_df["Datetime"]
     temp_df = input_df.drop(["Datetime"], axis=1)
@@ -138,11 +156,14 @@ def year_DF_heatmap(input_df, output_path):
         os.makedirs(output_path)
     
     # Calculate total load for each day by summing across all transformers
-    total_load_per_day = temp_df.sum(axis=1)
-    print(total_load_per_day)
-    # Calculate maximum load across all days
-    max_load = total_load_per_day.max()
-    print(max_load)
+    total_load_per_day = temp_df.sum(axis=0)
+    
+    if type == "Rated_capacity":
+        max_load = 24 * meta_df["YXRL"].sum()
+    else:
+        # Calculate maximum load across all hours
+        max_load = total_load_per_day.max()
+
     # Calculate diversity factor for each day
     diversity_factor = total_load_per_day / max_load
     diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
