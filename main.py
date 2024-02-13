@@ -325,11 +325,11 @@ if __name__ == "__main__":
     
     
     #district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
-    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     
     #resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
     #resample.resample_visualization(imputed_df, resample_df_list, "./result/resample/figure/")
-    daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
+    
 
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
@@ -340,8 +340,9 @@ if __name__ == "__main__":
     #DF_all_list, name_list = analysis.diversity_factor_all(imputed_df, meta_df, "./result/diversity_factor/", "")
     #analysis.diversity_heatmap(DF_all_list, name_list, "./result/diversity_factor/")
     
-    DF_district_list, name_list = analysis.diversity_factor(imputed_df, meta_df, "./result/diversity_factor/districts/", "")
-    analysis.diversity_heatmap(DF_district_list, name_list, "./result/diversity_factor/districts/figure/")
+    #DF_district_list, name_list = analysis.diversity_factor(imputed_df, meta_df, "./result/diversity_factor/districts/", "")
+    #analysis.diversity_heatmap(DF_district_list, name_list, "./result/diversity_factor/districts/figure/")
+    #daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
     #analysis.year_DF_heatmap(daily_df, meta_df, "./result/diversity_factor/", "")
     
-    
+    analysis.average_load_profile(city_df, "./result/load_profile/")

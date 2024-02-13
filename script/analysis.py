@@ -7,11 +7,62 @@ import os
 import calplot
 
 
-def average_load_profile():
+def average_load_profile(input_df, output_path):
+    """Plot the load profile curve
+
+    Args:
+        input_df (dataframe): contain the data to be plotted
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
+    
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        
+    start_time = '2022-01-01 00:00:00'
+    end_time = '2023-11-10 08:00:00'
+    temp_df = input_df.drop(["Datetime"], axis=1)
+    
+    input_df = input_df.loc[(input_df['Datetime'] >= start_time) & (input_df['Datetime'] <= end_time)]
+    color_list = ["#669bbc", "#003049", "#780000", 
+        "#0466c8", "#d90429",  "#0353a4", "#023e7d", "#002855", "#001845", "#001233", "#33415c", "#5c677d", "#7d8597", "#979dac", ]
+
+    column_names = temp_df.columns
+    subplot_num = 3
+    fig, axes = plt.subplots(subplot_num, 1, figsize=(20, 7))
+    for iter in range(subplot_num):
+
+        sns.lineplot(data=input_df, x='Datetime', y=column_names[iter], ax=axes[iter], color=color_list[iter])
+        axes[iter].set_title(column_names[iter])
+
+        n = 1000  # Set the desired frequency of ticks
+        ticks = input_df.iloc[::n, 0]  # Select every nth tick from the 'Date' column
+        axes[iter].set_xticks(ticks)
+        axes[iter].set(xlabel="", ylabel="")
+
+            
+    # Hide xticks for all subplots except the bottom one
+    for ax in axes[:-1]:
+        ax.xaxis.set_tick_params(which='both', bottom=False, top=False, labelbottom=False)
+
+    # Display xticks only at the bottom subplot
+    axes[-1].xaxis.set_ticks_position('both')  # Display ticks on both sides
+    axes[-1].xaxis.set_tick_params(which='both', bottom=True, top=False)  # Only bottom ticks are visible
     
     
-    
-    
+    # Rotate the x-tick labels for better readability
+    plt.xticks(rotation=45)
+
+    # Adjust layout
+    plt.tight_layout()
+    # Show the plot
+    plt.savefig(output_path + "city_load_profile.png", dpi=600)
+    plt.close()
     
     return None
 
