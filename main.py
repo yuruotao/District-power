@@ -329,7 +329,7 @@ if __name__ == "__main__":
     
     #resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
     #resample.resample_visualization(imputed_df, resample_df_list, "./result/resample/figure/")
-    #daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
+    daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
 
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
@@ -337,11 +337,11 @@ if __name__ == "__main__":
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
     
-    #DF_all_list = analysis.diversity_factor_all(imputed_df, meta_df, "./result/diversity_factor/", "")
-    #analysis.diversity_heatmap(DF_all_list, "./result/diversity_factor/")
-    #analysis.diversity_factor(imputed_df, meta_df, "./result/diversity_factor/districts/", "")
+    #DF_all_list, name_list = analysis.diversity_factor_all(imputed_df, meta_df, "./result/diversity_factor/", "")
+    #analysis.diversity_heatmap(DF_all_list, name_list, "./result/diversity_factor/")
+    
+    DF_district_list, name_list = analysis.diversity_factor(imputed_df, meta_df, "./result/diversity_factor/districts/", "")
+    analysis.diversity_heatmap(DF_district_list, name_list, "./result/diversity_factor/districts/figure/")
     #analysis.year_DF_heatmap(daily_df, meta_df, "./result/diversity_factor/", "")
-    
-    
     
     

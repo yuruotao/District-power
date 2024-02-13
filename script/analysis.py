@@ -6,9 +6,6 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 import os
 import calplot
 
-#sns.set_theme(style="whitegrid")
-#sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
-
 
 def average_load_profile():
     
@@ -29,6 +26,7 @@ def diversity_factor_all(input_df, meta_df, output_path, type):
 
     Returns:
         list: containing the DF dataframe of input dataframe
+        list: contain the name of dataframes
     """
     datetime_column = input_df["Datetime"]
     temp_df = input_df.drop(["Datetime"], axis=1)
@@ -55,7 +53,7 @@ def diversity_factor_all(input_df, meta_df, output_path, type):
     print(diversity_factor_df)
     diversity_factor_df.to_excel(output_path + "DF_all_transformers.xlsx", index=False)
     
-    return [diversity_factor_df]
+    return [diversity_factor_df], ["all"]
 
 def diversity_factor(input_df, meta_df, output_path, type):
     """calculate the diversity factor for all transformers in the same district
@@ -68,6 +66,7 @@ def diversity_factor(input_df, meta_df, output_path, type):
 
     Returns:
         list: containing the DF dataframes for each district
+        list: contain the name of dataframes
     """
     datetime_column = input_df["Datetime"]
     temp_df = input_df.drop(["Datetime"], axis=1)
@@ -81,16 +80,18 @@ def diversity_factor(input_df, meta_df, output_path, type):
     sub_dataframes = [sub_df for _, sub_df in grouped]
 
     return_list = []
+    name_list = []
     # Print sub-DataFrames
     for i, sub_df in enumerate(sub_dataframes, 1):
         name = sub_df.columns[0].rsplit('-', 1)[0]
+        name_list.append(name)
         print("Sub-DataFrame ", name)
         index = name.split("-")
         city_num = int(index[0])
         district_num = int(index[1])
         
         # Calculate total load for each hour by summing across all transformers
-        total_load_per_hour = sub_df.sum(axis=0)
+        total_load_per_hour = sub_df.sum(axis=1)
         
         # Calculate maximum load across all hours
         if type == "Rated_capacity":
@@ -108,27 +109,31 @@ def diversity_factor(input_df, meta_df, output_path, type):
         print(diversity_factor_df)
         diversity_factor_df.to_excel(output_path + "DF_" + name + ".xlsx", index=False)
     
-    return return_list
+    return return_list, name_list
 
-def diversity_heatmap(input_df_list, output_path):
+def diversity_heatmap(input_df_list, name_list, output_path):
     """plot the heatmap of diversity factor
 
     Args:
         input_df_list (list): list containing dataframes of diversity factor
+        name_list (list): contain the names of dataframes
         output_path (string): folder to store the heatmap plot
 
     Returns:
         None
     """
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     
     start_time = '2022-01-01 00:00:00'
-    end_time = '2022-01-31 23:00:00'
-    
+    end_time = '2023-11-10 08:00:00'
         
-    for df in input_df_list:
-        name = df.columns[1].rsplit('-', 1)[0]
+    for iter in range(len(input_df_list)):
+        df = input_df_list[iter]
+        name = name_list[iter]
         df = df.loc[(df['Datetime'] >= start_time) & (df['Datetime'] <= end_time)]
         
         df['hour'] = df['Datetime'].dt.hour
@@ -136,10 +141,22 @@ def diversity_heatmap(input_df_list, output_path):
         df_pivot = df.pivot_table(index='date', columns='hour', values='Diversity Factor', aggfunc='mean')
 
         # Plot heatmap
-        f, ax = plt.subplots()
-        htmap = sns.heatmap(df_pivot, cmap="crest", annot=True, ax=ax)
-        htmap.set(xlabel=None)
-        htmap.set(ylabel=None)
+        ax = sns.heatmap(df_pivot, cmap="crest", annot=False)
+        # Get the current x-axis tick labels and positions
+        xticklabels = ax.get_xticklabels()
+        xtickpositions = ax.get_xticks()
+
+        # Set the step size for displaying xticks (e.g., display every nth tick)
+        step_size = 2
+
+        # Filter the xtick labels and positions to show only every step_size-th tick
+        filtered_xticklabels = [label.get_text() for i, label in enumerate(xticklabels) if i % step_size == 0]
+        filtered_xtickpositions = [position for i, position in enumerate(xtickpositions) if i % step_size == 0]
+
+        # Set the filtered xtick labels and positions
+        ax.set_xticks(filtered_xtickpositions)
+        ax.set_xticklabels(filtered_xticklabels, rotation=0)        
+        ax.set(xlabel="", ylabel="")
         
         plt.tight_layout()
         plt.savefig(output_path + "DF_" + name + ".png", dpi=600)
@@ -148,7 +165,18 @@ def diversity_heatmap(input_df_list, output_path):
     return None
 
 def year_DF_heatmap(input_df, meta_df, output_path, type):
-    
+    """Plot the Github style heatmap for diversity factor
+    https://python.plainenglish.io/interactive-calendar-heatmaps-with-plotly-the-easieast-way-youll-find-5fc322125db7
+
+    Args:
+        input_df (dataframe): the dataframe containing all transformers' load profile
+        meta_df (dataframe): the dataframe containing rated capacity for transformers
+        output_path (string): path to store the output xlsx
+        type (string): specify the definition of max_load. "Rated_capacity" for meta.xlsx reference
+
+    Returns:
+        None
+    """
     datetime_column = input_df["Datetime"]
     temp_df = input_df.drop(["Datetime"], axis=1)
     
@@ -156,7 +184,7 @@ def year_DF_heatmap(input_df, meta_df, output_path, type):
         os.makedirs(output_path)
     
     # Calculate total load for each day by summing across all transformers
-    total_load_per_day = temp_df.sum(axis=0)
+    total_load_per_day = temp_df.sum(axis=1)
     
     if type == "Rated_capacity":
         max_load = 24 * meta_df["YXRL"].sum()
@@ -167,14 +195,14 @@ def year_DF_heatmap(input_df, meta_df, output_path, type):
     # Calculate diversity factor for each day
     diversity_factor = total_load_per_day / max_load
     diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
+    diversity_factor_df.reset_index()
     diversity_factor_df = pd.concat([datetime_column, diversity_factor_df], axis=1)
-    
-    print(diversity_factor_df)
+
     diversity_factor_df.to_excel(output_path + "DF_daily_all_transformers.xlsx", index=False)
-    
     diversity_factor_df = diversity_factor_df.set_index("Datetime")
-    calplot.calplot(diversity_factor_df["Diversity Factor"])
-    plt.show()
+    calplot.calplot(diversity_factor_df["Diversity Factor"], cmap="Blues")
+    plt.savefig(output_path + "DF_daily_all.png", dpi=600)
+    plt.close()
     
     return None
     
