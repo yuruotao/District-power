@@ -305,9 +305,9 @@ if __name__ == "__main__":
     
     
     # Delete the columns whose missing value takes up more than 20%
-    #raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
-    #raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
-    #raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
+    raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
+    raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
+    raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
     #basic_statistics.basic_statistics(raw_data_adjusted_df, "./result/basic_statistics/adjusted")
     
     #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]

@@ -157,8 +157,17 @@ def imputation(input_df, imputation_method, save_path):
             df_grouped['time'] = df_grouped['Datetime'].dt.time
             # Group by day of the week and time of day, then calculate the mean
             mean_values = df_grouped.groupby(['dayofweek', 'time'])[column].mean().reset_index()
-            # Map the mean values to the corresponding missing values
-            temp_df[column] = temp_df.index.map(lambda x: mean_values.loc[(mean_values['dayofweek'] == x.dayofweek) & (mean_values['time'] == x.time()), column].values[0])
+            
+            # Function to fill missing values in a column based on datetime index
+            def fill_missing_values(index_value, column, mean_values):
+                if pd.isnull(temp_df.loc[index_value, column]):
+                    # Find the corresponding mean value based on datetime index
+                    mean_value = mean_values.loc[(mean_values['dayofweek'] == index_value.dayofweek) & (mean_values['time'] == index_value.time()), column].values[0]
+                    return mean_value
+                else:
+                    return temp_df.loc[index_value, column]
+            temp_df[column] = temp_df.apply(lambda row: fill_missing_values(row.name, column, mean_values), axis=1)
+
         temp_df = temp_df.reset_index()
         imputed_df = temp_df.drop(columns=["Datetime", "index"])
     
@@ -224,27 +233,16 @@ def imputation_visualization(raw_data_df, start_time, end_time, method_list, col
     plt.figure(figsize=(20,8))
     ax = sns.lineplot(data=time_series_df, markers=True)
     missing_mask = time_series_df['raw'].isna().values.astype(int)
+    ax.set_xlim(time_series_df.index[0], time_series_df.index[-1])
     ax.pcolorfast(ax.get_xlim(), ax.get_ylim(),
                   missing_mask[np.newaxis], cmap='Blues', alpha=0.2)
-    sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
+    # Set x-axis limits
     
     
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
     plt.legend(frameon=False)
-    # Get the current x-axis tick labels and positions
-    #xticklabels = ax.get_xticklabels()
-    #xtickpositions = ax.get_xticks()
 
-    # Set the step size for displaying xticks (e.g., display every nth tick)
-    #step_size = 2
-
-    # Filter the xtick labels and positions to show only every step_size-th tick
-    #filtered_xticklabels = [label.get_text() for i, label in enumerate(xticklabels) if i % step_size == 0]
-    #filtered_xtickpositions = [position for i, position in enumerate(xtickpositions) if i % step_size == 0]
-
-    # Set the filtered xtick labels and positions
-    #ax.set_xticks(filtered_xtickpositions)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
     ax.set(xlabel="", ylabel="")
         
