@@ -305,9 +305,9 @@ if __name__ == "__main__":
     
     
     # Delete the columns whose missing value takes up more than 20%
-    #raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
-    #raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
-    #raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
+    raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
+    raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
+    raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
     #basic_statistics.basic_statistics(raw_data_adjusted_df, "./result/basic_statistics/adjusted")
     
     #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
@@ -316,9 +316,9 @@ if __name__ == "__main__":
         #imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")
         #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/" + method)
     
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="AutoML")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_AutoML.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/AutoML")
+    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
+    imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
+    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
     
     #imputation.imputation_visualization(raw_data_df, '2022-01-01 00:00:00', '2022-01-08 00:00:00', 
     #                                    ["Linear", "Forward", "Backward", "Forward-Backward"],
