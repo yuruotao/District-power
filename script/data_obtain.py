@@ -5,6 +5,21 @@ import matplotlib.pyplot as plt
 import gdelt
 import datetime
 
+def NCDC_weather_data_obtain(meta_path, download_path, start_year, stop_year):
+    # meta_df is obtained from
+    # https://www.ncei.noaa.gov/data/global-summary-of-the-day/access/
+    meta_df = pd.read_csv(meta_path)
+    meta_df = meta_df[["CTRY"]== "CH"]
+    meta_df.reset_index()
+    
+    # download the data with respect to "USAF"
+    
+    
+
+    "LAT	LON	ELEV(M)	BEGIN	END"
+    
+    return None
+    
 def GDELT_data_obtain():
 
 
@@ -29,11 +44,6 @@ def GDELT_data_obtain():
 
     # Display the filtered DataFrame
     print(guangxi_df.head())
-
-
-    
-    
-    
     
     return None
 
