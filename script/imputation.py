@@ -11,6 +11,7 @@ from sklearn.metrics import mean_squared_error
 from autoimpute.imputations import SingleImputer, MultipleImputer
 import numpy as np
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def imputation(input_df, imputation_method, save_path):
@@ -195,9 +196,18 @@ def imputation(input_df, imputation_method, save_path):
     
     return imputed_df
 
-def imputation_visualization(start_time, end_time, method_list, column, save_path):
+def imputation_visualization(raw_data_df, start_time, end_time, method_list, column, output_path):
     
+    sns.set_theme(style="whitegrid")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    raw_data_df = raw_data_df[["Datetime", column]]
+    raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
+    raw_data_df = raw_data_df.rename(columns={column:"raw"})
+    
     time_index = pd.date_range(start=start_time, end=end_time, freq="h")
     # Create a DataFrame with the time series column
     time_series_df = pd.DataFrame({'Datetime': time_index})
@@ -205,8 +215,41 @@ def imputation_visualization(start_time, end_time, method_list, column, save_pat
         temp_df = pd.read_excel("./result/imputation/imputed_data_" + method +".xlsx")
         temp_df = temp_df[["Datetime", column]]
         temp_df = temp_df.loc[(temp_df['Datetime'] >= start_time) & (temp_df['Datetime'] <= end_time)]
-        temp_df = temp_df.rename({column:method})
+        temp_df = temp_df.rename(columns={column:method})
         time_series_df = pd.merge(time_series_df, temp_df, on='Datetime', how="left")
+        
+    time_series_df = pd.merge(time_series_df, raw_data_df, on='Datetime', how="left")
+    time_series_df = time_series_df.set_index("Datetime")
     
+    plt.figure(figsize=(20,8))
+    ax = sns.lineplot(data=time_series_df, markers=True)
+    missing_mask = time_series_df['raw'].isna().values.astype(int)
+    ax.pcolorfast(ax.get_xlim(), ax.get_ylim(),
+                  missing_mask[np.newaxis], cmap='Blues', alpha=0.2)
+    sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
+    
+    
+    legend = plt.legend()
+    legend.get_frame().set_facecolor('none')
+    plt.legend(frameon=False)
+    # Get the current x-axis tick labels and positions
+    #xticklabels = ax.get_xticklabels()
+    #xtickpositions = ax.get_xticks()
+
+    # Set the step size for displaying xticks (e.g., display every nth tick)
+    #step_size = 2
+
+    # Filter the xtick labels and positions to show only every step_size-th tick
+    #filtered_xticklabels = [label.get_text() for i, label in enumerate(xticklabels) if i % step_size == 0]
+    #filtered_xtickpositions = [position for i, position in enumerate(xtickpositions) if i % step_size == 0]
+
+    # Set the filtered xtick labels and positions
+    #ax.set_xticks(filtered_xtickpositions)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    ax.set(xlabel="", ylabel="")
+        
+    plt.tight_layout()
+    plt.savefig(output_path + "imputation_methods.png", dpi=600)
+    plt.close()
     
     return None

@@ -288,7 +288,7 @@ if __name__ == "__main__":
     raw_data_path = "./data/raw_data.xlsx"
     meta_path = "./data/meta.xlsx"
     
-    #raw_data_df = pd.read_excel(raw_data_path)
+    raw_data_df = pd.read_excel(raw_data_path)
     meta_df = pd.read_excel(meta_path)
     
     # Define the time interval
@@ -320,12 +320,15 @@ if __name__ == "__main__":
     #imputed_df = pd.read_excel("./result/imputation/imputed_data_AutoML.xlsx")
     #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/AutoML")
     
-    
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
+    imputation.imputation_visualization(raw_data_df, '2022-01-01 00:00:00', '2022-01-08 00:00:00', 
+                                        ["Linear", "Forward", "Backward", "Forward-Backward"],
+                                        "0-0-0",
+                                        "./result/imputation/")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
     
     
     #district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
-    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     
     #resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
     #resample.resample_visualization(imputed_df, resample_df_list, "./result/resample/figure/")
@@ -345,4 +348,6 @@ if __name__ == "__main__":
     #daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
     #analysis.year_DF_heatmap(daily_df, meta_df, "./result/diversity_factor/", "")
     
-    analysis.average_load_profile(city_df, "./result/load_profile/")
+    #analysis.average_load_profile(city_df, "./result/load_profile/")
+    
+    
