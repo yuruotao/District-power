@@ -316,9 +316,9 @@ if __name__ == "__main__":
         #imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")
         #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/" + method)
     
-    imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
-    basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
+    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
+    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
     
     #imputation.imputation_visualization(raw_data_df, '2022-01-01 00:00:00', '2022-01-08 00:00:00', 
     #                                    ["Linear", "Forward", "Backward", "Forward-Backward"],
