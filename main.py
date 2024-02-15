@@ -14,6 +14,7 @@ import script.profiling as profiling
 import script.basic_statistics as basic_statistics
 import script.resample as resample
 
+
 def time_series_dataframe_create(start_time, stop_time, time_interval):
     """create a dataframe with a column containing a time series, which is the return value
 
@@ -56,7 +57,7 @@ def district_aggregate(input_df, level, output_path):
 
     Args:
         input_df (dataframe): the input dataframe containing data
-        level (int): level for aggregation, 1 for city level, 2 for district level
+        level (int): level for aggregation, 1 for city level, 2 for district level, 0 for all
         output_path (string): the output directory to save the intermediate file
 
     Returns:
@@ -75,6 +76,8 @@ def district_aggregate(input_df, level, output_path):
         df_grouped = input_df.groupby(common_prefix, axis=1).sum()
         # Step 4: Rename columns
         df_grouped.columns = common_prefix.unique()
+        df_grouped = df_grouped.reindex(sorted(df_grouped.columns), axis=1)
+        output_df = df_grouped
         
     elif level == 1:
         name = "city"
@@ -84,9 +87,15 @@ def district_aggregate(input_df, level, output_path):
         df_grouped = input_df.groupby(a_part, axis=1).sum()
         # Step 4: Rename columns (optional, if you want)
         df_grouped.columns = a_part.unique()
+        df_grouped = df_grouped.reindex(sorted(df_grouped.columns), axis=1)
+        output_df = df_grouped
+    
+    elif level == 0:
+        name = "all"
+        output_df = input_df.sum(axis=1)
+        output_df = output_df.to_frame()
+        output_df.rename(columns={output_df.columns[0]: "Power" }, inplace = True)
         
-    df_grouped = df_grouped.reindex(sorted(df_grouped.columns), axis=1)
-    output_df = df_grouped
     output_df = pd.concat([datetime_column, output_df], axis=1)
     output_df.to_excel(output_path + name + ".xlsx", index=False)
     
@@ -325,7 +334,7 @@ if __name__ == "__main__":
     #                                    ["Linear", "Forward", "Backward", "Forward-Backward"],
     #                                    "0-0-0",
     #                                    "./result/imputation/")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
+    imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
     
     
     #district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
@@ -351,4 +360,5 @@ if __name__ == "__main__":
     
     #analysis.average_load_profile(city_df, "./result/load_profile/")
     
-
+    province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
+    analysis.extreme_weather_plot(province_df, "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")

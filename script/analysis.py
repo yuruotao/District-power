@@ -336,4 +336,43 @@ def weather_analysis():
     
     
     return None
+
+def extreme_weather_plot(input_df, weather_data_path, start_time, end_time, output_path):
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
+    weather_df = pd.read_excel(weather_data_path)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    time_index = pd.date_range(start=start_time, end=end_time, freq="h")
+    # Create a DataFrame with the time series column
+    time_series_df = pd.DataFrame({'Datetime': time_index})
+    weather_df = pd.merge(time_series_df, weather_df, on='Datetime', how="left")
+    
+    time_series_df = pd.merge(time_series_df, input_df, on='Datetime', how="left")
+    time_series_df = time_series_df.set_index("Datetime")
+    
+    plt.figure(figsize=(20,8))
+    ax = sns.lineplot(data=time_series_df, markers=False)
+    
+    ax.set_xlim(time_series_df.index[0], time_series_df.index[-1])
+    ax.fill_between(weather_df.index, weather_df['Event'] == "Typhoon Chaba", color='lightgray')
+    #ax.pcolorfast(ax.get_xlim(), ax.get_ylim(),
+    #              missing_mask[np.newaxis], cmap='Blues', alpha=0.2)
+    # Set x-axis limits
+    
+    
+    legend = plt.legend()
+    legend.get_frame().set_facecolor('none')
+    plt.legend(frameon=False)
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    ax.set(xlabel="", ylabel="")
+        
+    plt.tight_layout()
+    plt.savefig(output_path + "extreme_weather.png", dpi=600)
+    plt.close()
+    
+    return None
