@@ -6,6 +6,17 @@ import gdelt
 import requests
 
 def NCDC_weather_data_obtain(meta_path, output_path, start_year, stop_year):
+    """Obtain the weather data from NCDC
+
+    Args:
+        meta_path (string): xlsx containing the NCDC station data
+        output_path (string): folder to contain the weather data
+        start_year (int): the start year of data
+        stop_year (int): the stop year of data
+
+    Returns:
+        None
+    """
     # meta_df is obtained from
     # https://www.ncei.noaa.gov/data/global-summary-of-the-day/access/
     meta_df = pd.read_csv(meta_path)
@@ -32,39 +43,19 @@ def NCDC_weather_data_obtain(meta_path, output_path, start_year, stop_year):
             response = requests.get(url)
             csv_data = response.text
             
-            
             filename = output_year + str(usaf_value) + str(wban_value) + ".csv"
             with open(filename, 'w') as f:
                 f.write(csv_data)
     
     return None
+
+def NCDC_weather_data_process():
     
-def GDELT_data_obtain():
-
-
-    # Set up the GDELT API
-    gd = gdelt.gdelt()
-
-    # Define the date range
-    start_date = "20220101"
-    end_date = "20231231"
-
-    # Define the location (Guangxi China)
-    location = "Guangxi China"
-
-    # Search for events during the specified time period
-    results = gd.Search(date=(start_date, end_date), table='events', coverage=True)
-
-    # Convert the results to a DataFrame
-    df = pd.DataFrame(results)
-
-    # Filter the DataFrame for events related to Guangxi China
-    guangxi_df = df[df['Actor2Geo_FullName'].str.contains(location, na=False) | df['Actor1Geo_FullName'].str.contains(location, na=False)]
-
-    # Display the filtered DataFrame
-    print(guangxi_df.head())
+    
+    
     
     return None
 
 if __name__ == "__main__":
-    NCDC_weather_data_obtain("./data/isd-history.csv", "./result/weather_data/", 2022, 2023+1)
+    #NCDC_weather_data_obtain("./data/isd-history.csv", "./result/NCDC_weather_data/", 2022, 2023+1)
+    
