@@ -144,7 +144,21 @@ def NCDC_weather_data_imputation(data_path, output_path):
 
 
 if __name__ == "__main__":
-    NCDC_weather_data_obtain("./data/isd-history.csv", "./result/NCDC_weather_data/", 2022, 2023+1)
+    #NCDC_weather_data_obtain("./data/isd-history.csv", "./result/NCDC_weather_data/", 2022, 2023+1)
+    
+    
+    url = "https://www.ncei.noaa.gov/data/global-summary-of-the-day/access/2022/5646259999.csv"
+    response = requests.get(url)
+    csv_data = response.text
+    with open("./result/NCDC_weather_data/2022/5646259999.csv", 'w') as f:
+        f.write(csv_data)
+        
+    url = "https://www.ncei.noaa.gov/data/global-summary-of-the-day/access/2023/5646259999.csv"
+    response = requests.get(url)
+    csv_data = response.text
+    with open("./result/NCDC_weather_data/2023/5646259999.csv", 'w') as f:
+        f.write(csv_data)
+    
     NCDC_weather_data_station_merge("./data/isd-history.csv",
                                     "./result/NCDC_weather_data/", 
                                     "./result/NCDC_weather_data/stations/",
