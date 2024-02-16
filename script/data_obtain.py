@@ -101,6 +101,7 @@ def NCDC_weather_data_imputation(data_path, output_path):
         
     station_files = [f for f in listdir(data_path) if isfile(join(data_path, f))]
     for station_file in station_files:
+        print(station_file)
         temp_df = pd.read_excel(data_path + station_file)
         temp_df = temp_df[["STATION", "DATE", "LATITUDE", "LONGITUDE", "ELEVATION", 
                            "NAME", "TEMP", "DEWP", "SLP", "STP", "VISIB", 
@@ -137,13 +138,13 @@ def NCDC_weather_data_imputation(data_path, output_path):
         
         imputed_df = temp_df.interpolate(method='linear')
         imputed_df.to_excel(output_path + station_file, index=False)
-        time.sleep(60)
+
     return None
 
 
 
 if __name__ == "__main__":
-    #NCDC_weather_data_obtain("./data/isd-history.csv", "./result/NCDC_weather_data/", 2022, 2023+1)
+    NCDC_weather_data_obtain("./data/isd-history.csv", "./result/NCDC_weather_data/", 2022, 2023+1)
     NCDC_weather_data_station_merge("./data/isd-history.csv",
                                     "./result/NCDC_weather_data/", 
                                     "./result/NCDC_weather_data/stations/",
