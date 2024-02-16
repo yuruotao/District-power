@@ -145,6 +145,13 @@ def NCDC_weather_data_imputation(data_path, output_path):
         
         
         imputed_df = temp_df.interpolate(method='linear')
+        # Select only numeric columns
+        numeric_cols = ["TEMP", "DEWP", "SLP", "STP", "VISIB", "WDSP", "MXSPD", "GUST", "MAX", "MIN", "PRCP", "SNDP"]
+        # Calculate means for numeric columns
+        col_means = imputed_df[numeric_cols].mean()
+        # Fill NaN values in numeric columns with their respective means
+        imputed_df[numeric_cols] = imputed_df[numeric_cols].fillna(col_means)
+        
         imputed_df.to_excel(output_path + station_file, index=False)
 
     return None

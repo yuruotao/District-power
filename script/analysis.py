@@ -326,12 +326,29 @@ def weather_analysis():
 
 
 
-def extreme_weather_detect(input_df, output_path):
+def extreme_weather_detect(input_df, output_path, start_date, end_date):
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     
+    time_index = pd.date_range(start=start_date, end=end_date, freq='H')
+    # Create a DataFrame with the time series column
+    datetime_df = pd.DataFrame({'Datetime': time_index})
+        
+    station_set = set(input_df["Closest_Station"])
+    xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
     
+    for element in station_set:
+        temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
+        temp_weather_df = pd.read_excel(temp_xlsx_path)
+        city_df = input_df.loc[input_df['"Closest_Station"'] == element]
+        city_num = set(city_df["City"])
+        
+        extreme_weather_df = datetime_df
+        
+        
+        
+        extreme_weather_df.to_excel(output_path + "extreme_weather_" + str(city_num) + ".xlsx", index=False)
     
     return None
 
