@@ -225,27 +225,29 @@ if __name__ == "__main__":
         basic_statistics.basic_statistics(temp_weather_df, "./result/extreme_weather/basic_statistics/city_" + str(city_num))
     """
     # Weather correlation
-    
+    """
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
         temp_weather_df = temp_weather_df[["TEMP", "DEWP", "SLP", "STP", "VISIB", "WDSP", "MXSPD", "GUST", "MAX", "MIN", "PRCP", "SNDP"]]
+        temp_weather_df = temp_weather_df.drop(["SNDP"], axis=1)
         
         city_df = meta_df.loc[meta_df['Closest_Station'] == element]
         city_num = set(city_df["City"]).pop()
         print("City", city_num)
         
         analysis.weather_correlation(temp_weather_df, "./result/extreme_weather/correlation/", str(city_num))
-    
+    """
     # Time sequence analysis
     
     # Extreme weather
     analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
     
+    # Extreme weather plot
     #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
     
-
+    
     
     

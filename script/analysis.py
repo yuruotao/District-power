@@ -6,7 +6,7 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 import os
 import calplot
 import datetime
-
+from scipy.stats import pearsonr
 
 def average_load_profile(input_df, output_path):
     """Plot the load profile curve
@@ -329,23 +329,35 @@ def weather_correlation(input_df, output_path, city_num):
     sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
-    corr= input_df.corr(method="pearson")
+    def corrfunc(x, y, **kwds):
+        cmap = kwds['cmap']
+        norm = kwds['norm']
+        ax = plt.gca()
+        ax.tick_params(bottom=False, top=False, left=False, right=False)
+        sns.despine(ax=ax, bottom=True, top=True, left=True, right=True)
+        r, _ = pearsonr(x, y)
+        facecolor = cmap(norm(r))
+        ax.set_facecolor(facecolor)
+        lightness = (max(facecolor[:3]) + min(facecolor[:3]) ) / 2
+        ax.annotate(f"r={r:.2f}", xy=(.5, .5), xycoords=ax.transAxes,
+                color='white' if lightness < 0.7 else 'black', size=26, ha='center', va='center')
+    
+    
+    g = sns.PairGrid(input_df)
+    g.map_lower(plt.scatter, s=10)
+    g.map_diag(sns.histplot, kde=False)
+    g.map_upper(corrfunc, cmap=plt.get_cmap('crest'), norm=plt.Normalize(vmin=-.5, vmax=.5))
+    #g.subplots_adjust(wspace=0.06, hspace=0.06) # equal spacing in both directions
+
+    #corr= input_df.corr(method="pearson")
     # Getting the Upper Triangle of the co-relation matrix
-    mask = np.triu(np.ones_like(corr, dtype=bool))
+    #mask = np.triu(np.ones_like(corr, dtype=bool))
     
     # Plot heatmap
-    ax = sns.heatmap(corr, cmap="crest", mask=mask, annot=True)
-
-    # Apply the mask to annotations as well
-    for i in range(len(ax.texts)):
-        row, col = ax.texts[i].get_position()
-        row_index = int(row)
-        col_index = int(col)
-        if mask[row_index, col_index]:
-            ax.texts[i].set_visible(False)
+    #ax = sns.heatmap(corr, cmap="crest", mask=mask, annot=True)
     
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=0)        
-    ax.set(xlabel="", ylabel="")
+    #ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    #ax.set(xlabel="", ylabel="")
         
     plt.tight_layout()
     plt.savefig(output_path + "/correlation_" + city_num + ".png", dpi=600)
