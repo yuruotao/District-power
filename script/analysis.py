@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import seasonal_decompose
 import os
 import calplot
+import datetime
 
 
 def average_load_profile(input_df, output_path):
@@ -318,10 +319,38 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
     
     return None
 
-def weather_analysis():
+
+
+def weather_correlation(input_df, output_path, city_num):
     
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     
+    sns.set_theme(style="white")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
+    corr= input_df.corr(method="pearson")
+    # Getting the Upper Triangle of the co-relation matrix
+    mask = np.triu(np.ones_like(corr, dtype=bool))
+    
+    # Plot heatmap
+    ax = sns.heatmap(corr, cmap="crest", mask=mask, annot=True)
+
+    # Apply the mask to annotations as well
+    for i in range(len(ax.texts)):
+        row, col = ax.texts[i].get_position()
+        row_index = int(row)
+        col_index = int(col)
+        if mask[row_index, col_index]:
+            ax.texts[i].set_visible(False)
+    
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=0)        
+    ax.set(xlabel="", ylabel="")
+        
+    plt.tight_layout()
+    plt.savefig(output_path + "/correlation_" + city_num + ".png", dpi=600)
+    plt.close()
+
     return None
 
 
@@ -333,6 +362,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
     time_index = pd.date_range(start=start_date, end=end_date, freq='H')
     # Create a DataFrame with the time series column
     datetime_df = pd.DataFrame({'Datetime': time_index})
+    datetime_df["date"] = datetime_df["Datetime"].dt.date
         
     station_set = set(input_df["Closest_Station"])
     xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
@@ -340,23 +370,44 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
-        city_df = input_df.loc[input_df['"Closest_Station"'] == element]
+        temp_weather_df['DATE'] = pd.to_datetime(temp_weather_df['DATE'], format='%Y-%m-%d').dt.floor('D')
+        city_df = input_df.loc[input_df['Closest_Station'] == element]
         city_num = next(iter(set(city_df["City"])))
+        print("City", city_num)
         
         extreme_weather_df = datetime_df
         # Temperature
-        #extreme_weather_df["Temperature"] = 
+        extreme_weather_df['High Temperature'] = np.nan
+        MAX_percentile_95 = temp_weather_df['MAX'].quantile(0.95)
+        high_temp_df = temp_weather_df.loc[temp_weather_df['MAX'] > MAX_percentile_95]
+        for date in high_temp_df['DATE']:
+            extreme_weather_df[extreme_weather_df['date'] == date.date, 'High Temperature'] = 1
+            print("kkkkkkkkkkkkkkkkkkkkkkkkkk")
+            import time
+            time.sleep(60)
+        print(extreme_weather_df)
+        extreme_weather_df.to_excel("./result/extreme_weather/aaa.xlsx", index=False)
+        
+        #extreme_weather_df['Low Temperature'] = np.nan
+        #MIN_percentile_5 = temp_weather_df['MIN'].quantile(0.05)
+        #low_temp_df = temp_weather_df.loc[temp_weather_df['MIN'] < MIN_percentile_5, 'Datetime']
+        
+        #extreme_weather_df["Low Temperature"] = 
+        
         # Humidity
         #extreme_weather_df["Humidity"] = 
+        
         # Temp and humidity
         #extreme_weather_df["Thunderstorm"] = 
+        
         # Thunderstorm
         #extreme_weather_df["Storm"] = 
+        
         # Storm
         #extreme_weather_df["Temp_and_Humidity"] = 
         
         
-        extreme_weather_df.to_excel(output_path + "extreme_weather_" + str(city_num) + ".xlsx", index=False)
+        #extreme_weather_df.to_excel(output_path + "extreme_weather_" + str(city_num) + ".xlsx", index=False)
     
     return None
 

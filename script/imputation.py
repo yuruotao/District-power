@@ -70,7 +70,6 @@ def imputation(input_df, imputation_method, save_path):
         for idx, df_imputed in enumerate(imputed_data_list):
             print(f"Imputed DataFrame {idx+1}:")
             print(df_imputed)
-            
           
     elif imputation_method == "Forward-Backward":
         forward_df = input_df.shift(-7*24)
@@ -198,7 +197,7 @@ def imputation(input_df, imputation_method, save_path):
 
         temp_df = temp_df.reset_index()
         imputed_df = temp_df.drop(columns=["Datetime", "index"])
-        
+    
     print(imputed_df)
     imputed_df = pd.concat([datetime_column, imputed_df], axis=1)
     imputed_df.to_excel(imputation_dir + "/" + "imputed_data_" + imputation_method + ".xlsx", index=False)
