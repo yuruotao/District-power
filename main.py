@@ -245,9 +245,19 @@ if __name__ == "__main__":
 
     
     # Extreme weather plot
+    # All districts
     #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
-    
-    
-    
-    
+    """
+    # Cities
+    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    datetime_col = "Datetime"
+    temp_city_df = city_df.drop([datetime_col], axis=1)
+    city_list = temp_city_df.columns()
+    for city in city_list:
+        iter_df = city_df[["Datetime", city]]
+        analysis.extreme_weather_plot(iter_df, city, 
+                                      "./result/extreme_weather/extreme_weather_data/extreme_weather_" + str(city) + ".xlsx", 
+                                      start_time, end_time, 
+                                      "./result/extreme_weather/extreme_plot/")
+    """
