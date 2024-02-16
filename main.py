@@ -194,16 +194,41 @@ if __name__ == "__main__":
     
     ####################################################################################################
     # Transformer by capacity
+    """
     capacity_threashold = 3000
     meta_df = meta_df.astype({"YXRL":int})
+    
     valid_meta = meta_df[meta_df['Delete'].isna()]
     valid_meta = valid_meta.drop(columns=["Delete"])
     low_meta = valid_meta[valid_meta["YXRL"] < capacity_threashold]
     low_meta = low_meta.reset_index(drop=True)
+    low_strings = []
+    # Iterate through the rows of df1
+    for index, row in low_meta.iterrows():
+        # Concatenate values of columns 'a', 'b', and 'c' into a single string in the "a-b-c" format
+        formatted_string = f"{row['City']}-{row['District']}-{row['Transformer']}"
+        # Append the formatted string to the list
+        low_strings.append(formatted_string)
+    low_capacity_df = pd.DataFrame(columns=['Datetime', 'Low Capacity'])
+    low_capacity_df['Datetime'] = imputed_df['Datetime']
+    low_capacity_df['Low Capacity'] = imputed_df[low_strings].sum(axis=1)
+    
     high_meta = valid_meta[valid_meta["YXRL"] >= capacity_threashold]
     high_meta = high_meta.reset_index(drop=True)
-
-
+    high_strings = []
+    # Iterate through the rows of df1
+    for index, row in high_meta.iterrows():
+        # Concatenate values of columns 'a', 'b', and 'c' into a single string in the "a-b-c" format
+        formatted_string = f"{row['City']}-{row['District']}-{row['Transformer']}"
+        # Append the formatted string to the list
+        high_strings.append(formatted_string)
+    high_capacity_df = pd.DataFrame(columns=['Datetime', 'High Capacity'])
+    high_capacity_df['Datetime'] = imputed_df['Datetime']
+    high_capacity_df['High Capacity'] = imputed_df[high_strings].sum(axis=1)
+    
+    capacity_df = pd.merge(high_capacity_df, low_capacity_df, on='Datetime', how="left")
+    analysis.capacity_plot(capacity_df, "./result/capacity/")
+    """
     ####################################################################################################
     # Weather analysis
     station_set = set(meta_df["Closest_Station"])
