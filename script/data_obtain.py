@@ -95,7 +95,15 @@ def NCDC_weather_data_station_merge(meta_path,
     return None
 
 def NCDC_weather_data_imputation(data_path, output_path):
+    """Reformat and impute the missing data of weather data
 
+    Args:
+        data_path (string): path to station data
+        output_path (string): path to store the imputed data
+
+    Returns:
+        None
+    """
     if not os.path.exists(output_path):
         os.makedirs(output_path)
         
@@ -151,4 +159,4 @@ if __name__ == "__main__":
     #                                "./result/NCDC_weather_data/stations/",
     #                                2022, 2023+1)
     
-    NCDC_weather_data_imputation("./result/NCDC_weather_data/stations/", "./result/NCDC_weather_data/stations_imputed/")
+    #NCDC_weather_data_imputation("./result/NCDC_weather_data/stations/", "./result/NCDC_weather_data/stations_imputed/")
