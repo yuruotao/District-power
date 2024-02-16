@@ -1,9 +1,12 @@
 import pandas as pd
+import numpy as np
 import os
 import time
 import matplotlib.pyplot as plt
 import gdelt
 import requests
+from os import listdir
+from os.path import isfile, join
 
 def NCDC_weather_data_obtain(meta_path, output_path, start_year, stop_year):
     """Obtain the weather data from NCDC
@@ -91,6 +94,52 @@ def NCDC_weather_data_station_merge(meta_path,
     
     return None
 
+def NCDC_weather_data_imputation(data_path, output_path):
+
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        
+    station_files = [f for f in listdir(data_path) if isfile(join(data_path, f))]
+    for station_file in station_files:
+        temp_df = pd.read_excel(data_path + station_file)
+        temp_df = temp_df[["STATION", "DATE", "LATITUDE", "LONGITUDE", "ELEVATION", 
+                           "NAME", "TEMP", "DEWP", "SLP", "STP", "VISIB", 
+                           "WDSP", "MXSPD", "GUST", "MAX", "MIN", "PRCP", 
+                           "SNDP"]]
+        
+        # Missing data
+        temp_df.replace(99.99, np.nan, inplace=True)
+        temp_df.replace(999.9, np.nan, inplace=True)
+        temp_df.replace(9999.9, np.nan, inplace=True)
+        
+        # Degree to Celsius
+        temp_df['TEMP'] = temp_df.apply(lambda x: (9/5)*x['TEMP']+32, axis=1)
+        temp_df['DEWP'] = temp_df.apply(lambda x: (9/5)*x['DEWP']+32, axis=1)
+        temp_df['MAX'] = temp_df.apply(lambda x: (9/5)*x['MAX']+32, axis=1)
+        temp_df['MIN'] = temp_df.apply(lambda x: (9/5)*x['MIN']+32, axis=1)
+        
+        # Millibar to kPa
+        temp_df['SLP'] = temp_df.apply(lambda x: x['SLP']/10, axis=1)
+        temp_df['STP'] = temp_df.apply(lambda x: x['STP']/10, axis=1)
+        
+        # Miles to km
+        temp_df['VISIB'] = temp_df.apply(lambda x: x['VISIB']*1.609, axis=1)
+        
+        # Knots to m/s
+        temp_df['WDSP'] = temp_df.apply(lambda x: x['WDSP']*0.51444, axis=1)
+        temp_df['MXSPD'] = temp_df.apply(lambda x: x['MXSPD']*0.51444, axis=1)
+        temp_df['GUST'] = temp_df.apply(lambda x: x['GUST']*0.51444, axis=1)
+        
+        # Inches to meter
+        temp_df['PRCP'] = temp_df.apply(lambda x: x['PRCP']*0.0254, axis=1)
+        temp_df['SNDP'] = temp_df.apply(lambda x: x['SNDP']*0.0254, axis=1)
+        
+        
+        imputed_df = temp_df.interpolate(method='linear')
+        imputed_df.to_excel(output_path + station_file, index=False)
+        time.sleep(60)
+    return None
+
 
 
 if __name__ == "__main__":
@@ -99,3 +148,5 @@ if __name__ == "__main__":
                                     "./result/NCDC_weather_data/", 
                                     "./result/NCDC_weather_data/stations/",
                                     2022, 2023+1)
+    
+    NCDC_weather_data_imputation("./result/NCDC_weather_data/stations/", "./result/NCDC_weather_data/stations_imputed/")

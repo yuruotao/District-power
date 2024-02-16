@@ -324,10 +324,14 @@ def weather_analysis():
     
     return None
 
+
+
 def extreme_weather_detect(input_df, output_path):
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
+    
+    
     
     return None
 
