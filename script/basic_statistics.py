@@ -8,6 +8,15 @@ sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
 
 
 def basic_statistics(input_df, save_path):
+    """Calculate the basic statistics of input_df
+
+    Args:
+        input_df (dataframe): dataframe containing data to be computed
+        save_path (string): path to save the basic statistics
+
+    Returns:
+        None
+    """
     datetime_column = input_df["Datetime"]
     input_df = input_df.drop(columns=["Datetime"])
     column_list = input_df.columns.values.tolist()
@@ -35,20 +44,3 @@ def basic_statistics(input_df, save_path):
     
     return None
 
-def power_scatter_plot(input_df, save_path):
-    sns.set_theme(style="whitegrid")
-    
-    datetime_column = input_df["Datetime"]
-    input_df = input_df.drop(columns=["Datetime"])
-    column_list = input_df.columns.values.tolist()
-
-    stats_dir = save_path + "/"
-    
-    if not os.path.exists(stats_dir):
-        os.makedirs(stats_dir)
-    
-    for column in column_list:
-        pass
-    
-    
-    return None

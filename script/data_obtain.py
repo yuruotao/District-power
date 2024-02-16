@@ -91,6 +91,8 @@ def NCDC_weather_data_station_merge(meta_path,
     
     return None
 
+
+
 if __name__ == "__main__":
     #NCDC_weather_data_obtain("./data/isd-history.csv", "./result/NCDC_weather_data/", 2022, 2023+1)
     NCDC_weather_data_station_merge("./data/isd-history.csv",

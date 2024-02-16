@@ -255,14 +255,7 @@ def year_DF_heatmap(input_df, meta_df, output_path, type):
     plt.savefig(output_path + "DF_daily_all.png", dpi=600)
     plt.close()
     
-    return None
-    
-
-def clustering():
-    
-    
-    
-    return None
+    return None 
 
 def seasonality_decomposition(input_df, output_path, period_num, model):
     """decomposition the dataframe by seasonality
@@ -325,15 +318,16 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
     
     return None
 
-def socio_economic_analysis():
+def weather_analysis():
+    
     
     
     return None
 
-
-def weather_analysis():
+def extreme_weather_detect(input_df, output_path):
     
-    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     
     return None
 
@@ -350,19 +344,44 @@ def extreme_weather_plot(input_df, weather_data_path, start_time, end_time, outp
     # Create a DataFrame with the time series column
     time_series_df = pd.DataFrame({'Datetime': time_index})
     weather_df = pd.merge(time_series_df, weather_df, on='Datetime', how="left")
+    # Filter out missing values from weather_df
+    weather_df_filtered = weather_df.fillna("None")
     
     time_series_df = pd.merge(time_series_df, input_df, on='Datetime', how="left")
+    time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    plt.figure(figsize=(20,8))
-    ax = sns.lineplot(data=time_series_df, markers=False)
+    event_colors = {'Hot weather': '#bc4749', 
+                    'Severe convective weather': '#4f000b', 
+                    'Cold wave': '#5a189a',
+                    'Dragon-boat rain': '#00a6fb',
+                    'Drought': '#e09f3e',
+                    'Excessive flooding': '#003554',
+                    'Extreme rainfall': '#0582ca',
+                    'Rainstorm': '#006494',
+                    'Tropical Storm Sanba': '#ff6700',
+                    'Typhoon Chaba': '#4f772d',
+                    'Typhoon Haikui': '#4f772d',
+                    'None':"#FFFFFF"}
     
-    ax.set_xlim(time_series_df.index[0], time_series_df.index[-1])
-    ax.fill_between(weather_df.index, weather_df['Event'] == "Typhoon Chaba", color='lightgray')
-    #ax.pcolorfast(ax.get_xlim(), ax.get_ylim(),
-    #              missing_mask[np.newaxis], cmap='Blues', alpha=0.2)
-    # Set x-axis limits
-    
+
+    fig, ax = plt.subplots(figsize=(20, 8))
+    ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
+
+    # Set background color according to Event values
+    for event, color in event_colors.items():
+        subset = time_series_df[time_series_df['Event'] == event]
+        print(event)
+        
+        non_nan_indices = subset['Event'].notna().astype(int).diff().fillna(0).abs().cumsum()
+        for group, group_df in subset.groupby(non_nan_indices):
+            print(group_df)
+            if not group_df.empty:
+                if event == "None":
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3)
+                else:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0)
+        
     
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
@@ -370,9 +389,60 @@ def extreme_weather_plot(input_df, weather_data_path, start_time, end_time, outp
 
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
     ax.set(xlabel="", ylabel="")
-        
+    
     plt.tight_layout()
-    plt.savefig(output_path + "extreme_weather.png", dpi=600)
+    plt.savefig(output_path + "extreme_weather_all.png", dpi=600)
+    plt.close()
+    
+    return None
+
+def extreme_whether_single_plot(input_df, extreme_weather, weather_data_path, start_time, end_time, output_path):
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    weather_df = pd.read_excel(weather_data_path)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    time_index = pd.date_range(start=start_time, end=end_time, freq="h")
+    # Create a DataFrame with the time series column
+    time_series_df = pd.DataFrame({'Datetime': time_index})
+    weather_df = pd.merge(time_series_df, weather_df, on='Datetime', how="left")
+    # Filter out missing values from weather_df
+    weather_df_filtered = weather_df.fillna("None")
+    
+    time_series_df = pd.merge(time_series_df, input_df, on='Datetime', how="left")
+    time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
+    time_series_df = time_series_df.set_index("Datetime")
+    
+    event_colors = {'Hot weather': '#bc4749', 
+                    'Severe convective weather': '#4f000b', 
+                    'Cold wave': '#5a189a',
+                    'Dragon-boat rain': '#00a6fb',
+                    'Drought': '#e09f3e',
+                    'Excessive flooding': '#003554',
+                    'Extreme rainfall': '#0582ca',
+                    'Rainstorm': '#006494',
+                    'Tropical Storm Sanba': '#ff6700',
+                    'Typhoon Chaba': '#4f772d',
+                    'Typhoon Haikui': '#4f772d',
+                    'None':"#FFFFFF"}
+    
+    subset = time_series_df[time_series_df['Event'] == extreme_weather]
+    
+    
+    
+    
+    legend = plt.legend()
+    legend.get_frame().set_facecolor('none')
+    plt.legend(frameon=False)
+
+    #ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    #ax.set(xlabel="", ylabel="")
+    
+    plt.tight_layout()
+    plt.savefig(output_path + "extreme_weather" + extreme_weather +".png", dpi=600)
     plt.close()
     
     return None

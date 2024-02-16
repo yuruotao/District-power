@@ -206,7 +206,19 @@ def imputation(input_df, imputation_method, save_path):
     return imputed_df
 
 def imputation_visualization(raw_data_df, start_time, end_time, method_list, column, output_path):
-    
+    """Visualize the imputation result, comparing methods
+
+    Args:
+        raw_data_df (dataframe): contain the raw data
+        start_time (string): plot start time
+        end_time (string): plot stop time
+        method_list (list): contain the imputation methods
+        column (string): contain the transformer index
+        output_path (string): path to save the figure
+
+    Returns:
+        None
+    """
     sns.set_theme(style="whitegrid")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
