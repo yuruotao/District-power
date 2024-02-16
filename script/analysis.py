@@ -325,7 +325,6 @@ def weather_analysis():
     return None
 
 
-
 def extreme_weather_detect(input_df, output_path, start_date, end_date):
     
     if not os.path.exists(output_path):
@@ -342,10 +341,19 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
         city_df = input_df.loc[input_df['"Closest_Station"'] == element]
-        city_num = set(city_df["City"])
+        city_num = next(iter(set(city_df["City"])))
         
         extreme_weather_df = datetime_df
-        
+        # Temperature
+        #extreme_weather_df["Temperature"] = 
+        # Humidity
+        #extreme_weather_df["Humidity"] = 
+        # Temp and humidity
+        #extreme_weather_df["Thunderstorm"] = 
+        # Thunderstorm
+        #extreme_weather_df["Storm"] = 
+        # Storm
+        #extreme_weather_df["Temp_and_Humidity"] = 
         
         
         extreme_weather_df.to_excel(output_path + "extreme_weather_" + str(city_num) + ".xlsx", index=False)

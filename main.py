@@ -360,6 +360,18 @@ if __name__ == "__main__":
     
     #analysis.average_load_profile(city_df, "./result/load_profile/")
     
+    
+    
+    
+    # Weather correlation
+    
+    
+    
+    # Extreme weather
+    
     #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
+    
+
+    
     
