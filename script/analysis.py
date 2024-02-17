@@ -452,7 +452,9 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         print("City", city_num)
         extreme_weather_df = datetime_df
         
-        # Heat Index       
+        # Heat Index
+
+        
         def calculate_heat_index(temp_celsius, relative_humidity):
             """Constants for the Heat Index calculation
             Input is celsius
@@ -466,32 +468,22 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
             Returns:
                 float: 
             """
-            
-            c1 = -8.78469475556
-            c2 = 1.61139411
-            c3 = 2.33854883889
-            c4 = -0.14611605
-            c5 = -0.012308094
-            c6 = -0.0164248277778
-            c7 = 0.002211732
-            c8 = 0.00072546
-            c9 = -0.000003582
-
-            # Calculate the Heat Index
-            heat_index = (
-                c1 +
-                c2 * temp_celsius +
-                c3 * relative_humidity +
-                c4 * temp_celsius * relative_humidity +
-                c5 * temp_celsius ** 2 +
-                c6 * relative_humidity ** 2 +
-                c7 * temp_celsius ** 2 * relative_humidity +
-                c8 * temp_celsius * relative_humidity ** 2 +
-                c9 * temp_celsius ** 2 * relative_humidity ** 2
-            )
+            temp_fahrenheit = (temp_celsius * 9/5) + 32
+            relative_humidity = relative_humidity / 100
+    
+            # Calculate the Heat Index in Fahrenheit
+            HI = (-42.379 + 
+                  2.04901523 * temp_fahrenheit + 
+                  10.14333127 * relative_humidity - 
+                  0.22475541 * temp_fahrenheit * relative_humidity - 
+                  0.00683783 * temp_fahrenheit ** 2 - 
+                  0.05481717 * relative_humidity ** 2 + 
+                  0.00122874 * temp_fahrenheit ** 2 * relative_humidity + 
+                  0.00085282 * temp_fahrenheit * relative_humidity ** 2 - 
+                  0.00000199 * temp_fahrenheit ** 2 * relative_humidity ** 2)
 
             # Convert Heat Index from Fahrenheit to Celsius
-            heat_index_celsius = (heat_index - 32) * 5/9
+            heat_index_celsius = (HI - 32) * 5/9
 
             return heat_index_celsius
         
@@ -554,7 +546,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
             """# Calculate wind chill index
 
             Args:
-                temp_celsius (float): the temperature in celcius
+                temp_celsius (float): the temperature in celsius
                 wind_speed_mps (float): the wind speed in mile per second
 
             Returns:
@@ -806,7 +798,7 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    event_colors = {"Heat Index Caution":                   "#ad2831",
+    event_colors = {#"Heat Index Caution":                   "#ad2831",
                     "Heat Index Extreme Caution":           "#800e13",
                     "Heat Index Danger":                    "#640d14",
                     "Heat Index Extreme Danger":            "#38040e",
