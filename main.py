@@ -282,7 +282,7 @@ if __name__ == "__main__":
     """
     
     # Extreme weather detection
-    analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
+    #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
     # Extreme weather plot
     # All districts
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
 
     # Cities
-    """
+
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     datetime_col = "Datetime"
     temp_city_df = city_df.drop([datetime_col], axis=1)
@@ -302,4 +302,4 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx", 
                                       start_time, end_time, 
                                       "./result/extreme_weather/extreme_plot/")
-        """
+  

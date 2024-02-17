@@ -495,10 +495,11 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
 
             return heat_index_celsius
         
-        temp_weather_df['Heat Index'] = calculate_heat_index(temp_weather_df['MAX'], temp_weather_df['RH'])
+        temp_weather_df['Heat Index'] = calculate_heat_index(temp_weather_df['TEMP'], temp_weather_df['RH'])
         
-        extreme_weather_df['Heat Index'] = np.nan
-        high_hum_df = temp_weather_df.loc[temp_weather_df['Heat'] > ]
+        extreme_weather_df['Heat Index Caution'] = np.nan
+        high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > 27) & 
+                                               (temp_weather_df['Heat Index'] <= 32)]
         for date in high_hum_df['DATE']:
             # Iterate over the rows of the DataFrame
             for index, row in extreme_weather_df.iterrows():
@@ -506,17 +507,73 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                 if row['Datetime'].year == date.year and \
                     row['Datetime'].month == date.month and \
                     row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'Heat Index'] = 1
+                    extreme_weather_df.at[index, 'Heat Index Caution'] = 1
+                    
+                    
+        extreme_weather_df['Heat Index Extreme Caution'] = np.nan
+        high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > 32) & 
+                                               (temp_weather_df['Heat Index'] <= 41)]
+        for date in high_hum_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Heat Index Extreme Caution'] = 1
+        
+        
+        extreme_weather_df['Heat Index Danger'] = np.nan
+        high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > 41) & 
+                                               (temp_weather_df['Heat Index'] <= 54)]
+        for date in high_hum_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Heat Index Danger'] = 1
+        
+        
+        extreme_weather_df['Heat Index Extreme Danger'] = np.nan
+        high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > 54)]
+        for date in high_hum_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Heat Index Extreme Danger'] = 1
         print("Heat Index done")
-        
-        
-        
-        
-        
+
         
         # Wind Chill
-        extreme_weather_df['Wind Chill'] = np.nan
-        high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > ]
+        def calculate_wind_chill_index(temp_celsius, wind_speed_mps):
+            """# Calculate wind chill index
+
+            Args:
+                temp_celsius (float): the temperature in celcius
+                wind_speed_mps (float): the wind speed in mile per second
+
+            Returns:
+                float: American wind chill index
+            """
+            
+            wind_chill_index_us = (
+                35.74 + 
+                0.6215 * temp_celsius - 
+                35.75 * wind_speed_mps ** 0.16 + 
+                0.4275 * temp_celsius * wind_speed_mps ** 0.16
+            )
+            return wind_chill_index_us
+        
+        temp_weather_df['Wind Chill'] = calculate_wind_chill_index(temp_weather_df['TEMP'], temp_weather_df['WDSP'])
+        
+        extreme_weather_df['Wind Chill Very Cold'] = np.nan
+        high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > -35) & 
+                                               (temp_weather_df['Heat Index'] <= -25)]
         for date in high_hum_df['DATE']:
             # Iterate over the rows of the DataFrame
             for index, row in extreme_weather_df.iterrows():
@@ -524,7 +581,32 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                 if row['Datetime'].year == date.year and \
                     row['Datetime'].month == date.month and \
                     row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'Wind Chill'] = 1
+                    extreme_weather_df.at[index, 'Wind Chill Very Cold'] = 1
+        
+        
+        extreme_weather_df['Wind Chill Frostbite Danger'] = np.nan
+        high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > -60) & 
+                                               (temp_weather_df['Heat Index'] <= -35)]
+        for date in high_hum_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Chill Frostbite Danger'] = 1
+                    
+        
+        extreme_weather_df['Wind Chill Great Frostbite Danger'] = np.nan
+        high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] <= -60)]
+        for date in high_hum_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Chill Great Frostbite Danger'] = 1
         print("Wind Chill done")
         
         
@@ -724,20 +806,20 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    event_colors = {"High Temperature":             "#ad2831",
-                    "Low Temperature":              "#0466c8",
-                    "High Humidity":                "#004b23",
-                    "High Temperature and Humidity":"#ffaa00",
+    event_colors = {"Heat Index Caution":                   "#ad2831",
+                    "Heat Index Extreme Caution":           "#800e13",
+                    "Heat Index Danger":                    "#640d14",
+                    "Heat Index Extreme Danger":            "#38040e",
                     
-                    #"Damaging Wind Gusts":          "#979dac",
-                    #"Very Damaging Wind Gusts":     "#5c677d",
-                    #"Violent Wind Gusts":           "#33415c",
+                    "Wind Chill Very Cold":                 "#0096c7",
+                    "Wind Chill Frostbite Danger":          "#023e8a",
+                    "Wind Chill Great Frostbite Danger":    "#03045e",
                     
-                    "Tropical Storm":               "#9d4edd",
-                    "Severe Tropical Storm":        "#7b2cbf",
-                    "Typhoon":                      "#5a189a",
-                    "Strong Typhoon":               "#3c096c",
-                    "Super Typhoon":                "#240046",}
+                    "Tropical Storm":                       "#9d4edd",
+                    "Severe Tropical Storm":                "#7b2cbf",
+                    "Typhoon":                              "#5a189a",
+                    "Strong Typhoon":                       "#3c096c",
+                    "Super Typhoon":                        "#240046",}
     
 
     fig, ax = plt.subplots(figsize=(20, 8))
