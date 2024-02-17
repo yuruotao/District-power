@@ -242,7 +242,7 @@ if __name__ == "__main__":
     xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
     
     # Weather basic statistics
-    """
+
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
@@ -254,9 +254,9 @@ if __name__ == "__main__":
         print("City", city_num)
         
         basic_statistics.basic_statistics(temp_weather_df, "./result/extreme_weather/basic_statistics/city_" + str(city_num))
-    """
+
     # Weather correlation
-    """
+
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
@@ -279,10 +279,10 @@ if __name__ == "__main__":
         temp_weather_df = temp_weather_df.drop(["Datetime"], axis=1)
         
         analysis.weather_correlation(temp_weather_df, "./result/extreme_weather/correlation/", str(city_num))
-    """
+
     
     # Extreme weather detection
-    #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
+    analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
     # Extreme weather plot
     # All districts
