@@ -696,7 +696,7 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
             if event == "None":
                 ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0)
             else:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.6)
     
     
     
@@ -746,9 +746,9 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    event_colors = {"High Temperature":             "#ff6000",
+    event_colors = {"High Temperature":             "#ad2831",
                     "Low Temperature":              "#0466c8",
-                    "High Humidity":                "#137547",
+                    "High Humidity":                "#004b23",
                     "High Temperature and Humidity":"#ffaa00",
                     
                     #"Damaging Wind Gusts":          "#979dac",
@@ -770,26 +770,27 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
         subset = time_series_df[time_series_df[event] == 1]
         print(event)
         
-        dfs = []
-        start_idx = subset.index[0]
-        end_idx = None
+        if not subset.empty:
+            dfs = []
+            start_idx = subset.index[0]
+            end_idx = None
         
-        for idx in subset.index[1:]:
-            if (idx - start_idx).days > 1:
-                # End of current part found
-                dfs.append(subset.loc[start_idx:end_idx])
-                start_idx = idx
-                end_idx = None
-            else:
-                # Continuation of current part
-                end_idx = idx
+            for idx in subset.index[1:]:
+                if (idx - start_idx).days > 1:
+                    # End of current part found
+                    dfs.append(subset.loc[start_idx:end_idx])
+                    start_idx = idx
+                    end_idx = None
+                else:
+                    # Continuation of current part
+                    end_idx = idx
 
-        # Add the last part of the DataFrame
-        if end_idx is not None:
-            dfs.append(subset.loc[start_idx:end_idx])
+            # Add the last part of the DataFrame
+            if end_idx is not None:
+                dfs.append(subset.loc[start_idx:end_idx])
         
-        for group_df in dfs:
-            ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
+            for group_df in dfs:
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.6)
         
         
     legend = plt.legend()
@@ -877,9 +878,9 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
         
         for group_df in dfs:
             if event == "None":
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0)
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0, edgecolor='none')
             else:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
     
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')

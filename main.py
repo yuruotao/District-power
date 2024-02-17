@@ -232,10 +232,10 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Holiday
-    """
+
     province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
     analysis.holiday_plot(province_df, "all", "./data/festival.xlsx", start_time, end_time, "./result/festival/")
-    """
+    
     ####################################################################################################
     # Weather analysis
     station_set = set(meta_df["Closest_Station"])
