@@ -510,6 +510,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         print("High Temperature and Humidity done")
         
         # Thunderstorm
+        """
         extreme_weather_df['Damaging Wind Gusts'] = np.nan
         thunderstorm_58_74 = temp_weather_df.loc[(temp_weather_df['GUST'] > (58 * 0.44704)) & 
                                                (temp_weather_df['GUST'] <= (74 * 0.44704))]
@@ -547,6 +548,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                     row['Datetime'].day == date.day:
                     extreme_weather_df.at[index, 'Violent Wind Gusts'] = 1
         print("Violent Wind Gusts done")
+        """
         
         # Storm
         extreme_weather_df['Tropical Storm'] = np.nan
@@ -650,18 +652,18 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
     time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    event_colors = {'Hot weather': '#bc4749', 
-                    'Severe convective weather': '#4f000b', 
-                    'Cold wave': '#5a189a',
-                    'Dragon-boat rain': '#00a6fb',
-                    'Drought': '#e09f3e',
-                    'Excessive flooding': '#003554',
-                    'Extreme rainfall': '#0582ca',
-                    'Rainstorm': '#006494',
-                    'Tropical Storm Sanba': '#ff6700',
-                    'Typhoon Chaba': '#4f772d',
-                    'Typhoon Haikui': '#4f772d',
-                    'None':"#FFFFFF"}
+    event_colors = {'Hot weather':                  '#bc4749', 
+                    'Severe convective weather':    '#4f000b', 
+                    'Cold wave':                    '#5a189a',
+                    'Dragon-boat rain':             '#00a6fb',
+                    'Drought':                      '#e09f3e',
+                    'Excessive flooding':           '#003554',
+                    'Extreme rainfall':             '#0582ca',
+                    'Rainstorm':                    '#006494',
+                    'Tropical Storm Sanba':         '#ff6700',
+                    'Typhoon Chaba':                '#4f772d',
+                    'Typhoon Haikui':               '#4f772d',
+                    'None':                         "#FFFFFF"}
     
 
     fig, ax = plt.subplots(figsize=(20, 8))
@@ -674,17 +676,29 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
         
         dfs = []
         start_idx = subset.index[0]
-        for idx in subset.index:
-            if (idx - start_idx).days == 1:
-                dfs.append(subset.loc[start_idx:idx])
-                start_idx = idx + pd.Timedelta(hours=1)
+        end_idx = None
+        
+        for idx in subset.index[1:]:
+            if (idx - start_idx).days > 1:
+                # End of current part found
+                dfs.append(subset.loc[start_idx:end_idx])
+                start_idx = idx
+                end_idx = None
+            else:
+                # Continuation of current part
+                end_idx = idx
+
+        # Add the last part of the DataFrame
+        if end_idx is not None:
+            dfs.append(subset.loc[start_idx:end_idx])
         
         for group_df in dfs:
             if event == "None":
                 ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0)
             else:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3)
-        
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
+    
+    
     
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
@@ -737,9 +751,9 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
                     "High Humidity":                "#137547",
                     "High Temperature and Humidity":"#ffaa00",
                     
-                    "Damaging Wind Gusts":          "#979dac",
-                    "Very Damaging Wind Gusts":     "#5c677d",
-                    "Violent Wind Gusts":           "#33415c",
+                    #"Damaging Wind Gusts":          "#979dac",
+                    #"Very Damaging Wind Gusts":     "#5c677d",
+                    #"Violent Wind Gusts":           "#33415c",
                     
                     "Tropical Storm":               "#9d4edd",
                     "Severe Tropical Storm":        "#7b2cbf",
@@ -756,16 +770,27 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
         subset = time_series_df[time_series_df[event] == 1]
         print(event)
         
-        if len(subset.index) != 0:
-            dfs = []
-            start_idx = subset.index[0]
-            for idx in subset.index:
-                if (idx - start_idx).days == 1:
-                    dfs.append(subset.loc[start_idx:idx])
-                    start_idx = idx + pd.Timedelta(hours=1)
+        dfs = []
+        start_idx = subset.index[0]
+        end_idx = None
         
-            for group_df in dfs:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
+        for idx in subset.index[1:]:
+            if (idx - start_idx).days > 1:
+                # End of current part found
+                dfs.append(subset.loc[start_idx:end_idx])
+                start_idx = idx
+                end_idx = None
+            else:
+                # Continuation of current part
+                end_idx = idx
+
+        # Add the last part of the DataFrame
+        if end_idx is not None:
+            dfs.append(subset.loc[start_idx:end_idx])
+        
+        for group_df in dfs:
+            ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
+        
         
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
@@ -776,6 +801,95 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     
     plt.tight_layout()
     plt.savefig(output_path + "extreme_weather_" + city + ".png", dpi=600)
+    plt.close()
+    
+    return None
+
+
+def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output_path):
+    """Plot the extreme weather
+
+    Args:
+        input_df (dataframe): contain the power data
+        city (string): city to plot (all)
+        weather_data_path (string): path to the extreme weather data
+        start_time (string): the start date of extreme weather
+        end_date (string): the end date of extreme weather
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    weather_df = pd.read_excel(weather_data_path)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    time_index = pd.date_range(start=start_time, end=end_time, freq="h")
+    # Create a DataFrame with the time series column
+    time_series_df = pd.DataFrame({'Datetime': time_index})
+    weather_df = pd.merge(time_series_df, weather_df, on='Datetime', how="left")
+    # Filter out missing values from weather_df
+    weather_df_filtered = weather_df.fillna("None")
+    
+    time_series_df = pd.merge(time_series_df, input_df, on='Datetime', how="left")
+    time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
+    time_series_df = time_series_df.set_index("Datetime")
+    
+    event_colors = {'New year':                     '#641220', 
+                    'Dragon Boat Festival':         '#3fa34d', 
+                    'International Labor Day':      '#22333b',
+                    'Mid-autumn festival':          '#fdc500',
+                    'National Day':                 '#e09f3e',
+                    'Qingming':                     '#8b949a',
+                    'Spring Festival':              '#e01e37',
+                    'None':                         "#FFFFFF"}
+    
+
+    fig, ax = plt.subplots(figsize=(20, 8))
+    ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
+
+    # Set background color according to Event values
+    for event, color in event_colors.items():
+        subset = time_series_df[time_series_df['Holiday'] == event]
+        print(event)
+        
+        dfs = []
+        start_idx = subset.index[0]
+        end_idx = None
+        
+        for idx in subset.index[1:]:
+            if (idx - start_idx).days > 1:
+                # End of current part found
+                dfs.append(subset.loc[start_idx:end_idx])
+                start_idx = idx
+                end_idx = None
+            else:
+                # Continuation of current part
+                end_idx = idx
+
+        # Add the last part of the DataFrame
+        if end_idx is not None:
+            dfs.append(subset.loc[start_idx:end_idx])
+        
+        for group_df in dfs:
+            if event == "None":
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0)
+            else:
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
+    
+    legend = plt.legend()
+    legend.get_frame().set_facecolor('none')
+    plt.legend(frameon=False)
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    ax.set(xlabel="", ylabel="")
+    
+    plt.tight_layout()
+    plt.savefig(output_path + "holiday_" + city + ".png", dpi=600)
     plt.close()
     
     return None

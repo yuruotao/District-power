@@ -231,6 +231,12 @@ if __name__ == "__main__":
     analysis.capacity_plot(capacity_df, "./result/capacity/")
     """
     ####################################################################################################
+    # Holiday
+    """
+    province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
+    analysis.holiday_plot(province_df, "all", "./data/festival.xlsx", start_time, end_time, "./result/festival/")
+    """
+    ####################################################################################################
     # Weather analysis
     station_set = set(meta_df["Closest_Station"])
     xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
@@ -277,15 +283,15 @@ if __name__ == "__main__":
     # Time sequence analysis
     
     # Extreme weather detection
-    analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
+    #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
     # Extreme weather plot
     # All districts
-    #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
-    #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
+    province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
+    analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
 
     # Cities
-    """
+
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     datetime_col = "Datetime"
     temp_city_df = city_df.drop([datetime_col], axis=1)
@@ -297,4 +303,4 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx", 
                                       start_time, end_time, 
                                       "./result/extreme_weather/extreme_plot/")
-    """
+        
