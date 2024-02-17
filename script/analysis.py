@@ -454,10 +454,19 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         
         # Heat Index
         def calculate_heat_index(temp_celsius, relative_humidity):
-            # Constants for the Heat Index calculation
-            # Input is celsius
-            # Coefficients are retrieved here
-            # https://en.wikipedia.org/wiki/Heat_index
+            """Constants for the Heat Index calculation
+            Input is celsius
+            Coefficients are retrieved here
+            https://en.wikipedia.org/wiki/Heat_index
+
+            Args:
+                temp_celsius (float): _description_
+                relative_humidity (float): _description_
+
+            Returns:
+                float: 
+            """
+            
             c1 = -8.78469475556
             c2 = 1.61139411
             c3 = 2.33854883889
@@ -486,10 +495,10 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
 
             return heat_index_celsius
         
+        temp_weather_df['Heat Index'] = calculate_heat_index(temp_weather_df['MAX'], temp_weather_df['RH'])
         
         extreme_weather_df['Heat Index'] = np.nan
-        temp_weather_df['Heat Index'] = calculate_heat_index(temp_weather_df['MAX'], temp_weather_df[''])
-        high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > ]
+        high_hum_df = temp_weather_df.loc[temp_weather_df['Heat'] > ]
         for date in high_hum_df['DATE']:
             # Iterate over the rows of the DataFrame
             for index, row in extreme_weather_df.iterrows():
@@ -500,9 +509,13 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                     extreme_weather_df.at[index, 'Heat Index'] = 1
         print("Heat Index done")
         
+        
+        
+        
+        
+        
         # Wind Chill
         extreme_weather_df['Wind Chill'] = np.nan
-
         high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > ]
         for date in high_hum_df['DATE']:
             # Iterate over the rows of the DataFrame
@@ -513,7 +526,6 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                     row['Datetime'].day == date.day:
                     extreme_weather_df.at[index, 'Wind Chill'] = 1
         print("Wind Chill done")
-        
         
         
         # Storm
