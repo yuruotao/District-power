@@ -421,7 +421,17 @@ def weather_correlation(input_df, output_path, city_num):
     return None
 
 def extreme_weather_detect(input_df, output_path, start_date, end_date):
-    
+    """Detect the extreme weather based on conditions
+
+    Args:
+        input_df (dataframe): contain the weather data
+        output_path (string): path to save the extreme weather data
+        start_date (string): the start date of extreme weather
+        end_date (string): the end date of extreme weather
+
+    Returns:
+        None
+    """
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     
@@ -607,6 +617,19 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
     return None
 
 def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time, output_path):
+    """Plot the extreme weather
+
+    Args:
+        input_df (dataframe): contain the power data
+        city (string): city to plot (all)
+        weather_data_path (string): path to the extreme weather data
+        start_time (string): the start date of extreme weather
+        end_date (string): the end date of extreme weather
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
     sns.set_theme(style="whitegrid")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
@@ -708,8 +731,7 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
                     "Severe Tropical Storm":        "#7b2cbf",
                     "Typhoon":                      "#5a189a",
                     "Strong Typhoon":               "#3c096c",
-                    "Super Typhoon":                "#240046",
-                    'None':"#FFFFFF"}
+                    "Super Typhoon":                "#240046",}
     
 
     fig, ax = plt.subplots(figsize=(20, 8))
@@ -720,20 +742,17 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
         subset = time_series_df[time_series_df[event] == 1]
         print(event)
         
-        dfs = []
-        start_idx = subset.index[0]
-        for idx in subset.index:
-            if (idx - start_idx).days == 1:
-                dfs.append(subset.loc[start_idx:idx])
-                start_idx = idx + pd.Timedelta(hours=1)
+        if len(subset.index) != 0:
+            dfs = []
+            start_idx = subset.index[0]
+            for idx in subset.index:
+                if (idx - start_idx).days == 1:
+                    dfs.append(subset.loc[start_idx:idx])
+                    start_idx = idx + pd.Timedelta(hours=1)
         
-        for group_df in dfs:
-            if event == "None":
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0)
-            else:
+            for group_df in dfs:
                 ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3)
         
-    
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
     plt.legend(frameon=False)

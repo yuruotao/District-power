@@ -277,11 +277,14 @@ if __name__ == "__main__":
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     datetime_col = "Datetime"
     temp_city_df = city_df.drop([datetime_col], axis=1)
-    city_list = temp_city_df.columns()
+    city_list = list(temp_city_df.columns.values)
     for city in city_list:
-        iter_df = city_df[["Datetime", city]]
-        iter_df = iter_df.rename(columns={city: "Power"})
-        analysis.extreme_weather_plot(iter_df, city, 
-                                      "./result/extreme_weather/extreme_weather_data/extreme_weather_" + str(city) + ".xlsx", 
+        if city == str(7):
+            pass
+        else:
+            iter_df = city_df[["Datetime", city]]
+            iter_df = iter_df.rename(columns={city: "Power"})
+            analysis.extreme_weather_city_plot(iter_df, city, 
+                                      "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx", 
                                       start_time, end_time, 
                                       "./result/extreme_weather/extreme_plot/")
