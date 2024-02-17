@@ -125,6 +125,7 @@ def NCDC_weather_data_imputation(data_path, output_path):
         temp_df['TEMP'] = temp_df.apply(lambda x: (x['TEMP']-32)*(5/9), axis=1)
         temp_df['MAX'] = temp_df.apply(lambda x: (x['MAX']-32)*(5/9), axis=1)
         temp_df['MIN'] = temp_df.apply(lambda x: (x['MIN']-32)*(5/9), axis=1)
+        temp_df['DEWP'] = temp_df.apply(lambda x: (x['DEWP']-32)*(5/9), axis=1)
         
         # Dew point to relative humidity
         def calculate_relative_humidity(dew_point_celsius, air_temperature_celsius):
