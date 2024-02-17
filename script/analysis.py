@@ -452,7 +452,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         print("City", city_num)
         extreme_weather_df = datetime_df
         
-        # Heat Index
+        # Heat Index       
         def calculate_heat_index(temp_celsius, relative_humidity):
             """Constants for the Heat Index calculation
             Input is celsius
