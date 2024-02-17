@@ -699,6 +699,19 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
     return None
 
 def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end_time, output_path):
+    """Plot extreme weather load profile for each city
+
+    Args:
+        input_df (dataframe): contain the power data
+        city (string): city to plot
+        weather_data_path (string): path to the extreme weather data
+        start_time (string): the start date of extreme weather
+        end_date (string): the end date of extreme weather
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
     sns.set_theme(style="whitegrid")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
@@ -751,7 +764,7 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
                     start_idx = idx + pd.Timedelta(hours=1)
         
             for group_df in dfs:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3)
+                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5)
         
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
