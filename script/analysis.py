@@ -495,7 +495,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
 
             return heat_index_celsius
         
-        temp_weather_df['Heat Index'] = calculate_heat_index(temp_weather_df['TEMP'], temp_weather_df['RH'])
+        temp_weather_df['Heat Index'] = calculate_heat_index(temp_weather_df['MAX'], temp_weather_df['RH'])
         
         extreme_weather_df['Heat Index Caution'] = np.nan
         high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > 27) & 
@@ -569,7 +569,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
             )
             return wind_chill_index_us
         
-        temp_weather_df['Wind Chill'] = calculate_wind_chill_index(temp_weather_df['TEMP'], temp_weather_df['WDSP'])
+        temp_weather_df['Wind Chill'] = calculate_wind_chill_index(temp_weather_df['MIN'], temp_weather_df['MXSPD'])
         
         extreme_weather_df['Wind Chill Very Cold'] = np.nan
         high_hum_df = temp_weather_df.loc[(temp_weather_df['Heat Index'] > -35) & 

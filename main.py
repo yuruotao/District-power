@@ -282,7 +282,7 @@ if __name__ == "__main__":
 """
     
     # Extreme weather detection
-    #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
+    analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
     # Extreme weather plot
     # All districts
