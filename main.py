@@ -232,10 +232,10 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Holiday
-
+    """
     province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
     analysis.holiday_plot(province_df, "all", "./data/festival.xlsx", start_time, end_time, "./result/festival/")
-    
+    """
     ####################################################################################################
     # Weather analysis
     station_set = set(meta_df["Closest_Station"])
@@ -283,7 +283,7 @@ if __name__ == "__main__":
     # Time sequence analysis
     
     # Extreme weather detection
-    #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
+    analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
     # Extreme weather plot
     # All districts

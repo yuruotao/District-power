@@ -95,6 +95,7 @@ def NCDC_weather_data_station_merge(meta_path,
 
 def NCDC_weather_data_imputation(data_path, output_path):
     """Reformat and impute the missing data of weather data
+    Add relative humidity "RH" to the dataframe
 
     Args:
         data_path (string): path to station data
@@ -122,9 +123,22 @@ def NCDC_weather_data_imputation(data_path, output_path):
         
         # Degree to Celsius
         temp_df['TEMP'] = temp_df.apply(lambda x: (9/5)*x['TEMP']+32, axis=1)
-        temp_df['DEWP'] = temp_df.apply(lambda x: (9/5)*x['DEWP']+32, axis=1)
         temp_df['MAX'] = temp_df.apply(lambda x: (9/5)*x['MAX']+32, axis=1)
         temp_df['MIN'] = temp_df.apply(lambda x: (9/5)*x['MIN']+32, axis=1)
+        
+        # Dew point to relative humidity
+        def calculate_relative_humidity(dew_point_celsius, air_temperature_celsius):
+            # Calculate saturation vapor pressure at dew point and air temperature
+            es_td = 6.112 * np.exp(17.67 * dew_point_celsius / (dew_point_celsius + 243.5))
+            es_t = 6.112 * np.exp(17.67 * air_temperature_celsius / (air_temperature_celsius + 243.5))
+
+            # Calculate relative humidity
+            relative_humidity = 100 * (es_td / es_t)
+
+            return relative_humidity
+        
+        # RH for relative humidity
+        temp_df['RH'] = temp_df.apply(lambda x: calculate_relative_humidity(x['DEWP'], x['TEMP']), axis=1)
         
         # Millibar to kPa
         temp_df['SLP'] = temp_df.apply(lambda x: x['SLP']/10, axis=1)
@@ -145,7 +159,7 @@ def NCDC_weather_data_imputation(data_path, output_path):
         
         imputed_df = temp_df.interpolate(method='linear')
         # Select only numeric columns
-        numeric_cols = ["TEMP", "DEWP", "SLP", "STP", "VISIB", "WDSP", "MXSPD", "GUST", "MAX", "MIN", "PRCP", "SNDP"]
+        numeric_cols = ["TEMP", 'RH', "DEWP", "SLP", "STP", "VISIB", "WDSP", "MXSPD", "GUST", "MAX", "MIN", "PRCP", "SNDP"]
         # Calculate means for numeric columns
         col_means = imputed_df[numeric_cols].mean()
         # Fill NaN values in numeric columns with their respective means
@@ -165,4 +179,4 @@ if __name__ == "__main__":
     #                                "./result/NCDC_weather_data/stations/",
     #                                2022, 2023+1)
     
-    #NCDC_weather_data_imputation("./result/NCDC_weather_data/stations/", "./result/NCDC_weather_data/stations_imputed/")
+    NCDC_weather_data_imputation("./result/NCDC_weather_data/stations/", "./result/NCDC_weather_data/stations_imputed/")

@@ -451,39 +451,45 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         city_num = next(iter(set(city_df["City"])))
         print("City", city_num)
         extreme_weather_df = datetime_df
+        
+        # Heat Index
+        def calculate_heat_index(temp_celsius, relative_humidity):
+            # Constants for the Heat Index calculation
+            # Input is celsius
+            # Coefficients are retrieved here
+            # https://en.wikipedia.org/wiki/Heat_index
+            c1 = -8.78469475556
+            c2 = 1.61139411
+            c3 = 2.33854883889
+            c4 = -0.14611605
+            c5 = -0.012308094
+            c6 = -0.0164248277778
+            c7 = 0.002211732
+            c8 = 0.00072546
+            c9 = -0.000003582
 
+            # Calculate the Heat Index
+            heat_index = (
+                c1 +
+                c2 * temp_celsius +
+                c3 * relative_humidity +
+                c4 * temp_celsius * relative_humidity +
+                c5 * temp_celsius ** 2 +
+                c6 * relative_humidity ** 2 +
+                c7 * temp_celsius ** 2 * relative_humidity +
+                c8 * temp_celsius * relative_humidity ** 2 +
+                c9 * temp_celsius ** 2 * relative_humidity ** 2
+            )
+
+            # Convert Heat Index from Fahrenheit to Celsius
+            heat_index_celsius = (heat_index - 32) * 5/9
+
+            return heat_index_celsius
         
-        # Temperature
-        extreme_weather_df['High Temperature'] = np.nan
-        MAX_percentile_95 = temp_weather_df['MAX'].quantile(0.95)
-        high_temp_df = temp_weather_df.loc[temp_weather_df['MAX'] > MAX_percentile_95]
-        for date in high_temp_df['DATE']:
-            # Iterate over the rows of the DataFrame
-            for index, row in extreme_weather_df.iterrows():
-                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
-                if row['Datetime'].year == date.year and \
-                    row['Datetime'].month == date.month and \
-                    row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'High Temperature'] = 1
-        print("High Temperature done")
         
-        extreme_weather_df['Low Temperature'] = np.nan
-        MIN_percentile_5 = temp_weather_df['MIN'].quantile(0.05)
-        low_temp_df = temp_weather_df.loc[temp_weather_df['MIN'] < MIN_percentile_5]
-        for date in low_temp_df['DATE']:
-            # Iterate over the rows of the DataFrame
-            for index, row in extreme_weather_df.iterrows():
-                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
-                if row['Datetime'].year == date.year and \
-                    row['Datetime'].month == date.month and \
-                    row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'Low Temperature'] = 1
-        print("Low Temperature done")
-        
-        # Humidity
-        extreme_weather_df['High Humidity'] = np.nan
-        DEWP_percentile_95 = temp_weather_df['DEWP'].quantile(0.95)
-        high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > DEWP_percentile_95]
+        extreme_weather_df['Heat Index'] = np.nan
+        temp_weather_df['Heat Index'] = calculate_heat_index(temp_weather_df['MAX'], temp_weather_df[''])
+        high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > ]
         for date in high_hum_df['DATE']:
             # Iterate over the rows of the DataFrame
             for index, row in extreme_weather_df.iterrows():
@@ -491,64 +497,24 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                 if row['Datetime'].year == date.year and \
                     row['Datetime'].month == date.month and \
                     row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'High Humidity'] = 1
-        print("High Humidity done")
+                    extreme_weather_df.at[index, 'Heat Index'] = 1
+        print("Heat Index done")
         
-        # Temp and humidity
-        extreme_weather_df['High Temperature and Humidity'] = np.nan
-        DEWP_percentile_60 = temp_weather_df['DEWP'].quantile(0.60)
-        high_temp_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > DEWP_percentile_60]
-        high_temp_hum_df = high_temp_hum_df.loc[temp_weather_df['MAX'] > 35]
-        for date in high_temp_hum_df['DATE']:
-            # Iterate over the rows of the DataFrame
-            for index, row in extreme_weather_df.iterrows():
-                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
-                if row['Datetime'].year == date.year and \
-                    row['Datetime'].month == date.month and \
-                    row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'High Temperature and Humidity'] = 1
-        print("High Temperature and Humidity done")
-        
-        # Thunderstorm
-        """
-        extreme_weather_df['Damaging Wind Gusts'] = np.nan
-        thunderstorm_58_74 = temp_weather_df.loc[(temp_weather_df['GUST'] > (58 * 0.44704)) & 
-                                               (temp_weather_df['GUST'] <= (74 * 0.44704))]
-        for date in thunderstorm_58_74['DATE']:
-            # Iterate over the rows of the DataFrame
-            for index, row in extreme_weather_df.iterrows():
-                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
-                if row['Datetime'].year == date.year and \
-                    row['Datetime'].month == date.month and \
-                    row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'Damaging Wind Gusts'] = 1
-        print("Damaging Wind Gusts done")
+        # Wind Chill
+        extreme_weather_df['Wind Chill'] = np.nan
 
-        extreme_weather_df['Very Damaging Wind Gusts'] = np.nan
-        thunderstorm_74_91 = temp_weather_df.loc[(temp_weather_df['GUST'] > (74 * 0.44704)) & 
-                                               (temp_weather_df['GUST'] <= (91 * 0.44704))]
-        for date in thunderstorm_74_91['DATE']:
+        high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > ]
+        for date in high_hum_df['DATE']:
             # Iterate over the rows of the DataFrame
             for index, row in extreme_weather_df.iterrows():
                 # Compare year, month, day, and hour of "Datetime" column with the target timestamp
                 if row['Datetime'].year == date.year and \
                     row['Datetime'].month == date.month and \
                     row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'Very Damaging Wind Gusts'] = 1
-        print("Very Damaging Wind Gusts done")
+                    extreme_weather_df.at[index, 'Wind Chill'] = 1
+        print("Wind Chill done")
         
-        extreme_weather_df['Violent Wind Gusts'] = np.nan
-        thunderstorm_91 = temp_weather_df.loc[temp_weather_df['GUST'] > (91 * 0.44704)]
-        for date in thunderstorm_91['DATE']:
-            # Iterate over the rows of the DataFrame
-            for index, row in extreme_weather_df.iterrows():
-                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
-                if row['Datetime'].year == date.year and \
-                    row['Datetime'].month == date.month and \
-                    row['Datetime'].day == date.day:
-                    extreme_weather_df.at[index, 'Violent Wind Gusts'] = 1
-        print("Violent Wind Gusts done")
-        """
+        
         
         # Storm
         extreme_weather_df['Tropical Storm'] = np.nan
