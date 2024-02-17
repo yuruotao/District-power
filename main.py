@@ -302,4 +302,3 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx", 
                                       start_time, end_time, 
                                       "./result/extreme_weather/extreme_plot/")
-  
