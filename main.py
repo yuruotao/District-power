@@ -143,6 +143,7 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Imputation
+    """
     #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
     #for method in imputation_methods:
         #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method=method)
@@ -157,8 +158,8 @@ if __name__ == "__main__":
     #                                    ["Linear", "Forward", "Backward", "Forward-Backward"],
     #                                    "0-0-0",
     #                                    "./result/imputation/")
+    """
     imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
-    
     ####################################################################################################
     # Resample
     """
@@ -232,7 +233,6 @@ if __name__ == "__main__":
     ####################################################################################################
     # Weather analysis
     station_set = set(meta_df["Closest_Station"])
-    print(station_set)
     xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
     
     # Weather basic statistics
@@ -265,15 +265,14 @@ if __name__ == "__main__":
     """
     # Time sequence analysis
     
-    # Extreme weather
-    analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
+    # Extreme weather detection
+    #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
-    
     # Extreme weather plot
     # All districts
     #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
-    """
+
     # Cities
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     datetime_col = "Datetime"
@@ -281,8 +280,8 @@ if __name__ == "__main__":
     city_list = temp_city_df.columns()
     for city in city_list:
         iter_df = city_df[["Datetime", city]]
+        iter_df = iter_df.rename(columns={city: "Power"})
         analysis.extreme_weather_plot(iter_df, city, 
                                       "./result/extreme_weather/extreme_weather_data/extreme_weather_" + str(city) + ".xlsx", 
                                       start_time, end_time, 
                                       "./result/extreme_weather/extreme_plot/")
-    """
