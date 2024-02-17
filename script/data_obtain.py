@@ -52,7 +52,6 @@ def NCDC_weather_data_obtain(meta_path, output_path, start_year, stop_year):
     
     return None
 
-
 def NCDC_weather_data_station_merge(meta_path, 
                                     input_path, output_path, 
                                     start_year, stop_year):
