@@ -451,6 +451,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         city_num = next(iter(set(city_df["City"])))
         print("City", city_num)
         extreme_weather_df = datetime_df
+
         
         # Temperature
         extreme_weather_df['High Temperature'] = np.nan

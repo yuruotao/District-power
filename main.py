@@ -254,19 +254,30 @@ if __name__ == "__main__":
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
-        temp_weather_df = temp_weather_df[["TEMP", "DEWP", "SLP", "STP", "VISIB", "WDSP", "MXSPD", "GUST", "MAX", "MIN", "PRCP", "SNDP"]]
-        temp_weather_df = temp_weather_df.drop(["SNDP"], axis=1)
-        
+        temp_weather_df = temp_weather_df[["DATE", "TEMP", "DEWP", "SLP", "STP", "VISIB", "WDSP", "MXSPD", "MAX", "MIN", "PRCP"]]
+        temp_weather_df = temp_weather_df.rename({"DATE":"Datetime"}, axis=1)
+        temp_weather_df['Datetime'] = pd.to_datetime(temp_weather_df['Datetime'])
         city_df = meta_df.loc[meta_df['Closest_Station'] == element]
         city_num = set(city_df["City"]).pop()
         print("City", city_num)
+        
+        temp_city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+        temp_city_df = temp_city_df[["Datetime", str(city_num)]]
+        temp_city_df = temp_city_df.rename({str(city_num):"POWER"}, axis=1)
+        temp_city_df['Datetime'] = temp_city_df['Datetime'].dt.floor('D')
+        temp_city_df['Datetime'] = pd.to_datetime(temp_city_df['Datetime'])
+        # Group by day and aggregate values
+        temp_city_df = temp_city_df.groupby('Datetime').agg({"POWER": 'max'}).reset_index()
+        temp_weather_df = pd.merge(temp_weather_df, temp_city_df, on='Datetime', how="left")
+        temp_weather_df = temp_weather_df[temp_weather_df['POWER'].notna()]
+        temp_weather_df = temp_weather_df.drop(["Datetime"], axis=1)
         
         analysis.weather_correlation(temp_weather_df, "./result/extreme_weather/correlation/", str(city_num))
     """
     # Time sequence analysis
     
     # Extreme weather detection
-    #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
+    analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
 
     # Extreme weather plot
     # All districts
@@ -274,6 +285,7 @@ if __name__ == "__main__":
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
 
     # Cities
+    """
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     datetime_col = "Datetime"
     temp_city_df = city_df.drop([datetime_col], axis=1)
@@ -285,3 +297,4 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx", 
                                       start_time, end_time, 
                                       "./result/extreme_weather/extreme_plot/")
+    """
