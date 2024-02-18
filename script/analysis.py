@@ -799,14 +799,13 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     time_series_df = time_series_df.set_index("Datetime")
     
     event_colors = {#"Heat Index Caution":                   "#ad2831",
+                    
                     "Heat Index Extreme Caution":           "#800e13",
                     "Heat Index Danger":                    "#640d14",
                     "Heat Index Extreme Danger":            "#38040e",
-                    
                     "Wind Chill Very Cold":                 "#0096c7",
                     "Wind Chill Frostbite Danger":          "#023e8a",
                     "Wind Chill Great Frostbite Danger":    "#03045e",
-                    
                     "Tropical Storm":                       "#9d4edd",
                     "Severe Tropical Storm":                "#7b2cbf",
                     "Typhoon":                              "#5a189a",
