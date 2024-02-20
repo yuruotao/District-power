@@ -13,6 +13,7 @@ import script.missing_value as missing_value
 import script.profiling as profiling
 import script.basic_statistics as basic_statistics
 import script.resample as resample
+import script.uniform as uniform
 
 
 
@@ -238,8 +239,8 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Weather analysis
-    station_set = set(meta_df["Closest_Station"])
-    xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
+    #station_set = set(meta_df["Closest_Station"])
+    #xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
     
     # Weather basic statistics
     """
@@ -291,7 +292,8 @@ if __name__ == "__main__":
 
     # Cities
 
-    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    """
     datetime_col = "Datetime"
     temp_city_df = city_df.drop([datetime_col], axis=1)
     city_list = list(temp_city_df.columns.values)
@@ -302,3 +304,13 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx", 
                                       start_time, end_time, 
                                       "./result/extreme_weather/extreme_plot/")
+                                      
+    """
+    #
+    # Basic statistics for uniform data
+    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    city_df_22 = city_df.loc[(city_df['Datetime'] >= start_time) & (city_df['Datetime'] <= '2022-12-31 00:00:00')]
+    city_df_22 = city_df_22.reset_index()
+    uniform_df_22 = uniform.uniform(meta_df, city_df_22, "./result/uniform")
+    basic_statistics.basic_statistics(uniform_df_22, "./result/basic_statistics/uniform")
+    
