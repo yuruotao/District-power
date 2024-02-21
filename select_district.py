@@ -15,44 +15,6 @@ import script.basic_statistics as basic_statistics
 import script.resample as resample
 import script.uniform as uniform
 
-
-def time_series_dataframe_create(start_time, stop_time, time_interval):
-    """create a dataframe with a column containing a time series, which is the return value
-
-    Args:
-        start_time (string): the start time of the time series
-        stop_time (string): the stop time of the time series
-        time_interval (string): the time interval of the time series
-
-    Returns:
-        _datafra_: dataframe containing a column of time series
-    """
-
-    time_index = pd.date_range(start=start_time, end=stop_time, freq=time_interval)
-    # Create a DataFrame with the time series column
-    time_series_df = pd.DataFrame({'Datetime': time_index})
-    return time_series_df
-
-def separate_by(input_df, meta_df, output_path):
-    """separate the dataframe by city, into individual xlsx files
-
-    Args:
-        input_df (dataframe): the input dataframe to be separated
-        meta_df (dataframe): the dataframe containing information about input_df
-        output_path (string): the folder to contain the output xlsx files
-
-    Returns:
-        None
-    """
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-    
-    
-    
-    
-    
-    return None
-
 def district_aggregate(input_df, level, output_path):
     """aggregate the data by different levels
 
@@ -109,5 +71,6 @@ if __name__ == "__main__":
     district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     
+    select_df = district_df[district_df["0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
     
     
