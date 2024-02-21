@@ -67,6 +67,96 @@ def average_load_profile(input_df, output_path):
     
     return None
 
+def district_average_load_profile(input_df, output_path):
+    """Plot the load profile curve for each district
+
+    Args:
+        input_df (dataframe): contain the data to be plotted
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
+    
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        
+    start_time = '2022-01-01 00:00:00'
+    end_time = '2023-11-10 08:00:00'
+    temp_df = input_df.drop(["Datetime"], axis=1)
+    input_df = input_df.loc[(input_df['Datetime'] >= start_time) & (input_df['Datetime'] <= end_time)]
+
+    column_names = temp_df.columns
+    subplot_num = len(column_names)
+
+    for iter in range(subplot_num):
+        fig, ax = plt.subplots(figsize=(20, 8))
+        sns.lineplot(data=input_df, x='Datetime', y=column_names[iter], color="#0466c8")
+        ax.set_title(column_names[iter])
+        ax.set(xlabel="", ylabel="")
+
+        # Adjust layout
+        plt.tight_layout()
+        # Show the plot
+        plt.savefig(output_path + "load_profile_" + column_names[iter] + ".png", dpi=600)
+        plt.close()
+    
+    return None
+
+def average_load_profiles(input_df, output_path):
+    """Plot the load profile curve for each column
+
+    Args:
+        input_df (dataframe): contain the data to be plotted
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
+    
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        
+    start_time = '2022-01-01 00:00:00'
+    end_time = '2023-11-10 08:00:00'
+    temp_df = input_df.drop(["Datetime"], axis=1)
+    
+    input_df = input_df.loc[(input_df['Datetime'] >= start_time) & (input_df['Datetime'] <= end_time)]
+    color_list = ["#669bbc", "#003049", "#780000", 
+        "#0466c8", "#d90429",  "#0353a4", "#023e7d", "#002855", "#001845", "#001233", "#33415c", "#5c677d", "#7d8597", "#979dac", ]
+
+    # Create a figure and axes
+    fig, axs = plt.subplots(4, 3, figsize=(20, 12))
+
+    # Flatten the axes array for easy iteration
+    axs = axs.flatten()
+
+    # Plot each column
+    for i, column in enumerate(input_df.columns[1:]):  # Exclude the datetime column
+        ax = axs[i]
+        ax.plot(input_df['Datetime'], input_df[column], color="#0466c8")
+        ax.set_title("C" + column)
+        ax.grid(True)
+
+    # Hide the empty subplots
+    for ax in axs[len(input_df.columns)-1:]:
+        ax.axis('off')
+
+    # Adjust layout
+    plt.tight_layout()
+    # Show the plot
+    plt.savefig(output_path + "city_load_profile_all.png", dpi=600)
+    plt.close()
+
+    return None
+
+
 def diversity_factor_all(input_df, meta_df, output_path, type):
     """calculate the diversity factor for all transformers
 

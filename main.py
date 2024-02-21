@@ -192,8 +192,10 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Load profile
-    #analysis.average_load_profile(city_df, "./result/load_profile/")
-    
+    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #analysis.average_load_profile(city_df, "./result/load_profile/city/")
+    #analysis.average_load_profiles(city_df, "./result/load_profile/city/")
+    analysis.district_average_load_profile(imputed_df, "./result/load_profile/district/")
     ####################################################################################################
     # Transformer by capacity
     """
@@ -239,8 +241,8 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Weather analysis
-    #station_set = set(meta_df["Closest_Station"])
-    #xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
+    station_set = set(meta_df["Closest_Station"])
+    xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
     
     # Weather basic statistics
     """
@@ -255,9 +257,26 @@ if __name__ == "__main__":
         print("City", city_num)
         
         basic_statistics.basic_statistics(temp_weather_df, "./result/extreme_weather/basic_statistics/city_" + str(city_num))
-
+    """
+    
+    """   
+    # 2022 Weather basic statistics
+    for element in station_set:
+        temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
+        temp_weather_df = pd.read_excel(temp_xlsx_path)
+        temp_weather_df = temp_weather_df.rename(columns={"DATE": "Datetime"})
+        temp_weather_df_22 = temp_weather_df.loc[(temp_weather_df['Datetime'] >= start_time) & (temp_weather_df['Datetime'] <= '2022-12-31 00:00:00')]
+        temp_weather_df_22 = temp_weather_df_22.reset_index()
+        temp_weather_df_22 = temp_weather_df_22[["Datetime", "RH", "TEMP", "DEWP", "SLP", "STP", "VISIB", "WDSP", "MXSPD", "GUST", "MAX", "MIN", "PRCP", "SNDP"]]
+        
+        city_df = meta_df.loc[meta_df['Closest_Station'] == element]
+        city_num = set(city_df["City"]).pop()
+        print("City", city_num)
+        
+        basic_statistics.basic_statistics(temp_weather_df_22, "./result/extreme_weather/basic_statistics_22/city_" + str(city_num))
+    """
     # Weather correlation
-
+    """
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
@@ -306,11 +325,12 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/extreme_plot/")
                                       
     """
-    #
-    # Basic statistics for uniform data
+    # Basic statistics for uniform data and imputed data in 2022
+    """
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     city_df_22 = city_df.loc[(city_df['Datetime'] >= start_time) & (city_df['Datetime'] <= '2022-12-31 00:00:00')]
     city_df_22 = city_df_22.reset_index()
+    basic_statistics.basic_statistics(city_df_22, "./result/basic_statistics/imputed_22")
     uniform_df_22 = uniform.uniform(meta_df, city_df_22, "./result/uniform")
     basic_statistics.basic_statistics(uniform_df_22, "./result/basic_statistics/uniform")
-    
+    """
