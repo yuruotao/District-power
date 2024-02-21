@@ -169,17 +169,17 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Seasonality decomposition
-
+    """
     district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
-    """
+
     analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
     analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
     
     analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
     analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
-    """
-    #analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 24, "additive")
+
+    analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 24, "additive")
     analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 168, "additive")
     
     analysis.seasonality_decomposition(city_df, "./result/seasonality/city/multiplicative/", 24, "multiplicative")
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     
     analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 24, "multiplicative")
     analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 168, "multiplicative")
-
+    """
     ####################################################################################################
     # Diversity factor
     """
@@ -209,9 +209,7 @@ if __name__ == "__main__":
     #analysis.average_load_profile(city_df, "./result/load_profile/city/")
     # Load profile for each city in one plot
     #analysis.average_load_profiles(city_df, "./result/load_profile/city/")
-    
-    #city_list = [0, 2, 3, 5, 9]
-    #analysis.specific_load_profile_plot(city_df, city_list, start_time, stop_time, output_path)
+
     
     ####################################################################################################
     # Transformer by capacity

@@ -134,7 +134,7 @@ def average_load_profiles(input_df, output_path):
         "#0466c8", "#d90429",  "#0353a4", "#023e7d", "#002855", "#001845", "#001233", "#33415c", "#5c677d", "#7d8597", "#979dac", ]
 
     # Create a figure and axes
-    fig, axs = plt.subplots(4, 3, figsize=(20, 12))
+    fig, axs = plt.subplots(4, 3, figsize=(24, 12))
 
     # Flatten the axes array for easy iteration
     axs = axs.flatten()
@@ -145,6 +145,7 @@ def average_load_profiles(input_df, output_path):
         ax.plot(input_df['Datetime'], input_df[column], color="#0466c8")
         ax.set_title(alphabet_list[i] + ") C" + column, fontsize=14)
         ax.set_xlim(input_df['Datetime'].min(), input_df['Datetime'].max())
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45)   
         ax.grid(False)
 
     # Hide the empty subplots
@@ -159,39 +160,50 @@ def average_load_profiles(input_df, output_path):
 
     return None
 
-def specific_load_profile_plot(input_df, city_list, start_time, end_time, start_time_1, end_time_1, time_type, output_path):
+def specific_load_profile_plot(input_df, start_time, end_time, start_time_1, end_time_1, time_type, output_path):
+    """Plot load profile for 2 time intervals
 
+    Args:
+        input_df (dataframe): dataframe containing data to be plotted
+        start_time (string): start time for time interval 0
+        end_time (string): end time for time interval 0
+        start_time_1 (string): start time for time interval 1
+        end_time_1 (string): end time for time interval 1
+        time_type (string): time interval range
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
     
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
         
     alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
-    alphabet_count = 0
     
-    input_df_0 = input_df.loc[(input_df['Datetime'] >= start_time) & (input_df['Datetime'] <= end_time)]
-    input_df_1 = input_df.loc[(input_df['Datetime'] >= start_time_1) & (input_df['Datetime'] <= end_time_1)]
+    input_df_0 = input_df.loc[(input_df['Datetime'] >= pd.to_datetime(start_time)) & (input_df['Datetime'] <= pd.to_datetime(end_time))]
+    input_df_1 = input_df.loc[(input_df['Datetime'] >= pd.to_datetime(start_time_1)) & (input_df['Datetime'] <= pd.to_datetime(end_time_1))]
     
     if time_type == "Day":
         time_index = pd.date_range(start="00:00:00", end="23:00:00", freq='h')
-        label_0 = "Workday"
-        label_1 = "Weekend"
+        label_0 = "Monday"
+        label_1 = "Sunday"
         
     elif time_type == "Week":
-        time_index = pd.date_range(start="00 00:00:00", end="07 23:00:00", freq='h')
-        label_0 = ""
-        label_1 = ""
+        time_index = pd.date_range(start="2022-07-01 00:00:00", end="2022-07-07 23:00:00", freq='h')
+        label_0 = "July 4-July 10"
+        label_1 = "July 11-July 17"
         
     elif time_type == "Month":
-        time_index = pd.date_range(start="00 00:00:00", end="31 00:00:00", freq='h')
-        label_0 = ""
-        label_1 = ""
-        print("h")
+        time_index = pd.date_range(start="2022-07-01 00:00:00", end="2022-07-31 23:00:00", freq='h')
+        label_0 = "July"
+        label_1 = "August"
         
-    #input_df_0["Datetime"] = time_index
-    #input_df_1["Datetime"] = time_index
+    input_df_0["Datetime"] = time_index
+    input_df_1["Datetime"] = time_index
     
     # Create a figure and axes
     fig, axs = plt.subplots(2, 3, figsize=(20, 10))
@@ -200,14 +212,19 @@ def specific_load_profile_plot(input_df, city_list, start_time, end_time, start_
     axs = axs.flatten()
 
     # Plot each column
-    for i in city_list:  # Exclude the datetime column
-        ax = axs[alphabet_count]
-        ax.plot(input_df_0['Datetime'], input_df_0[i], color="#0466c8", label=label_0)
-        ax.plot(input_df_1['Datetime'], input_df_1[i], color="#d90429", label=label_1)
-        ax.set_title(alphabet_list[alphabet_count] + ") C" + str(i), fontsize=14)
-        ax.grid(True)
-        
-        alphabet_count = alphabet_count + 1
+    alphabet_num = 0
+    for i, column in enumerate(input_df.columns[1:]):  # Exclude the datetime column
+        ax = axs[i]
+        ax.plot(input_df_0['Datetime'], input_df_0[column], color="#0466c8", label=label_0)
+        ax.plot(input_df_1['Datetime'], input_df_1[column], color="#d90429", label=label_1)
+        ax.set_title(alphabet_list[alphabet_num] + ") C" + column, fontsize=17)
+        ax.set_xlim(input_df_0['Datetime'].min(), input_df_0['Datetime'].max())
+        ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%d %H:%M'))
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45)   
+        ax.grid(False)
+        if alphabet_num == 0:
+            ax.legend()
+        alphabet_num = alphabet_num + 1
 
     # Hide the empty subplots
     for ax in axs[len(input_df.columns)-1:]:

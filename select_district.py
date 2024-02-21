@@ -4,16 +4,9 @@ import os
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.spatial.distance import cdist
 
 # Import modules
 import script.analysis as analysis
-import script.imputation as imputation
-import script.missing_value as missing_value
-import script.profiling as profiling
-import script.basic_statistics as basic_statistics
-import script.resample as resample
-import script.uniform as uniform
 
 def district_aggregate(input_df, level, output_path):
     """aggregate the data by different levels
@@ -71,13 +64,31 @@ if __name__ == "__main__":
     district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     
-    select_df = district_df[district_df["0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
-    select_df = select_df.rename({
+    select_df = district_df[["Datetime", "0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
+    select_df = select_df.rename(columns={
         "0-0":"0", "1-0":"1", "2-0":"2", 
         "3-0":"3", "4-0":"4", "5-0":"5", 
         "6-0":"6", "7-0":"7", "8-0":"8", 
         "9-0":"9"
     })
+    
     # Load profile for all districts
-    analysis.average_load_profiles(select_df, "./result/select/")
+    #analysis.average_load_profiles(select_df, "./result/select/")
+    
+    # Load profile in different scales
+    """
+    select_df = select_df[["Datetime", "0", "2", "3", "5", "9"]]
+    analysis.specific_load_profile_plot(select_df, 
+                                        '2022-07-04 00:00:00', '2022-07-04 23:00:00', 
+                                        '2022-07-10 00:00:00', '2022-07-10 23:00:00', 
+                                        "Day", "./result/select/")
+    analysis.specific_load_profile_plot(select_df, 
+                                        '2022-07-04 00:00:00', '2022-07-10 23:00:00', 
+                                        '2022-07-11 00:00:00', '2022-07-17 23:00:00', 
+                                        "Week", "./result/select/")
+    analysis.specific_load_profile_plot(select_df, 
+                                        '2022-07-01 00:00:00', '2022-07-31 23:00:00', 
+                                        '2022-08-01 00:00:00', '2022-08-31 23:00:00', 
+                                        "Month", "./result/select/")
+    """
     
