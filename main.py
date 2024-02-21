@@ -192,10 +192,10 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Load profile
-    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     #analysis.average_load_profile(city_df, "./result/load_profile/city/")
     #analysis.average_load_profiles(city_df, "./result/load_profile/city/")
-    analysis.district_average_load_profile(imputed_df, "./result/load_profile/district/")
+    #analysis.district_average_load_profile(imputed_df, "./result/load_profile/district/")
     ####################################################################################################
     # Transformer by capacity
     """
