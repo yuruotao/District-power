@@ -210,7 +210,6 @@ if __name__ == "__main__":
     # Load profile for each city in one plot
     #analysis.average_load_profiles(city_df, "./result/load_profile/city/")
 
-    
     ####################################################################################################
     # Transformer by capacity
     """
@@ -274,8 +273,8 @@ if __name__ == "__main__":
         basic_statistics.basic_statistics(temp_weather_df, "./result/extreme_weather/basic_statistics/city_" + str(city_num))
     """
     
-    """   
     # 2022 Weather basic statistics
+    """   
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
@@ -290,6 +289,7 @@ if __name__ == "__main__":
         
         basic_statistics.basic_statistics(temp_weather_df_22, "./result/extreme_weather/basic_statistics_22/city_" + str(city_num))
     """
+    
     # Weather correlation
     """
     for element in station_set:
@@ -324,22 +324,23 @@ if __name__ == "__main__":
     #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
 
-    # Cities
+    # Cities extreme weather
+    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
-    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
-    """
     datetime_col = "Datetime"
     temp_city_df = city_df.drop([datetime_col], axis=1)
     city_list = list(temp_city_df.columns.values)
     for city in city_list:
         iter_df = city_df[["Datetime", city]]
         iter_df = iter_df.rename(columns={city: "Power"})
-        analysis.extreme_weather_city_plot(iter_df, city, 
-                                      "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx", 
-                                      start_time, end_time, 
+        analysis.extreme_weather_city_plot_all(iter_df, city, 
+                                      "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx",
+                                      "./data/extreme_weather.xlsx", 
+                                      start_time, '2022-12-31 23:00:00', 
                                       "./result/extreme_weather/extreme_plot/")
                                       
-    """
+
+
     # Basic statistics for uniform data and imputed data in 2022
     """
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")

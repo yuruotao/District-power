@@ -902,6 +902,7 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
 
     fig, ax = plt.subplots(figsize=(20, 8))
     ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
+    ax.set_xlim(input_df.index.min(), input_df.index.max())
 
     # Set background color according to Event values
     for event, color in event_colors.items():
@@ -961,7 +962,7 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     Returns:
         None
     """
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
     weather_df = pd.read_excel(weather_data_path)
@@ -997,6 +998,7 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
 
     fig, ax = plt.subplots(figsize=(20, 8))
     ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
+    ax.set_xlim(input_df.index.min(), input_df.index.max())
 
     # Set background color according to Event values
     for event, color in event_colors.items():
@@ -1039,6 +1041,164 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     
     return None
 
+def extreme_weather_city_plot_all(input_df, city, weather_data_path, all_weather_path, start_time, end_time, output_path):
+    """Plot extreme weather load profile for each city along with the provincial weather data
+
+    Args:
+        input_df (dataframe): contain the power data
+        city (string): city to plot
+        weather_data_path (string): path to the extreme weather data
+        all_weather_data_path (string): path to the extreme weather data of province
+        start_time (string): the start date of extreme weather
+        end_date (string): the end date of extreme weather
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
+    sns.set_theme(style="white")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    weather_df = pd.read_excel(weather_data_path)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    time_index = pd.date_range(start=start_time, end=end_time, freq="h")
+    # Create a DataFrame with the time series column
+    time_series_df = pd.DataFrame({'Datetime': time_index})
+    weather_df = pd.merge(time_series_df, weather_df, on='Datetime', how="left")
+    # Filter out missing values from weather_df
+    weather_df_filtered = weather_df.fillna("None")
+    
+    time_series_df = pd.merge(time_series_df, input_df, on='Datetime', how="left")
+    time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
+    time_series_df = time_series_df.set_index("Datetime")
+    
+    all_event_colors = {
+                    #'Hot weather':                  '#e63946', 
+                    'Severe convective weather':    '#a8dadc', 
+                    'Cold wave':                    '#3a86ff',
+                    'Drought':                      '#e09f3e',
+                    'Dragon-boat rain':             '#005f73',
+                    'Excessive flooding':           '#76c893',
+                    'Extreme rainfall':             '#80ed99',
+                    'Rainstorm':                    '#b5179e',
+                    'Tropical Storm Sanba':         '#d6ccc2',}
+    
+    event_colors = {
+                    #"Heat Index Caution":                   "#ad2831",
+                    "Heat Index Extreme Caution":           "#800e13",
+                    "Heat Index Danger":                    "#640d14",
+                    "Heat Index Extreme Danger":            "#38040e",
+                    "Wind Chill Very Cold":                 "#0096c7",
+                    "Wind Chill Frostbite Danger":          "#023e8a",
+                    "Wind Chill Great Frostbite Danger":    "#03045e",
+                    "Tropical Storm":                       "#9d4edd",
+                    "Severe Tropical Storm":                "#7b2cbf",
+                    "Typhoon":                              "#5a189a",
+                    "Strong Typhoon":                       "#3c096c",
+                    "Super Typhoon":                        "#240046",}
+    
+
+    fig, ax = plt.subplots(figsize=(20, 8))
+    ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
+
+    # Set background color according to Event values
+    for event, color in event_colors.items():
+        subset = time_series_df[time_series_df[event] == 1]
+        print(event)
+        
+        if not subset.empty:
+            dfs = []
+            start_idx = subset.index[0]
+            end_idx = None
+        
+            for idx in subset.index[1:]:
+                if (idx - start_idx).days > 1:
+                    # End of current part found
+                    dfs.append(subset.loc[start_idx:end_idx])
+                    start_idx = idx
+                    end_idx = None
+                else:
+                    # Continuation of current part
+                    end_idx = idx
+
+        df_num = 0
+        for group_df in dfs:
+            if event == "None":
+                ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
+            else:
+                if df_num == 0:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
+                    df_num = df_num + 1
+                else:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
+                    df_num = df_num + 1
+        
+    weather_df = pd.read_excel(all_weather_path)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    time_index = pd.date_range(start=start_time, end=end_time, freq="h")
+    # Create a DataFrame with the time series column
+    time_series_df = pd.DataFrame({'Datetime': time_index})
+    weather_df = pd.merge(time_series_df, weather_df, on='Datetime', how="left")
+    # Filter out missing values from weather_df
+    weather_df_filtered = weather_df.fillna("None")
+    
+    time_series_df = pd.merge(time_series_df, input_df, on='Datetime', how="left")
+    time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
+    time_series_df = time_series_df.set_index("Datetime")
+    
+    # Set background color according to Event values
+    for event, color in all_event_colors.items():
+        subset = time_series_df[time_series_df['Event'] == event]
+        print(event)
+        
+        if not subset.empty:
+            dfs = []
+            start_idx = subset.index[0]
+            end_idx = None
+        
+            for idx in subset.index[1:]:
+                if (idx - start_idx).days > 1:
+                    # End of current part found
+                    dfs.append(subset.loc[start_idx:end_idx])
+                    start_idx = idx
+                    end_idx = None
+                else:
+                    # Continuation of current part
+                    end_idx = idx
+
+        df_num = 0
+        for group_df in dfs:
+            if event == "None":
+                ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
+            else:
+                if df_num == 0:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
+                    df_num = df_num + 1
+                else:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
+                    df_num = df_num + 1
+        
+    legend = plt.legend()
+    legend.get_frame().set_facecolor('none')
+    plt.legend(frameon=False)
+
+    ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    ax.set(xlabel="", ylabel="")
+    
+    plt.tight_layout()
+    plt.savefig(output_path + "extreme_weather_" + city + ".png", dpi=600)
+    plt.close()
+    
+    return None
+
+
 
 def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output_path):
     """Plot the extreme weather
@@ -1054,7 +1214,7 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
     Returns:
         None
     """
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
     weather_df = pd.read_excel(weather_data_path)
@@ -1084,6 +1244,7 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
 
     fig, ax = plt.subplots(figsize=(20, 8))
     ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
+    
 
     # Set background color according to Event values
     for event, color in event_colors.items():
@@ -1124,6 +1285,7 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
     legend.get_frame().set_facecolor('none')
     plt.legend(frameon=False)
 
+    ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
     ax.set(xlabel="", ylabel="")
     
