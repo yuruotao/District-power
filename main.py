@@ -325,6 +325,7 @@ if __name__ == "__main__":
     #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
 
     # Cities extreme weather
+    """
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
     datetime_col = "Datetime"
@@ -338,7 +339,9 @@ if __name__ == "__main__":
                                       "./data/extreme_weather.xlsx", 
                                       start_time, '2022-12-31 23:00:00', 
                                       "./result/extreme_weather/extreme_plot/")
-                                      
+    """
+    # Extreme weather plot for designated time interval
+                                
 
 
     # Basic statistics for uniform data and imputed data in 2022
