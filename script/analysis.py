@@ -867,7 +867,7 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
     Returns:
         None
     """
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
     weather_df = pd.read_excel(weather_data_path)
@@ -902,43 +902,43 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
 
     fig, ax = plt.subplots(figsize=(20, 8))
     ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
-    ax.set_xlim(input_df.index.min(), input_df.index.max())
 
-    # Set background color according to Event values
     for event, color in event_colors.items():
-        subset = time_series_df[time_series_df['Event'] == event]
+        subset = time_series_df[time_series_df["Event"] == event]
         print(event)
         
-        dfs = []
-        start_idx = subset.index[0]
-        end_idx = None
+        if not subset.empty:
+            dfs = []
+            start_idx = subset.index[0]
+            end_idx = None
         
-        for idx in subset.index[1:]:
-            if (idx - start_idx).days > 1:
-                # End of current part found
-                dfs.append(subset.loc[start_idx:end_idx])
-                start_idx = idx
-                end_idx = None
-            else:
-                # Continuation of current part
-                end_idx = idx
+            for idx in subset.index[1:]:
+                if (idx - start_idx).days > 1:
+                    # End of current part found
+                    dfs.append(subset.loc[start_idx:end_idx])
+                    start_idx = idx
+                    end_idx = None
+                else:
+                    # Continuation of current part
+                    end_idx = idx
 
-        # Add the last part of the DataFrame
-        if end_idx is not None:
-            dfs.append(subset.loc[start_idx:end_idx])
-        
-        for group_df in dfs:
-            if event == "None":
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0)
-            else:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.6)
-    
-    
+            df_num = 0
+            for group_df in dfs:
+                if event == "None":
+                    ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
+                else:
+                    if df_num == 0:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
+                        df_num = df_num + 1
+                    else:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
+                        df_num = df_num + 1
     
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
     plt.legend(frameon=False)
 
+    ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
     ax.set(xlabel="", ylabel="")
     
@@ -998,7 +998,7 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
 
     fig, ax = plt.subplots(figsize=(20, 8))
     ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
-    ax.set_xlim(input_df.index.min(), input_df.index.max())
+    
 
     # Set background color according to Event values
     for event, color in event_colors.items():
@@ -1020,18 +1020,24 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
                     # Continuation of current part
                     end_idx = idx
 
-            # Add the last part of the DataFrame
-            if end_idx is not None:
-                dfs.append(subset.loc[start_idx:end_idx])
-        
+            df_num = 0
             for group_df in dfs:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.6)
+                if event == "None":
+                    ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
+                else:
+                    if df_num == 0:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3, edgecolor='none', label=str(event))
+                        df_num = df_num + 1
+                    else:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3, edgecolor='none')
+                        df_num = df_num + 1
         
         
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
     plt.legend(frameon=False)
 
+    ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
     ax.set(xlabel="", ylabel="")
     
@@ -1089,20 +1095,21 @@ def extreme_weather_city_plot_all(input_df, city, weather_data_path, all_weather
     event_colors = {
                     #"Heat Index Caution":                   "#ad2831",
                     "Heat Index Extreme Caution":           "#800e13",
-                    "Heat Index Danger":                    "#640d14",
-                    "Heat Index Extreme Danger":            "#38040e",
+                    #"Heat Index Danger":                    "#640d14",
+                    #"Heat Index Extreme Danger":            "#38040e",
                     "Wind Chill Very Cold":                 "#0096c7",
-                    "Wind Chill Frostbite Danger":          "#023e8a",
-                    "Wind Chill Great Frostbite Danger":    "#03045e",
+                    #"Wind Chill Frostbite Danger":          "#023e8a",
+                    #"Wind Chill Great Frostbite Danger":    "#03045e",
                     "Tropical Storm":                       "#9d4edd",
                     "Severe Tropical Storm":                "#7b2cbf",
                     "Typhoon":                              "#5a189a",
-                    "Strong Typhoon":                       "#3c096c",
-                    "Super Typhoon":                        "#240046",}
+                    #"Strong Typhoon":                       "#3c096c",
+                    #"Super Typhoon":                        "#240046",
+                    }
     
 
     fig, ax = plt.subplots(figsize=(20, 8))
-    ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
+    ax.plot(time_series_df.index, time_series_df['Power'], color='#0a0908')
 
     # Set background color according to Event values
     for event, color in event_colors.items():
@@ -1124,17 +1131,17 @@ def extreme_weather_city_plot_all(input_df, city, weather_data_path, all_weather
                     # Continuation of current part
                     end_idx = idx
 
-        df_num = 0
-        for group_df in dfs:
-            if event == "None":
-                ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
-            else:
-                if df_num == 0:
-                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
-                    df_num = df_num + 1
+            df_num = 0
+            for group_df in dfs:
+                if event == "None":
+                    ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
                 else:
-                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
-                    df_num = df_num + 1
+                    if df_num == 0:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3, edgecolor='none', label=str(event))
+                        df_num = df_num + 1
+                    else:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3, edgecolor='none')
+                        df_num = df_num + 1
         
     weather_df = pd.read_excel(all_weather_path)
     
@@ -1154,7 +1161,7 @@ def extreme_weather_city_plot_all(input_df, city, weather_data_path, all_weather
     
     # Set background color according to Event values
     for event, color in all_event_colors.items():
-        subset = time_series_df[time_series_df['Event'] == event]
+        subset = time_series_df[time_series_df["Event"] == event]
         print(event)
         
         if not subset.empty:
@@ -1172,17 +1179,17 @@ def extreme_weather_city_plot_all(input_df, city, weather_data_path, all_weather
                     # Continuation of current part
                     end_idx = idx
 
-        df_num = 0
-        for group_df in dfs:
-            if event == "None":
-                ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
-            else:
-                if df_num == 0:
-                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
-                    df_num = df_num + 1
+            df_num = 0
+            for group_df in dfs:
+                if event == "None":
+                    ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
                 else:
-                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
-                    df_num = df_num + 1
+                    if df_num == 0:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3, edgecolor='none', label=str(event))
+                        df_num = df_num + 1
+                    else:
+                        ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.3, edgecolor='none')
+                        df_num = df_num + 1
         
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')

@@ -321,11 +321,11 @@ if __name__ == "__main__":
 
     # Extreme weather plot
     # All districts
-    #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
-    #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
+    province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
+    analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
 
     # Cities extreme weather
-    """
+
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
     datetime_col = "Datetime"
@@ -334,12 +334,20 @@ if __name__ == "__main__":
     for city in city_list:
         iter_df = city_df[["Datetime", city]]
         iter_df = iter_df.rename(columns={city: "Power"})
-        analysis.extreme_weather_city_plot_all(iter_df, city, 
+        analysis.extreme_weather_city_plot(iter_df, city, 
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx",
-                                      "./data/extreme_weather.xlsx", 
                                       start_time, '2022-12-31 23:00:00', 
                                       "./result/extreme_weather/extreme_plot/")
-    """
+    
+    for city in city_list:
+        iter_df = city_df[["Datetime", city]]
+        iter_df = iter_df.rename(columns={city: "Power"})
+        analysis.extreme_weather_city_plot_all(iter_df, city, 
+                                      "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx",
+                                      "./data/extreme_weather.xlsx",
+                                      start_time, '2022-12-31 23:00:00', 
+                                      "./result/extreme_weather/extreme_plot_all/")
+
     # Extreme weather plot for designated time interval
                                 
 
