@@ -425,6 +425,10 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
     Returns:
         None
     """
+    
+    sns.set_theme(style="white")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
     output_path = output_path + str(period_num) + "/"
     if not os.path.exists(output_path):
         os.makedirs(output_path)

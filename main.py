@@ -169,15 +169,15 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Seasonality decomposition
-    """
+
     district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
     
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
     
     analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 24, "additive")
     analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 168, "additive")
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     
     analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 24, "multiplicative")
     analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 168, "multiplicative")
-    """
+
     ####################################################################################################
     # Diversity factor
     """

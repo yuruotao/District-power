@@ -111,7 +111,3 @@ if __name__ == "__main__":
     
     
     
-    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
-    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
-    
-    
