@@ -118,7 +118,7 @@ def average_load_profiles(input_df, output_path):
         None
     """
     
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
     if not os.path.exists(output_path):
@@ -143,8 +143,8 @@ def average_load_profiles(input_df, output_path):
     for i, column in enumerate(input_df.columns[1:]):  # Exclude the datetime column
         ax = axs[i]
         ax.plot(input_df['Datetime'], input_df[column], color="#0466c8")
-        ax.set_title(alphabet_list[] + ") C" + column)
-        ax.grid(True)
+        ax.set_title(alphabet_list[i] + ") C" + column, fontsize=14)
+        ax.grid(False)
 
     # Hide the empty subplots
     for ax in axs[len(input_df.columns)-1:]:
@@ -156,6 +156,69 @@ def average_load_profiles(input_df, output_path):
     plt.savefig(output_path + "city_load_profile_all.png", dpi=600)
     plt.close()
 
+    return None
+
+def specific_load_profile_plot(input_df, city_list, start_time, end_time, start_time_1, end_time_1, time_type, output_path):
+
+    
+    sns.set_theme(style="whitegrid")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        
+    alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
+    alphabet_count = 0
+    
+    input_df_0 = input_df.loc[(input_df['Datetime'] >= start_time) & (input_df['Datetime'] <= end_time)]
+    input_df_1 = input_df.loc[(input_df['Datetime'] >= start_time_1) & (input_df['Datetime'] <= end_time_1)]
+    
+    if time_type == "Day":
+        #time_index = pd.date_range(start="00:00:00", end="23:00:00", freq='h')
+        label_0 = "Workday"
+        label_1 = "Weekend"
+        
+    elif time_type == "Week":
+        #time_index = pd.date_range(start=, end=, freq='h')
+        label_0 = ""
+        label_1 = ""
+        
+    elif time_type == "Month":
+        #time_index = pd.date_range(start=, end=, freq='h')
+        print("h")
+        
+    #input_df_0["Datetime"] = time_index
+    #input_df_1["Datetime"] = time_index
+    
+    # Create a figure and axes
+    fig, axs = plt.subplots(2, 3, figsize=(20, 10))
+
+    # Flatten the axes array for easy iteration
+    axs = axs.flatten()
+
+    # Plot each column
+    for i in city_list:  # Exclude the datetime column
+        ax = axs[alphabet_count]
+        ax.plot(input_df_0['Datetime'], input_df_0[i], color="#0466c8", label=label_0)
+        ax.plot(input_df_1['Datetime'], input_df_1[i], color="#d90429", label=label_1)
+        ax.set_title(alphabet_list[alphabet_count] + ") C" + str(i), fontsize=14)
+        ax.grid(True)
+        
+        alphabet_count = alphabet_count + 1
+
+    # Hide the empty subplots
+    for ax in axs[len(input_df.columns)-1:]:
+        ax.axis('off')
+
+    # Adjust layout
+    plt.tight_layout()
+    # Show the plot
+    plt.savefig(output_path + "city_load_profile_" + time_type + ".png", dpi=600)
+    plt.close()
+    
+    
+    
+    
     return None
 
 
@@ -500,12 +563,11 @@ def weather_correlation(input_df, output_path, city_num):
         ax.annotate(f"r={r:.2f}", xy=(.5, .5), xycoords=ax.transAxes,
                 color='white' if lightness < 0.7 else 'black', size=26, ha='center', va='center')
     
-    
     g = sns.PairGrid(input_df)
     g.map_lower(plt.scatter, s=10)
     g.map_diag(sns.histplot, kde=False)
     g.map_upper(corrfunc, cmap=plt.get_cmap('crest'), norm=plt.Normalize(vmin=-.5, vmax=.5))
-        
+    
     plt.tight_layout()
     plt.savefig(output_path + "/correlation_" + city_num + ".png", dpi=600)
     plt.close()
@@ -989,8 +1051,7 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
                     'Mid-autumn festival':          '#fdc500',
                     'National Day':                 '#e09f3e',
                     'Qingming':                     '#8b949a',
-                    'Spring Festival':              '#e01e37',
-                    'None':                         "#FFFFFF"}
+                    'Spring Festival':              '#e01e37',}
     
 
     fig, ax = plt.subplots(figsize=(20, 8))
@@ -1019,12 +1080,18 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
         if end_idx is not None:
             dfs.append(subset.loc[start_idx:end_idx])
         
+        df_num = 0
         for group_df in dfs:
             if event == "None":
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0, edgecolor='none')
+                ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
             else:
-                ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
-    
+                if df_num == 0:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
+                    df_num = df_num + 1
+                else:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
+                    df_num = df_num + 1
+                
     legend = plt.legend()
     legend.get_frame().set_facecolor('none')
     plt.legend(frameon=False)
