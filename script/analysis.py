@@ -35,6 +35,7 @@ def average_load_profile(input_df, output_path):
 
     column_names = temp_df.columns
     subplot_num = 3
+    
     fig, axes = plt.subplots(subplot_num, 1, figsize=(20, 7))
     for iter in range(subplot_num):
 
@@ -126,6 +127,7 @@ def average_load_profiles(input_df, output_path):
     start_time = '2022-01-01 00:00:00'
     end_time = '2023-11-10 08:00:00'
     temp_df = input_df.drop(["Datetime"], axis=1)
+    alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
     
     input_df = input_df.loc[(input_df['Datetime'] >= start_time) & (input_df['Datetime'] <= end_time)]
     color_list = ["#669bbc", "#003049", "#780000", 
@@ -141,7 +143,7 @@ def average_load_profiles(input_df, output_path):
     for i, column in enumerate(input_df.columns[1:]):  # Exclude the datetime column
         ax = axs[i]
         ax.plot(input_df['Datetime'], input_df[column], color="#0466c8")
-        ax.set_title("C" + column)
+        ax.set_title(alphabet_list[] + ") C" + column)
         ax.grid(True)
 
     # Hide the empty subplots
