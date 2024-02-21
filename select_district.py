@@ -65,12 +65,19 @@ def district_aggregate(input_df, level, output_path):
     return output_df
 
 if __name__ == "__main__":
-    
+    start_time = '2022-01-01 00:00:00'
     imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
     
     district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
     
     select_df = district_df[district_df["0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
-    
+    select_df = select_df.rename({
+        "0-0":"0", "1-0":"1", "2-0":"2", 
+        "3-0":"3", "4-0":"4", "5-0":"5", 
+        "6-0":"6", "7-0":"7", "8-0":"8", 
+        "9-0":"9"
+    })
+    # Load profile for all districts
+    analysis.average_load_profiles(select_df, "./result/select/")
     

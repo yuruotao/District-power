@@ -144,6 +144,7 @@ def average_load_profiles(input_df, output_path):
         ax = axs[i]
         ax.plot(input_df['Datetime'], input_df[column], color="#0466c8")
         ax.set_title(alphabet_list[i] + ") C" + column, fontsize=14)
+        ax.set_xlim(input_df['Datetime'].min(), input_df['Datetime'].max())
         ax.grid(False)
 
     # Hide the empty subplots
@@ -174,17 +175,19 @@ def specific_load_profile_plot(input_df, city_list, start_time, end_time, start_
     input_df_1 = input_df.loc[(input_df['Datetime'] >= start_time_1) & (input_df['Datetime'] <= end_time_1)]
     
     if time_type == "Day":
-        #time_index = pd.date_range(start="00:00:00", end="23:00:00", freq='h')
+        time_index = pd.date_range(start="00:00:00", end="23:00:00", freq='h')
         label_0 = "Workday"
         label_1 = "Weekend"
         
     elif time_type == "Week":
-        #time_index = pd.date_range(start=, end=, freq='h')
+        time_index = pd.date_range(start="00 00:00:00", end="07 23:00:00", freq='h')
         label_0 = ""
         label_1 = ""
         
     elif time_type == "Month":
-        #time_index = pd.date_range(start=, end=, freq='h')
+        time_index = pd.date_range(start="00 00:00:00", end="31 00:00:00", freq='h')
+        label_0 = ""
+        label_1 = ""
         print("h")
         
     #input_df_0["Datetime"] = time_index
@@ -451,22 +454,26 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
             result = seasonal_decompose(plot_df, model=model, period=period_num)  # Adjust period as needed
 
             # Create a Matplotlib figure and axes
-            fig, axes = plt.subplots(4, 1, figsize=(20, 8))
+            fig, axes = plt.subplots(4, 1, figsize=(20, 8), layout='compressed')
 
             # Plot the original time series
             axes[0].plot(plot_df, label='Original', color="#023e8a")
+            axes[0].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[0].legend()
 
             # Plot the trend component
             axes[1].plot(result.trend, label='Trend', color="#0077b6")
+            axes[1].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[1].legend()
 
             # Plot the seasonal component
             axes[2].plot(result.seasonal, label='Seasonal', color='#03045e')
+            axes[2].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[2].legend()
         
             # Plot the residual component
             axes[3].plot(result.resid, label='Residual', color='#780000')
+            axes[3].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[3].legend()
         
             # Adjust layout
