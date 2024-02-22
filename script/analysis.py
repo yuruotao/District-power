@@ -1412,8 +1412,8 @@ def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_
                 
                 
                 ax.plot(extreme_df.index, extreme_df['Power'], color="#ba181b", label="Extreme")
-                ax.plot(extreme_df_before.index, extreme_df_before['Power'], color='#274c77', label="1 Day before")
-                ax.plot(extreme_df_after.index, extreme_df_after['Power'], color='#fca311', label="1 Day after")
+                ax.plot(extreme_df_before.index, extreme_df_before['Power'], color='#274c77', label="Previous Day")
+                ax.plot(extreme_df_after.index, extreme_df_after['Power'], color='#fca311', label="Next Day")
 
                 ax.set_title(alphabet_list[event_num] + ") " + event, fontsize=16)
                 ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
