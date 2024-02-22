@@ -663,8 +663,8 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         
         # Humidity
         extreme_weather_df['High Humidity'] = np.nan
-        DEWP_percentile_95 = temp_weather_df['DEWP'].quantile(0.95)
-        high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > DEWP_percentile_95]
+        RH_percentile_95 = temp_weather_df['RH'].quantile(0.95)
+        high_hum_df = temp_weather_df.loc[temp_weather_df['RH'] > RH_percentile_95]
         for date in high_hum_df['DATE']:
             # Iterate over the rows of the DataFrame
             for index, row in extreme_weather_df.iterrows():
@@ -1234,14 +1234,14 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
                     #"Wind Level 2": "#9d4edd",
                     #"Wind Level 3": "#7b2cbf",
                     #"Wind Level 4": "#5a189a",
-                    "Wind Level 5": "#3c096c",
-                    "Wind Level 6": "#240046",
-                    "Wind Level 7": "#10002b",
-                    "Wind Level 8": "#aacc00",
-                    "Wind Level 9": "#80b918",
-                    "Wind Level 10": "#55a630",
-                    "Wind Level 11": "#2b9348",
-                    "Wind Level 12": "#007f5f",
+                    "Wind Level 5": "#e0aaff",
+                    "Wind Level 6": "#c77dff",
+                    "Wind Level 7": "#9d4edd",
+                    "Wind Level 8": "#7b2cbf",
+                    "Wind Level 9": "#5a189a",
+                    #"Wind Level 10": "#55a630",
+                    #"Wind Level 11": "#2b9348",
+                    #"Wind Level 12": "#007f5f",
                     "Precipitation 50": "#d5c7bc",
                     "Precipitation 100": "#785964",
                     
@@ -1304,6 +1304,130 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
     plt.close()
     
     return None
+
+def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_time, output_path):
+    """Plot extreme weather load profile for each city
+
+    Args:
+        input_df (dataframe): contain the power data
+        weather_data_path (string): path to the extreme weather data
+        start_time (string): the start date of time range
+        end_date (string): the end date of time range
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
+    sns.set_theme(style="white")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    weather_df = pd.read_excel(weather_data_path)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    time_index = pd.date_range(start=start_time, end=end_time, freq="h")
+    # Create a DataFrame with the time series column
+    time_series_df = pd.DataFrame({'Datetime': time_index})
+    weather_df = pd.merge(time_series_df, weather_df, on='Datetime', how="left")
+    # Filter out missing values from weather_df
+    weather_df_filtered = weather_df.fillna("None")
+    
+    time_series_df = pd.merge(time_series_df, input_df, on='Datetime', how="left")
+    time_series_df = pd.merge(time_series_df, weather_df_filtered, on='Datetime', how="left")
+    time_series_df = time_series_df.set_index("Datetime")
+    
+    event_colors = {#"Heat Index Caution":                   "#ad2831",
+                    
+                    "Heat Index Extreme Caution":           "#800e13",
+                    "Heat Index Danger":                    "#640d14",
+                    "Heat Index Extreme Danger":            "#38040e",
+                    #"Wind Chill Very Cold":                 "#0096c7",
+                    #"Wind Chill Frostbite Danger":          "#023e8a",
+                    #"Wind Chill Great Frostbite Danger":    "#03045e",
+                    "High Temperature": "#e5383b",
+                    "Low Temperature": "#192bc2",
+                    "High Humidity": "#007f5f",
+                    #"Wind Level 0": "#e0aaff",
+                    #"Wind Level 1": "#c77dff",
+                    #"Wind Level 2": "#9d4edd",
+                    #"Wind Level 3": "#7b2cbf",
+                    #"Wind Level 4": "#5a189a",
+                    "Wind Level 5": "#e0aaff",
+                    "Wind Level 6": "#c77dff",
+                    "Wind Level 7": "#9d4edd",
+                    "Wind Level 8": "#7b2cbf",
+                    "Wind Level 9": "#5a189a",
+                    #"Wind Level 10": "#55a630",
+                    #"Wind Level 11": "#2b9348",
+                    #"Wind Level 12": "#007f5f",
+                    "Precipitation 50": "#d5c7bc",
+                    "Precipitation 100": "#785964",
+                    }
+    
+
+    # Set background color according to Event values
+    for event, color in event_colors.items():
+        subset = time_series_df[time_series_df[event] == 1]
+        print(event)
+        fig, ax = plt.subplots(figsize=(16, 8))
+        
+        if not subset.empty:
+            dfs = []
+            start_idx = subset.index[0]
+            end_idx = None
+        
+            found = 0
+            for idx in subset.index[1:]:
+                
+                if found == 1:
+                    break
+                
+                if (idx - start_idx).days > 1:
+                    # End of current part found
+                    
+                    
+                    time_difference = abs(start_idx - end_idx)
+                    # Check if the difference is more than one day
+                    if time_difference.days > 1:
+                        start_time = start_idx - pd.Timedelta(days=2)
+                        end_time = start_idx + pd.Timedelta(days=1)
+                        end_idx = end_time
+                    else:
+                        start_time = start_idx - pd.Timedelta(days=1)
+                        end_time = start_idx + pd.Timedelta(days=2)
+                    
+                    dfs.append(subset.loc[start_idx:end_idx])
+                    
+                    start_idx = idx
+                    end_idx = None
+                    found = 1
+                else:
+                    # Continuation of current part
+                    end_idx = idx
+            if dfs:
+                extreme_df = time_series_df.loc[(time_series_df.index >= start_time) & (time_series_df.index <= end_time)]
+                ax.plot(extreme_df.index, extreme_df['Power'], color='#274c77')
+                print(extreme_df)
+                group_df = dfs[0]
+                print(group_df)
+
+                if event == "None":
+                    ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
+                else:
+                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
+
+                ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
+                ax.set_xticklabels(ax.get_xticklabels(), rotation=0)        
+                ax.set(xlabel="", ylabel="")
+    
+                plt.title(event)
+                plt.tight_layout()
+                plt.savefig(output_path + "extreme_weather_" + event + ".png", dpi=600)
+                plt.close()
+    
+    return None
+
 
 def extreme_weather_city_plot_all(input_df, city, weather_data_path, all_weather_path, start_time, end_time, output_path):
     """Plot extreme weather load profile for each city along with the provincial weather data
@@ -1462,8 +1586,6 @@ def extreme_weather_city_plot_all(input_df, city, weather_data_path, all_weather
     plt.close()
     
     return None
-
-
 
 def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output_path):
     """Plot the extreme weather

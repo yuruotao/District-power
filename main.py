@@ -328,6 +328,7 @@ if __name__ == "__main__":
 
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
+    """
     datetime_col = "Datetime"
     temp_city_df = city_df.drop([datetime_col], axis=1)
     city_list = list(temp_city_df.columns.values)
@@ -338,6 +339,16 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx",
                                       start_time, '2022-12-31 23:00:00', 
                                       "./result/extreme_weather/extreme_plot/")
+    """
+    
+    # Plot the subplots of extreme weather days
+    guilin_df = city_df[["Datetime", "2"]]
+    guilin_df = guilin_df.rename(columns={"2": "Power"})
+    analysis.extreme_normal_comparison_plot(guilin_df,
+                                      "./result/extreme_weather/city/extreme_weather_2.xlsx",
+                                      start_time, '2022-12-31 23:00:00', 
+                                      "./result/extreme_weather/sub_extreme_plots/")
+    
     """
     for city in city_list:
         iter_df = city_df[["Datetime", city]]
