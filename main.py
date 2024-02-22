@@ -341,7 +341,7 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/extreme_plot/")
     """
     
-    # Plot the subplots of extreme weather days
+    # Plot the subplots of extreme weather days for Guilin
     guilin_df = city_df[["Datetime", "2"]]
     guilin_df = guilin_df.rename(columns={"2": "Power"})
     analysis.extreme_normal_comparison_plot(guilin_df,

@@ -1365,12 +1365,15 @@ def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_
                     "Precipitation 100": "#785964",
                     }
     
-
-    # Set background color according to Event values
+    alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
+    fig, axs = plt.subplots(3, 3, figsize=(16, 8))
+    # Flatten the axes array for easy iteration
+    axs = axs.flatten()
+    
+    event_num = 0
     for event, color in event_colors.items():
         subset = time_series_df[time_series_df[event] == 1]
         print(event)
-        fig, ax = plt.subplots(figsize=(16, 8))
         
         if not subset.empty:
             dfs = []
@@ -1385,17 +1388,8 @@ def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_
                 
                 if (idx - start_idx).days > 1:
                     # End of current part found
-                    
-                    
-                    time_difference = abs(start_idx - end_idx)
-                    # Check if the difference is more than one day
-                    if time_difference.days > 1:
-                        start_time = start_idx - pd.Timedelta(days=2)
-                        end_time = start_idx + pd.Timedelta(days=1)
-                        end_idx = end_time
-                    else:
-                        start_time = start_idx - pd.Timedelta(days=1)
-                        end_time = start_idx + pd.Timedelta(days=2)
+                    start_time = start_idx
+                    end_time = start_idx + pd.Timedelta(days=1)
                     
                     dfs.append(subset.loc[start_idx:end_idx])
                     
@@ -1406,25 +1400,41 @@ def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_
                     # Continuation of current part
                     end_idx = idx
             if dfs:
+                ax = axs[event_num]
+                
                 extreme_df = time_series_df.loc[(time_series_df.index >= start_time) & (time_series_df.index <= end_time)]
-                ax.plot(extreme_df.index, extreme_df['Power'], color='#274c77')
-                print(extreme_df)
-                group_df = dfs[0]
-                print(group_df)
+                extreme_df_before = time_series_df.loc[(time_series_df.index >= start_time - pd.Timedelta(days=1)) & 
+                (time_series_df.index <= end_time - pd.Timedelta(days=1))]
+                extreme_df_before = extreme_df_before.shift(freq="24H")
+                extreme_df_after = time_series_df.loc[(time_series_df.index >= start_time + pd.Timedelta(days=1)) & 
+                (time_series_df.index <= end_time + pd.Timedelta(days=1))]
+                extreme_df_after = extreme_df_after.shift(freq="-24H")
+                
+                
+                ax.plot(extreme_df.index, extreme_df['Power'], color="#ba181b", label="Extreme")
+                ax.plot(extreme_df_before.index, extreme_df_before['Power'], color='#274c77', label="1 Day before")
+                ax.plot(extreme_df_after.index, extreme_df_after['Power'], color='#fca311', label="1 Day after")
 
-                if event == "None":
-                    ax.axvspan(group_df.index[0], group_df.index[-1], alpha=0, edgecolor='none')
-                else:
-                    ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none', label=str(event))
-
+                ax.set_title(alphabet_list[event_num] + ") " + event, fontsize=16)
                 ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
-                ax.set_xticklabels(ax.get_xticklabels(), rotation=0)        
+                ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
                 ax.set(xlabel="", ylabel="")
+                ax.legend()
+                
+                event_num = event_num + 1
+                
+                
+
     
-                plt.title(event)
-                plt.tight_layout()
-                plt.savefig(output_path + "extreme_weather_" + event + ".png", dpi=600)
-                plt.close()
+    # Hide the empty subplots
+    for ax in axs[7:]:
+        ax.axis('off')
+
+    # Adjust layout
+    plt.tight_layout()
+    # Show the plot
+    plt.savefig(output_path + "extreme_weather_sub_all.png", dpi=600)
+    plt.close()
     
     return None
 
