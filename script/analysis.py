@@ -634,8 +634,49 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
         print("City", city_num)
         extreme_weather_df = datetime_df
         
+        # Temperature
+        extreme_weather_df['High Temperature'] = np.nan
+        MAX_percentile_95 = temp_weather_df['MAX'].quantile(0.95)
+        high_temp_df = temp_weather_df.loc[temp_weather_df['MAX'] > MAX_percentile_95]
+        for date in high_temp_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'High Temperature'] = 1
+        print("High Temperature done")
+        
+        extreme_weather_df['Low Temperature'] = np.nan
+        MIN_percentile_5 = temp_weather_df['MIN'].quantile(0.05)
+        low_temp_df = temp_weather_df.loc[temp_weather_df['MIN'] < MIN_percentile_5]
+        for date in low_temp_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Low Temperature'] = 1
+        print("Low Temperature done")
+        
+        # Humidity
+        extreme_weather_df['High Humidity'] = np.nan
+        DEWP_percentile_95 = temp_weather_df['DEWP'].quantile(0.95)
+        high_hum_df = temp_weather_df.loc[temp_weather_df['DEWP'] > DEWP_percentile_95]
+        for date in high_hum_df['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'High Humidity'] = 1
+        print("High Humidity done")
+        
+        
         # Heat Index
-
         
         def calculate_heat_index(temp_celsius, relative_humidity):
             """Constants for the Heat Index calculation
@@ -783,7 +824,7 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                     extreme_weather_df.at[index, 'Wind Chill Great Frostbite Danger'] = 1
         print("Wind Chill done")
         
-        
+        """
         # Storm
         extreme_weather_df['Tropical Storm'] = np.nan
         thunderstorm_39_54 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > (39 * 0.44704)) & 
@@ -848,6 +889,202 @@ def extreme_weather_detect(input_df, output_path, start_date, end_date):
                     row['Datetime'].day == date.day:
                     extreme_weather_df.at[index, 'Super Typhoon'] = 1
         print("Super Typhoon done")
+        """
+        
+        # Wind Speed Level
+        extreme_weather_df['Wind Level 0'] = np.nan
+        thunderstorm_0 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 0) & 
+                                               (temp_weather_df['MXSPD'] <= 0.2)]
+        for date in thunderstorm_0['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 0'] = 1
+        print("Wind Level 0 done")
+        
+        extreme_weather_df['Wind Level 1'] = np.nan
+        thunderstorm_1 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 0.2) & 
+                                               (temp_weather_df['MXSPD'] <= 1.5)]
+        for date in thunderstorm_1['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 1'] = 1
+        print("Wind Level 1 done")
+        
+        extreme_weather_df['Wind Level 2'] = np.nan
+        thunderstorm_2 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 1.5) & 
+                                               (temp_weather_df['MXSPD'] <= 3.3)]
+        for date in thunderstorm_2['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 2'] = 1
+        print("Wind Level 2 done")
+        
+        extreme_weather_df['Wind Level 3'] = np.nan
+        thunderstorm_3 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 3.3) & 
+                                               (temp_weather_df['MXSPD'] <= 5.4)]
+        for date in thunderstorm_3['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 3'] = 1
+        print("Wind Level 3 done")
+        
+        extreme_weather_df['Wind Level 4'] = np.nan
+        thunderstorm_4 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 5.4) & 
+                                               (temp_weather_df['MXSPD'] <= 7.9)]
+        for date in thunderstorm_4['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 4'] = 1
+        print("Wind Level 4 done")
+        
+        extreme_weather_df['Wind Level 5'] = np.nan
+        thunderstorm_5 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 7.9) & 
+                                               (temp_weather_df['MXSPD'] <= 10.7)]
+        for date in thunderstorm_5['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 5'] = 1
+        print("Wind Level 5 done")
+        
+        extreme_weather_df['Wind Level 6'] = np.nan
+        thunderstorm_6 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 10.7) & 
+                                               (temp_weather_df['MXSPD'] <= 13.8)]
+        for date in thunderstorm_6['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 6'] = 1
+        print("Wind Level 6 done")
+        
+        extreme_weather_df['Wind Level 7'] = np.nan
+        thunderstorm_7 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 13.8) & 
+                                               (temp_weather_df['MXSPD'] <= 17.1)]
+        for date in thunderstorm_7['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 7'] = 1
+        print("Wind Level 7 done")
+        
+        extreme_weather_df['Wind Level 8'] = np.nan
+        thunderstorm_8 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 17.1) & 
+                                               (temp_weather_df['MXSPD'] <= 20.7)]
+        for date in thunderstorm_8['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 8'] = 1
+        print("Wind Level 8 done")
+        
+        extreme_weather_df['Wind Level 9'] = np.nan
+        thunderstorm_9 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 20.7) & 
+                                               (temp_weather_df['MXSPD'] <= 24.4)]
+        for date in thunderstorm_9['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 9'] = 1
+        print("Wind Level 9 done")
+        
+        extreme_weather_df['Wind Level 10'] = np.nan
+        thunderstorm_10 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 24.4) & 
+                                               (temp_weather_df['MXSPD'] <= 28.4)]
+        for date in thunderstorm_10['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 10'] = 1
+        print("Wind Level 10 done")
+        
+        extreme_weather_df['Wind Level 11'] = np.nan
+        thunderstorm_11 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 28.4) & 
+                                               (temp_weather_df['MXSPD'] <= 32.6)]
+        for date in thunderstorm_11['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 11'] = 1
+        print("Wind Level 11 done")
+        
+        extreme_weather_df['Wind Level 12'] = np.nan
+        thunderstorm_12 = temp_weather_df.loc[(temp_weather_df['MXSPD'] > 32.6)]
+        for date in thunderstorm_12['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Wind Level 12'] = 1
+        print("Wind Level 12 done")
+        
+        
+        # Precipitation
+        extreme_weather_df['Precipitation 50'] = np.nan
+        prcp_0 = temp_weather_df.loc[(temp_weather_df['PRCP'] >= 0.05) & (temp_weather_df['PRCP'] < 0.1)]
+        for date in prcp_0['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Precipitation 50'] = 1
+        print("Precipitation 50 done")
+        
+        extreme_weather_df['Precipitation 100'] = np.nan
+        prcp_1 = temp_weather_df.loc[(temp_weather_df['PRCP'] >= 0.1)]
+        for date in prcp_1['DATE']:
+            # Iterate over the rows of the DataFrame
+            for index, row in extreme_weather_df.iterrows():
+                # Compare year, month, day, and hour of "Datetime" column with the target timestamp
+                if row['Datetime'].year == date.year and \
+                    row['Datetime'].month == date.month and \
+                    row['Datetime'].day == date.day:
+                    extreme_weather_df.at[index, 'Precipitation 100'] = 1
+        print("Precipitation 100 done")
         
         extreme_weather_df.to_excel(output_path + "extreme_weather_" + str(city_num) + ".xlsx", index=False)
     
@@ -986,14 +1223,35 @@ def extreme_weather_city_plot(input_df, city, weather_data_path, start_time, end
                     "Heat Index Extreme Caution":           "#800e13",
                     "Heat Index Danger":                    "#640d14",
                     "Heat Index Extreme Danger":            "#38040e",
-                    "Wind Chill Very Cold":                 "#0096c7",
-                    "Wind Chill Frostbite Danger":          "#023e8a",
-                    "Wind Chill Great Frostbite Danger":    "#03045e",
-                    "Tropical Storm":                       "#9d4edd",
-                    "Severe Tropical Storm":                "#7b2cbf",
-                    "Typhoon":                              "#5a189a",
-                    "Strong Typhoon":                       "#3c096c",
-                    "Super Typhoon":                        "#240046",}
+                    #"Wind Chill Very Cold":                 "#0096c7",
+                    #"Wind Chill Frostbite Danger":          "#023e8a",
+                    #"Wind Chill Great Frostbite Danger":    "#03045e",
+                    "High Temperature": "#e5383b",
+                    "Low Temperature": "#192bc2",
+                    "High Humidity": "#007f5f",
+                    #"Wind Level 0": "#e0aaff",
+                    #"Wind Level 1": "#c77dff",
+                    #"Wind Level 2": "#9d4edd",
+                    #"Wind Level 3": "#7b2cbf",
+                    #"Wind Level 4": "#5a189a",
+                    "Wind Level 5": "#3c096c",
+                    "Wind Level 6": "#240046",
+                    "Wind Level 7": "#10002b",
+                    "Wind Level 8": "#aacc00",
+                    "Wind Level 9": "#80b918",
+                    "Wind Level 10": "#55a630",
+                    "Wind Level 11": "#2b9348",
+                    "Wind Level 12": "#007f5f",
+                    "Precipitation 50": "#d5c7bc",
+                    "Precipitation 100": "#785964",
+                    
+                    
+                    #"Tropical Storm":                       "#9d4edd",
+                    #"Severe Tropical Storm":                "#7b2cbf",
+                    #"Typhoon":                              "#5a189a",
+                    #"Strong Typhoon":                       "#3c096c",
+                    #"Super Typhoon":                        "#240046",
+                    }
     
 
     fig, ax = plt.subplots(figsize=(20, 8))

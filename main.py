@@ -321,8 +321,8 @@ if __name__ == "__main__":
 
     # Extreme weather plot
     # All districts
-    province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
-    analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
+    #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
+    #analysis.extreme_weather_plot(province_df, "all", "./data/extreme_weather.xlsx", start_time, end_time, "./result/extreme_weather/")
 
     # Cities extreme weather
 
@@ -338,7 +338,7 @@ if __name__ == "__main__":
                                       "./result/extreme_weather/city/extreme_weather_" + str(city) + ".xlsx",
                                       start_time, '2022-12-31 23:00:00', 
                                       "./result/extreme_weather/extreme_plot/")
-    
+    """
     for city in city_list:
         iter_df = city_df[["Datetime", city]]
         iter_df = iter_df.rename(columns={city: "Power"})
@@ -347,10 +347,7 @@ if __name__ == "__main__":
                                       "./data/extreme_weather.xlsx",
                                       start_time, '2022-12-31 23:00:00', 
                                       "./result/extreme_weather/extreme_plot_all/")
-
-    # Extreme weather plot for designated time interval
-                                
-
+    """     
 
     # Basic statistics for uniform data and imputed data in 2022
     """
