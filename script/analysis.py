@@ -236,9 +236,6 @@ def specific_load_profile_plot(input_df, start_time, end_time, start_time_1, end
     plt.savefig(output_path + "city_load_profile_" + time_type + ".png", dpi=600)
     plt.close()
     
-    
-    
-    
     return None
 
 
