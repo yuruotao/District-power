@@ -342,12 +342,14 @@ if __name__ == "__main__":
     """
     
     # Plot the subplots of extreme weather days for Guilin
+    """
     guilin_df = city_df[["Datetime", "2"]]
     guilin_df = guilin_df.rename(columns={"2": "Power"})
     analysis.extreme_normal_comparison_plot(guilin_df,
                                       "./result/extreme_weather/city/extreme_weather_2.xlsx",
                                       start_time, '2022-12-31 23:00:00', 
                                       "./result/extreme_weather/sub_extreme_plots/")
+    """
     
     """
     for city in city_list:
@@ -369,3 +371,11 @@ if __name__ == "__main__":
     uniform_df_22 = uniform.uniform(meta_df, city_df_22, "./result/uniform")
     basic_statistics.basic_statistics(uniform_df_22, "./result/basic_statistics/uniform")
     """
+    
+    # Extreme weather proportion calculation
+    extreme_weather_path = "./result/extreme_weather/city/extreme_weather_"
+    for extreme_weather_num in range(10):
+        temp_path = extreme_weather_path + str(extreme_weather_num) + ".xlsx"
+        temp_df = pd.read_excel(temp_path)
+        temp_df = temp_df.loc[(temp_df['Datetime'] >= start_time) & (temp_df['Datetime'] <= '2022-12-31 00:00:00')]
+        
