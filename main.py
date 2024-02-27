@@ -374,8 +374,18 @@ if __name__ == "__main__":
     
     # Extreme weather proportion calculation
     extreme_weather_path = "./result/extreme_weather/city/extreme_weather_"
+    extreme_weather_stats_path = "./result/extreme_weather/city/extreme_weather_stats.xlsx"
+    
     for extreme_weather_num in range(10):
+        print(extreme_weather_num)
         temp_path = extreme_weather_path + str(extreme_weather_num) + ".xlsx"
         temp_df = pd.read_excel(temp_path)
         temp_df = temp_df.loc[(temp_df['Datetime'] >= start_time) & (temp_df['Datetime'] <= '2022-12-31 00:00:00')]
-        
+        temp_sum_df = temp_df.drop(columns=['Datetime']).sum().to_frame().T
+        temp_sum_df = temp_sum_df.div(8760)
+        temp_sum_df["City"] = "City " + str(extreme_weather_num)
+        if extreme_weather_num == 0:
+            extreme_weather_df = temp_sum_df
+        else:
+            extreme_weather_df = pd.concat([extreme_weather_df, temp_sum_df])
+    extreme_weather_df.to_excel(extreme_weather_stats_path, index=False)
