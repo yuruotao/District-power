@@ -205,8 +205,7 @@ if __name__ == "__main__":
     ####################################################################################################
     # Load profile
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
-    # Load profile for selected cities
-    analysis.average_load_profile(city_df, "./result/load_profile/city/")
+
     # Load profile for each city in one plot
     analysis.average_load_profiles(city_df, "./result/load_profile/city/")
 

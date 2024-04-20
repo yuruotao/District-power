@@ -20,7 +20,7 @@ def average_load_profile(input_df, output_path):
         None
     """
     
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
     if not os.path.exists(output_path):
@@ -37,7 +37,11 @@ def average_load_profile(input_df, output_path):
     column_names = temp_df.columns
     subplot_num = 3
     
-    fig, axes = plt.subplots(subplot_num, 1, figsize=(20, 7))
+    matplotlib.rc('xtick', labelsize=22)
+    matplotlib.rc('ytick', labelsize=22)
+    plt.rc('legend', fontsize=22)
+    
+    fig, axes = plt.subplots(subplot_num, 1, figsize=(20, 12))
     for iter in range(subplot_num):
 
         sns.lineplot(data=input_df, x='Datetime', y=column_names[iter], ax=axes[iter], color=color_list[iter])
@@ -47,7 +51,7 @@ def average_load_profile(input_df, output_path):
         ticks = input_df.iloc[::n, 0]  # Select every nth tick from the 'Date' column
         axes[iter].set_xticks(ticks)
         axes[iter].set(xlabel="", ylabel="")
-
+        axes[iter].set_xlim(input_df.index.min(), input_df.index.max())
             
     # Hide xticks for all subplots except the bottom one
     for ax in axes[:-1]:
