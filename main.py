@@ -249,13 +249,13 @@ if __name__ == "__main__":
     ####################################################################################################
     # Holiday
 
-    #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
-    #analysis.holiday_plot(province_df, "all", "./data/festival.xlsx", start_time, '2022-12-31 23:00:00', "./result/festival/")
+    province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
+    analysis.holiday_plot(province_df, "all", "./data/festival.xlsx", start_time, '2022-12-31 23:00:00', "./result/festival/")
     
     ####################################################################################################
     # Weather analysis
-    #station_set = set(meta_df["Closest_Station"])
-    #xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
+    station_set = set(meta_df["Closest_Station"])
+    xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
     
     # Weather basic statistics
     """
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     """
     
     # Weather correlation
-    """
+
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
@@ -313,7 +313,7 @@ if __name__ == "__main__":
         temp_weather_df = temp_weather_df.drop(["Datetime"], axis=1)
         
         analysis.weather_correlation(temp_weather_df, "./result/extreme_weather/correlation/", str(city_num))
-    """
+
     
     # Extreme weather detection
     #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
