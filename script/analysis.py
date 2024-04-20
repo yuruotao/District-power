@@ -459,7 +459,8 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
     temp_df.set_index('Datetime', inplace=True)
     
     matplotlib.rc('xtick', labelsize=22)
-    matplotlib.rc('ytick', labelsize=22) 
+    matplotlib.rc('ytick', labelsize=22)
+    plt.rc('legend', fontsize=22)
     
     for column in temp_df.columns:
         print(column)
@@ -479,26 +480,31 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
             axes[0].plot(plot_df, label='Original', color="#023e8a")
             axes[0].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[0].legend()
+            axes[0].set_ylabel("Power(kW)", fontsize=22)
 
             # Plot the trend component
             axes[1].plot(result.trend, label='Trend', color="#0077b6")
             axes[1].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[1].legend()
+            axes[1].set_ylabel("Power(kW)", fontsize=22)
 
             # Plot the seasonal component
             axes[2].plot(result.seasonal, label='Seasonal', color='#03045e')
             axes[2].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[2].legend()
+            axes[2].set_ylabel("Power(kW)", fontsize=22)
         
             # Plot the residual component
             axes[3].plot(result.resid, label='Residual', color='#780000')
             axes[3].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[3].legend()
+            axes[3].set_ylabel("Power(kW)", fontsize=22)
+            
+
         
             # Adjust layout
-            plt.rc('legend', fontsize=22)
+            
             plt.xlabel("Time", fontsize=22)
-            plt.ylabel("Power(kW)", fontsize=22)
             plt.tight_layout()
             plt.savefig(output_path + "seasonality_" + str(period_num) + "_" + column + ".png", dpi=600)
             plt.close()
