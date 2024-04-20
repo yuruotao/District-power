@@ -54,15 +54,20 @@ def missing_value_visualization(input_df, save_path):
 
         temp_df = input_df[sorted_list]
         index = list[0].split("-")
+        temp_df.columns = temp_df.columns.str.split('-').str[-1]
         
         # Matrix plot
-        msno.matrix(temp_df)
+        ax = msno.matrix(temp_df, fontsize=20, figsize=(16, 12), label_rotation=0)
+        plt.xlabel("Transformers", fontsize=20)
+        plt.ylabel("Sample Points", fontsize=20)
         plt.savefig(missing_dir_matrix + "City-" + index[0] + "-" + "District-" + index[1] +'-matrix.png', dpi=600)
-        plt.clf()
+        plt.close()
         
         # Bar plot
-        msno.bar(temp_df)
+        ax = msno.bar(temp_df, fontsize=20, figsize=(16, 12), label_rotation=0)
+        plt.xlabel("Transformers", fontsize=20)
+        plt.ylabel("Sample Points", fontsize=20)
         plt.savefig(missing_dir_bar + "City-" + index[0] + "-" + "District-" + index[1] +'-bar.png', dpi=600)
-        plt.clf()
+        plt.close()
     
     return None

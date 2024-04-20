@@ -62,7 +62,7 @@ def resample_visualization(input_df, resample_df_list, output_path):
     
     for column in temp_df.columns:
         # Plotting
-        fig, axes = plt.subplots(3, 1, figsize=(20, 7))
+        fig, axes = plt.subplots(3, 1, figsize=(20, 12))
 
         # Plot for DataFrame 1
         sns.lineplot(data=input_df, x='Datetime', y=column, ax=axes[0]).set(xlabel=None)

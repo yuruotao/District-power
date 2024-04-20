@@ -7,6 +7,7 @@ import os
 import calplot
 import datetime
 from scipy.stats import pearsonr
+import matplotlib
 
 def average_load_profile(input_df, output_path):
     """Plot the load profile curve
@@ -456,6 +457,10 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
     
     temp_df = input_df
     temp_df.set_index('Datetime', inplace=True)
+    
+    matplotlib.rc('xtick', labelsize=22)
+    matplotlib.rc('ytick', labelsize=22) 
+    
     for column in temp_df.columns:
         print(column)
         plot_df = temp_df[[column]]
@@ -468,7 +473,7 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
             result = seasonal_decompose(plot_df, model=model, period=period_num)  # Adjust period as needed
 
             # Create a Matplotlib figure and axes
-            fig, axes = plt.subplots(4, 1, figsize=(20, 8), layout='compressed')
+            fig, axes = plt.subplots(4, 1, figsize=(20, 12), layout='compressed')
 
             # Plot the original time series
             axes[0].plot(plot_df, label='Original', color="#023e8a")
@@ -491,6 +496,9 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
             axes[3].legend()
         
             # Adjust layout
+            plt.rc('legend', fontsize=22)
+            plt.xlabel("Time", fontsize=22)
+            plt.ylabel("Power(kW)", fontsize=22)
             plt.tight_layout()
             plt.savefig(output_path + "seasonality_" + str(period_num) + "_" + column + ".png", dpi=600)
             plt.close()

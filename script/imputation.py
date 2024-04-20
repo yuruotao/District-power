@@ -13,6 +13,8 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+sns.set_theme(style="white")
 
 def imputation(input_df, imputation_method, save_path):
     """carry out the imputation for raw data with missing values
@@ -241,8 +243,8 @@ def imputation_visualization(raw_data_df, start_time, end_time, method_list, col
     time_series_df = pd.merge(time_series_df, raw_data_df, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    plt.figure(figsize=(20,8))
-    ax = sns.lineplot(data=time_series_df, markers=True)
+    plt.figure(figsize=(20,12))
+    ax = sns.lineplot(data=time_series_df, markers=True, linewidth=4)
     missing_mask = time_series_df['raw'].isna().values.astype(int)
     ax.set_xlim(time_series_df.index[0], time_series_df.index[-1])
     ax.pcolorfast(ax.get_xlim(), ax.get_ylim(),
@@ -251,11 +253,14 @@ def imputation_visualization(raw_data_df, start_time, end_time, method_list, col
     
     
     legend = plt.legend()
+    plt.rc('legend', fontsize=22)
     legend.get_frame().set_facecolor('none')
     plt.legend(frameon=False)
 
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
-    ax.set(xlabel="", ylabel="")
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
+    ax.tick_params(labelsize=22)
+    plt.xlabel("Time", fontsize=22)
+    plt.ylabel("Power(kW)", fontsize=22)
         
     plt.tight_layout()
     plt.savefig(output_path + "imputation_methods.png", dpi=600)

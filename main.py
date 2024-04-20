@@ -119,13 +119,13 @@ if __name__ == "__main__":
 
     # Create a new DataFrame based on the time interval
     #raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
-    #raw_data_df = raw_data_df.reset_index()
+    #raw_data_df = raw_data_df.reset_index(drop=True)
     
     ####################################################################################################
     # Missing value
-    """
-    missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
-    """
+
+    #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
+
     ####################################################################################################
     # Profiling
     """
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Imputation
-    """
+
     #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
     #for method in imputation_methods:
         #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method=method)
@@ -154,22 +154,22 @@ if __name__ == "__main__":
     #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
     #imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
     #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
-    
-    #imputation.imputation_visualization(raw_data_df, '2022-01-01 00:00:00', '2022-01-08 00:00:00', 
-    #                                    ["Linear", "Forward", "Backward", "Forward-Backward"],
-    #                                    "0-0-0",
-    #                                    "./result/imputation/")
+    """
+    imputation.imputation_visualization(raw_data_df, '2022-01-01 00:00:00', '2022-01-08 00:00:00', 
+                                        ["Linear", "Forward", "Backward", "Forward-Backward"],
+                                        "0-0-0",
+                                        "./result/imputation/")
     """
     imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
     ####################################################################################################
     # Resample
-    """
-    resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
-    resample.resample_visualization(imputed_df, resample_df_list, "./result/resample/figure/")
-    """
+
+    #resample_df_list = resample.resample(imputed_df, output_path="./result/resample", freq_list=['6h','D'])
+    #resample.resample_visualization(imputed_df, resample_df_list, "./result/resample/figure/")
+
     ####################################################################################################
     # Seasonality decomposition
-    """
+    
     district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     
     analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 24, "multiplicative")
     analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 168, "multiplicative")
-    """
+
     ####################################################################################################
     # Diversity factor
     """
@@ -255,8 +255,8 @@ if __name__ == "__main__":
     
     ####################################################################################################
     # Weather analysis
-    station_set = set(meta_df["Closest_Station"])
-    xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
+    #station_set = set(meta_df["Closest_Station"])
+    #xlsx_base = "./result/NCDC_weather_data/stations_imputed/"
     
     # Weather basic statistics
     """
@@ -326,7 +326,7 @@ if __name__ == "__main__":
 
     # Cities extreme weather
 
-    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
     """
     datetime_col = "Datetime"
@@ -375,7 +375,7 @@ if __name__ == "__main__":
     # Extreme weather proportion calculation
     extreme_weather_path = "./result/extreme_weather/city/extreme_weather_"
     extreme_weather_stats_path = "./result/extreme_weather/city/extreme_weather_stats.xlsx"
-    
+    """
     for extreme_weather_num in range(10):
         print(extreme_weather_num)
         temp_path = extreme_weather_path + str(extreme_weather_num) + ".xlsx"
@@ -389,3 +389,4 @@ if __name__ == "__main__":
         else:
             extreme_weather_df = pd.concat([extreme_weather_df, temp_sum_df])
     extreme_weather_df.to_excel(extreme_weather_stats_path, index=False)
+    """
