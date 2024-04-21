@@ -8,13 +8,12 @@ from scipy.spatial.distance import cdist
 
 # Import modules
 import script.analysis as analysis
-import script.imputation as imputation
+#import script.imputation as imputation
 import script.missing_value as missing_value
-import script.profiling as profiling
-import script.basic_statistics as basic_statistics
-import script.resample as resample
-import script.uniform as uniform
-
+#import script.profiling as profiling
+#import script.basic_statistics as basic_statistics
+#import script.resample as resample
+#import script.uniform as uniform
 
 
 def time_series_dataframe_create(start_time, stop_time, time_interval):
@@ -118,8 +117,8 @@ if __name__ == "__main__":
     end_time = '2023-11-10 08:00:00'
 
     # Create a new DataFrame based on the time interval
-    #raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
-    #raw_data_df = raw_data_df.reset_index(drop=True)
+    raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
+    raw_data_df = raw_data_df.reset_index(drop=True)
     
     ####################################################################################################
     # Missing value
@@ -169,34 +168,34 @@ if __name__ == "__main__":
 
     ####################################################################################################
     # Seasonality decomposition
-    """
+
     district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
     city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")
     
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
-    analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 24, "multiplicative")
+    #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/multiplicative/", 168, "multiplicative")
 
-    analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 24, "additive")
-    analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 168, "additive")
+    #analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 24, "additive")
+    #analysis.seasonality_decomposition(city_df, "./result/seasonality/city/additive/", 168, "additive")
     
-    analysis.seasonality_decomposition(city_df, "./result/seasonality/city/multiplicative/", 24, "multiplicative")
-    analysis.seasonality_decomposition(city_df, "./result/seasonality/city/multiplicative/", 168, "multiplicative")
+    #analysis.seasonality_decomposition(city_df, "./result/seasonality/city/multiplicative/", 24, "multiplicative")
+    #analysis.seasonality_decomposition(city_df, "./result/seasonality/city/multiplicative/", 168, "multiplicative")
     
-    analysis.seasonality_decomposition(district_df, "./result/seasonality/district/additive/", 24, "additive")
-    analysis.seasonality_decomposition(district_df, "./result/seasonality/district/additive/", 168, "additive")
+    #analysis.seasonality_decomposition(district_df, "./result/seasonality/district/additive/", 24, "additive")
+    #analysis.seasonality_decomposition(district_df, "./result/seasonality/district/additive/", 168, "additive")
     
-    analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 24, "multiplicative")
-    analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 168, "multiplicative")
-    """
+    #analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 24, "multiplicative")
+    #analysis.seasonality_decomposition(district_df, "./result/seasonality/district/multiplicative/", 168, "multiplicative")
+
     ####################################################################################################
     # Diversity factor
-    """
+
     DF_all_list, name_list = analysis.diversity_factor_all(imputed_df, meta_df, "./result/diversity_factor/", "")
     analysis.diversity_heatmap(DF_all_list, name_list, "./result/diversity_factor/")
-    
+    """
     DF_district_list, name_list = analysis.diversity_factor(imputed_df, meta_df, "./result/diversity_factor/districts/", "")
     analysis.diversity_heatmap(DF_district_list, name_list, "./result/diversity_factor/districts/figure/")
     daily_df = pd.read_excel("./result/resample/resampled_D.xlsx")
@@ -204,10 +203,10 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Load profile
-    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
     # Load profile for each city in one plot
-    analysis.average_load_profiles(city_df, "./result/load_profile/city/")
+    #analysis.average_load_profiles(city_df, "./result/load_profile/city/")
 
     ####################################################################################################
     # Transformer by capacity
@@ -249,8 +248,8 @@ if __name__ == "__main__":
     ####################################################################################################
     # Holiday
 
-    province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
-    analysis.holiday_plot(province_df, "all", "./data/festival.xlsx", start_time, '2022-12-31 23:00:00', "./result/festival/")
+    #province_df = district_aggregate(imputed_df, 0,"./result/aggregate/")
+    #analysis.holiday_plot(province_df, "all", "./data/festival.xlsx", start_time, '2022-12-31 23:00:00', "./result/festival/")
     
     ####################################################################################################
     # Weather analysis
@@ -290,11 +289,11 @@ if __name__ == "__main__":
     """
     
     # Weather correlation
-
+    """
     for element in station_set:
         temp_xlsx_path = xlsx_base + str(element) + ".xlsx"
         temp_weather_df = pd.read_excel(temp_xlsx_path)
-        temp_weather_df = temp_weather_df[["DATE", "TEMP", "DEWP", "WDSP", "MAX", "MIN"]]
+        temp_weather_df = temp_weather_df[["DATE", "TEMP", "DEWP", "WDSP"]]
         temp_weather_df = temp_weather_df.rename({"DATE":"Datetime"}, axis=1)
         temp_weather_df['Datetime'] = pd.to_datetime(temp_weather_df['Datetime'])
         city_df = meta_df.loc[meta_df['Closest_Station'] == element]
@@ -313,7 +312,7 @@ if __name__ == "__main__":
         temp_weather_df = temp_weather_df.drop(["Datetime"], axis=1)
         
         analysis.weather_correlation(temp_weather_df, "./result/extreme_weather/correlation/", str(city_num))
-
+    """
     
     # Extreme weather detection
     #analysis.extreme_weather_detect(meta_df, "./result/extreme_weather/city/", start_time, end_time)
