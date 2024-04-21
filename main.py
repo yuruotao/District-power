@@ -123,7 +123,7 @@ if __name__ == "__main__":
     ####################################################################################################
     # Missing value
 
-    #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
+    missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
 
     ####################################################################################################
     # Profiling
@@ -193,8 +193,8 @@ if __name__ == "__main__":
     ####################################################################################################
     # Diversity factor
 
-    DF_all_list, name_list = analysis.diversity_factor_all(imputed_df, meta_df, "./result/diversity_factor/", "")
-    analysis.diversity_heatmap(DF_all_list, name_list, "./result/diversity_factor/")
+    #DF_all_list, name_list = analysis.diversity_factor_all(imputed_df, meta_df, "./result/diversity_factor/", "")
+    #analysis.diversity_heatmap(DF_all_list, name_list, "./result/diversity_factor/")
     """
     DF_district_list, name_list = analysis.diversity_factor(imputed_df, meta_df, "./result/diversity_factor/districts/", "")
     analysis.diversity_heatmap(DF_district_list, name_list, "./result/diversity_factor/districts/figure/")
