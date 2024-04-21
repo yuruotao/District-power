@@ -45,7 +45,7 @@ def average_load_profile(input_df, output_path):
     for iter in range(subplot_num):
 
         sns.lineplot(data=input_df, x='Datetime', y=column_names[iter], ax=axes[iter], color=color_list[iter])
-        axes[iter].set_title(column_names[iter])
+        axes[iter].set_title("City " + column_names[iter])
 
         n = 1000  # Set the desired frequency of ticks
         ticks = input_df.iloc[::n, 0]  # Select every nth tick from the 'Date' column
@@ -139,18 +139,23 @@ def average_load_profiles(input_df, output_path):
         "#0466c8", "#d90429",  "#0353a4", "#023e7d", "#002855", "#001845", "#001233", "#33415c", "#5c677d", "#7d8597", "#979dac", ]
 
     # Create a figure and axes
-    fig, axs = plt.subplots(4, 3, figsize=(24, 12))
+    fig, axs = plt.subplots(4, 3, figsize=(20, 12))
 
     # Flatten the axes array for easy iteration
     axs = axs.flatten()
 
+    matplotlib.rc('xtick', labelsize=20)
+    matplotlib.rc('ytick', labelsize=20)
+    plt.rc('legend', fontsize=20)
+    
     # Plot each column
     for i, column in enumerate(input_df.columns[1:]):  # Exclude the datetime column
         ax = axs[i]
         ax.plot(input_df['Datetime'], input_df[column], color="#0466c8")
-        ax.set_title(alphabet_list[i] + ") C" + column, fontsize=14)
+        ax.set_title(alphabet_list[i] + ") C" + column, fontsize=20)
         ax.set_xlim(input_df['Datetime'].min(), input_df['Datetime'].max())
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=45)   
+        ax.tick_params(axis='both', which='major', labelsize=20)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45)  
         ax.grid(False)
 
     # Hide the empty subplots
@@ -215,26 +220,40 @@ def specific_load_profile_plot(input_df, start_time, end_time, start_time_1, end
 
     # Flatten the axes array for easy iteration
     axs = axs.flatten()
+    
+    matplotlib.rc('xtick', labelsize=20)
+    matplotlib.rc('ytick', labelsize=20)
+    plt.rc('legend', fontsize=20)
 
     # Plot each column
     alphabet_num = 0
     for i, column in enumerate(input_df.columns[1:]):  # Exclude the datetime column
         ax = axs[i]
-        ax.plot(input_df_0['Datetime'], input_df_0[column], color="#0466c8", label=label_0)
-        ax.plot(input_df_1['Datetime'], input_df_1[column], color="#d90429", label=label_1)
-        ax.set_title(alphabet_list[alphabet_num] + ") C" + column, fontsize=17)
+        ax.tick_params(axis='both', which='major', labelsize=20)
+        if alphabet_num == 0:
+            ax.plot(input_df_0['Datetime'], input_df_0[column], color="#0466c8", label=label_0, linewidth=3)
+            ax.plot(input_df_1['Datetime'], input_df_1[column], color="#d90429", label=label_1, linewidth=3)
+        else:
+            ax.plot(input_df_0['Datetime'], input_df_0[column], color="#0466c8", linewidth=3)
+            ax.plot(input_df_1['Datetime'], input_df_1[column], color="#d90429", linewidth=3)
+        ax.set_title(alphabet_list[alphabet_num] + ") C" + column, fontsize=20)
         ax.set_xlim(input_df_0['Datetime'].min(), input_df_0['Datetime'].max())
         ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%d %H:%M'))
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45)   
         ax.grid(False)
-        if alphabet_num == 0:
-            ax.legend()
         alphabet_num = alphabet_num + 1
 
     # Hide the empty subplots
     for ax in axs[len(input_df.columns)-1:]:
         ax.axis('off')
 
+    if time_type == "Day":
+        fig.legend(loc='lower right', fontsize=20, bbox_to_anchor=(0.8, 0.2))
+    elif time_type == "Week":
+        fig.legend(loc='lower right', fontsize=20, bbox_to_anchor=(0.85, 0.2))
+    elif time_type == "Month":
+        fig.legend(loc='lower right', fontsize=20, bbox_to_anchor=(0.8, 0.2))
+    
     # Adjust layout
     plt.tight_layout()
     # Show the plot
@@ -370,22 +389,36 @@ def diversity_heatmap(input_df_list, name_list, output_path):
         df_pivot = df.pivot_table(index='date', columns='hour', values='Diversity Factor', aggfunc='mean')
 
         # Plot heatmap
-        ax = sns.heatmap(df_pivot, cmap="crest", annot=False)
+        plt.rc('legend', fontsize=24)
+        fig, ax = plt.subplots(figsize=(20, 15))
+        sns.heatmap(df_pivot, cmap="crest", annot=False, ax=ax)
         # Get the current x-axis tick labels and positions
+        ax.tick_params(axis='both', which='major', labelsize=24)
         xticklabels = ax.get_xticklabels()
         xtickpositions = ax.get_xticks()
+        yticklabels = ax.get_yticklabels()
+        ytickpositions = ax.get_yticks()
 
         # Set the step size for displaying xticks (e.g., display every nth tick)
-        step_size = 2
-
-        # Filter the xtick labels and positions to show only every step_size-th tick
-        filtered_xticklabels = [label.get_text() for i, label in enumerate(xticklabels) if i % step_size == 0]
-        filtered_xtickpositions = [position for i, position in enumerate(xtickpositions) if i % step_size == 0]
+        step_size_x = 1
+        filtered_xticklabels = [label.get_text() for i, label in enumerate(xticklabels) if i % step_size_x == 0]
+        filtered_xtickpositions = [position for i, position in enumerate(xtickpositions) if i % step_size_x == 0]
+        
+        step_size_y = 3
+        filtered_yticklabels = [label.get_text() for i, label in enumerate(yticklabels) if i % step_size_y == 0]
+        filtered_ytickpositions = [position for i, position in enumerate(ytickpositions) if i % step_size_y == 0]
 
         # Set the filtered xtick labels and positions
         ax.set_xticks(filtered_xtickpositions)
-        ax.set_xticklabels(filtered_xticklabels, rotation=0)        
-        ax.set(xlabel="", ylabel="")
+        ax.set_xticklabels(filtered_xticklabels, rotation=0)  
+        ax.set_yticks(filtered_ytickpositions)
+        ax.set_yticklabels(filtered_yticklabels, rotation=0)        
+        #ax.set(xlabel="Hour", ylabel="Date")
+        ax.set_xlabel('Hour', fontsize=24)
+        ax.set_ylabel('Date', fontsize=24)
+        
+        cax = ax.figure.axes[-1]
+        cax.tick_params(labelsize=24)
         
         plt.tight_layout()
         plt.savefig(output_path + "DF_" + name + ".png", dpi=600)
@@ -484,25 +517,25 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
             axes[0].plot(plot_df, label='Original', color="#023e8a")
             axes[0].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[0].legend()
-            axes[0].set_ylabel("Power(kW)", fontsize=22)
+            #axes[0].set_ylabel("Power(kW)", fontsize=22)
 
             # Plot the trend component
             axes[1].plot(result.trend, label='Trend', color="#0077b6")
             axes[1].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[1].legend()
-            axes[1].set_ylabel("Power(kW)", fontsize=22)
+            #axes[1].set_ylabel("Power(kW)", fontsize=22)
 
             # Plot the seasonal component
             axes[2].plot(result.seasonal, label='Seasonal', color='#03045e')
             axes[2].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[2].legend()
-            axes[2].set_ylabel("Power(kW)", fontsize=22)
+            #axes[2].set_ylabel("Power(kW)", fontsize=22)
         
             # Plot the residual component
             axes[3].plot(result.resid, label='Residual', color='#780000')
             axes[3].set_xlim(plot_df.index.min(), plot_df.index.max())
             axes[3].legend()
-            axes[3].set_ylabel("Power(kW)", fontsize=22)
+            #axes[3].set_ylabel("Power(kW)", fontsize=22)
             
 
         
@@ -593,23 +626,32 @@ def weather_correlation(input_df, output_path, city_num):
     sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
     
+    matplotlib.rc('xtick', labelsize=20)
+    matplotlib.rc('ytick', labelsize=20)
+    plt.rc('legend', fontsize=20)
+    
     def corrfunc(x, y, **kwds):
         cmap = kwds['cmap']
         norm = kwds['norm']
         ax = plt.gca()
-        ax.tick_params(bottom=False, top=False, left=False, right=False)
+        ax.tick_params(bottom=False, top=False, left=False, right=False, axis="both", which="major", labelsize=20)
         sns.despine(ax=ax, bottom=True, top=True, left=True, right=True)
         r, _ = pearsonr(x, y)
         facecolor = cmap(norm(r))
         ax.set_facecolor(facecolor)
         lightness = (max(facecolor[:3]) + min(facecolor[:3]) ) / 2
-        ax.annotate(f"r={r:.2f}", xy=(.5, .5), xycoords=ax.transAxes,
+        # Correlation number on the plot
+        ax.annotate(f"{r:.2f}", xy=(.5, .5), xycoords=ax.transAxes,
                 color='white' if lightness < 0.7 else 'black', size=26, ha='center', va='center')
     
     g = sns.PairGrid(input_df)
-    g.map_lower(plt.scatter, s=10)
+    g.map_lower(plt.scatter, s=20)
     g.map_diag(sns.histplot, kde=False)
-    g.map_upper(corrfunc, cmap=plt.get_cmap('crest'), norm=plt.Normalize(vmin=-.5, vmax=.5))
+    g.map_upper(corrfunc, cmap=plt.get_cmap('crest'), norm=plt.Normalize(vmin=0, vmax=1))
+    
+    # Adjust label size for all axes
+    for ax in g.axes.flatten():
+        ax.tick_params(axis='both', which='major', labelsize=20)
     
     plt.tight_layout()
     plt.savefig(output_path + "/correlation_" + city_num + ".png", dpi=600)
@@ -1152,9 +1194,14 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
                     'None':                         "#FFFFFF"}
     
 
-    fig, ax = plt.subplots(figsize=(20, 8))
+    fig, ax = plt.subplots(figsize=(26, 12), layout='constrained')
+    ax.tick_params(axis='both', which='major', labelsize=22)
     ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
 
+    matplotlib.rc('xtick', labelsize=22)
+    matplotlib.rc('ytick', labelsize=22)
+    plt.rc('legend', fontsize=22)
+    
     for event, color in event_colors.items():
         subset = time_series_df[time_series_df["Event"] == event]
         print(event)
@@ -1186,15 +1233,22 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
                         ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
                         df_num = df_num + 1
     
-    legend = plt.legend()
-    legend.get_frame().set_facecolor('none')
-    plt.legend(frameon=False)
+    #legend = plt.legend()
+    #legend.get_frame().set_facecolor('none')
+    #plt.legend(frameon=False)
+    #box = ax.get_position()
+    #ax.set_position([box.x0, box.y0 + box.height * 0.1,
+    #             box.width, box.height * 0.9])
+
+    fig.legend(loc='outside center right')
+    # Put a legend below current axis
+    #ax.legend(loc='lower left', mode="expand", bbox_to_anchor=(0, 1.02, 1, 0.2), ncol=11)
 
     ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
     ax.set(xlabel="", ylabel="")
     
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.savefig(output_path + "extreme_weather_" + city + ".png", dpi=600)
     plt.close()
     
@@ -1425,16 +1479,20 @@ def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_
                 (time_series_df.index <= end_time + pd.Timedelta(days=1))]
                 extreme_df_after = extreme_df_after.shift(freq="-24H")
                 
+                if event_num == 0:
+                    ax.plot(extreme_df.index, extreme_df['Power'], color="#ba181b", label="Extreme")
+                    ax.plot(extreme_df_before.index, extreme_df_before['Power'], color='#274c77', label="Previous Day")
+                    ax.plot(extreme_df_after.index, extreme_df_after['Power'], color='#fca311', label="Next Day")
+                else:
+                    ax.plot(extreme_df.index, extreme_df['Power'], color="#ba181b")
+                    ax.plot(extreme_df_before.index, extreme_df_before['Power'], color='#274c77')
+                    ax.plot(extreme_df_after.index, extreme_df_after['Power'], color='#fca311')
                 
-                ax.plot(extreme_df.index, extreme_df['Power'], color="#ba181b", label="Extreme")
-                ax.plot(extreme_df_before.index, extreme_df_before['Power'], color='#274c77', label="Previous Day")
-                ax.plot(extreme_df_after.index, extreme_df_after['Power'], color='#fca311', label="Next Day")
-
                 ax.set_title(alphabet_list[event_num] + ") " + event, fontsize=16)
                 ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
-                ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+                ax.tick_params(axis='both', which='major', labelsize=16)
+                ax.set_xticklabels(ax.get_xticklabels(), rotation=45) 
                 ax.set(xlabel="", ylabel="")
-                ax.legend()
                 
                 event_num = event_num + 1
                 
@@ -1445,6 +1503,7 @@ def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_
     for ax in axs[7:]:
         ax.axis('off')
 
+    fig.legend(loc='lower right', fontsize=16, bbox_to_anchor=(0.6, 0.13))
     # Adjust layout
     plt.tight_layout()
     # Show the plot
@@ -1654,10 +1713,13 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
                     'Spring Festival':              '#e01e37',}
     
 
-    fig, ax = plt.subplots(figsize=(20, 8))
+    fig, ax = plt.subplots(figsize=(26, 12), layout='constrained')
+    ax.tick_params(axis='both', which='major', labelsize=22)
     ax.plot(time_series_df.index, time_series_df['Power'], color='#274c77')
     
-
+    matplotlib.rc('xtick', labelsize=22)
+    matplotlib.rc('ytick', labelsize=22)
+    plt.rc('legend', fontsize=22)
     # Set background color according to Event values
     for event, color in event_colors.items():
         subset = time_series_df[time_series_df['Holiday'] == event]
@@ -1693,15 +1755,25 @@ def holiday_plot(input_df, city, weather_data_path, start_time, end_time, output
                     ax.axvspan(group_df.index[0], group_df.index[-1], facecolor=color, alpha=0.5, edgecolor='none')
                     df_num = df_num + 1
                 
-    legend = plt.legend()
-    legend.get_frame().set_facecolor('none')
-    plt.legend(frameon=False)
+    #legend = plt.legend()
+    #legend.get_frame().set_facecolor('none')
+    #plt.legend(frameon=False)
 
     ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+    plt.xlabel("Time", fontsize=22)
+    plt.ylabel("Power(kW)", fontsize=22)
     ax.set(xlabel="", ylabel="")
     
-    plt.tight_layout()
+    fig.legend(loc='outside center right')
+    #box = ax.get_position()
+    #ax.set_position([box.x0, box.y0 + box.height * 0.1,
+    #             box.width, box.height * 0.9])
+
+    # Put a legend below current axis
+    #ax.legend(loc='lower left', mode="expand", bbox_to_anchor=(0, 1.02, 1, 0.2), ncol=7)
+    
+    #plt.tight_layout()
     plt.savefig(output_path + "holiday_" + city + ".png", dpi=600)
     plt.close()
     

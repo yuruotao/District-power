@@ -243,7 +243,7 @@ def imputation_visualization(raw_data_df, start_time, end_time, method_list, col
     time_series_df = pd.merge(time_series_df, raw_data_df, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    plt.figure(figsize=(20,12))
+    plt.figure(figsize=(20, 12))
     ax = sns.lineplot(data=time_series_df, markers=True, linewidth=4)
     missing_mask = time_series_df['raw'].isna().values.astype(int)
     ax.set_xlim(time_series_df.index[0], time_series_df.index[-1])
@@ -251,18 +251,20 @@ def imputation_visualization(raw_data_df, start_time, end_time, method_list, col
                   missing_mask[np.newaxis], cmap='Blues', alpha=0.2)
     # Set x-axis limits
     
-    
-    legend = plt.legend()
     plt.rc('legend', fontsize=22)
-    legend.get_frame().set_facecolor('none')
-    plt.legend(frameon=False)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                 box.width, box.height * 0.9])
 
+    # Put a legend below current axis
+    ax.legend(loc='lower left', mode="expand", bbox_to_anchor=(0, 1.02, 1, 0.2), ncol=5)
+    
     ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
     ax.tick_params(labelsize=22)
     plt.xlabel("Time", fontsize=22)
     plt.ylabel("Power(kW)", fontsize=22)
         
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.savefig(output_path + "imputation_methods.png", dpi=600)
     plt.close()
     

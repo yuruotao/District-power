@@ -76,19 +76,22 @@ if __name__ == "__main__":
     #analysis.average_load_profiles(select_df, "./result/select/")
     
     # Load profile in different scales
-    """
+
     select_df = select_df[["Datetime", "0", "2", "3", "5", "9"]]
+
     analysis.specific_load_profile_plot(select_df, 
                                         '2022-07-04 00:00:00', '2022-07-04 23:00:00', 
                                         '2022-07-10 00:00:00', '2022-07-10 23:00:00', 
                                         "Day", "./result/select/")
+    
     analysis.specific_load_profile_plot(select_df, 
                                         '2022-07-04 00:00:00', '2022-07-10 23:00:00', 
                                         '2022-07-11 00:00:00', '2022-07-17 23:00:00', 
                                         "Week", "./result/select/")
+
     analysis.specific_load_profile_plot(select_df, 
                                         '2022-07-01 00:00:00', '2022-07-31 23:00:00', 
                                         '2022-08-01 00:00:00', '2022-08-31 23:00:00', 
                                         "Month", "./result/select/")
-    """
+
     
