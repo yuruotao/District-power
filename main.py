@@ -7,7 +7,7 @@ import seaborn as sns
 from scipy.spatial.distance import cdist
 
 # Import modules
-import script.analysis as analysis
+#import script.analysis as analysis
 #import script.imputation as imputation
 import script.missing_value as missing_value
 #import script.profiling as profiling
@@ -119,6 +119,8 @@ if __name__ == "__main__":
     # Create a new DataFrame based on the time interval
     raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
     raw_data_df = raw_data_df.reset_index(drop=True)
+    raw_data_df['Datetime'] = pd.to_datetime(raw_data_df['Datetime'])
+    raw_data_df.set_index("Datetime", inplace=True)
     
     ####################################################################################################
     # Missing value

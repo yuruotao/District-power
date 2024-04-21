@@ -16,8 +16,6 @@ def missing_value_visualization(input_df, save_path):
     Returns:
         None
     """
-    datetime_column = input_df["Datetime"]
-    input_df = input_df.drop(columns=["Datetime"])
     column_list = input_df.columns.values.tolist()
 
     missing_dir_matrix = save_path + "/matrix/"
@@ -57,7 +55,7 @@ def missing_value_visualization(input_df, save_path):
         temp_df.columns = temp_df.columns.str.split('-').str[-1]
         
         # Matrix plot
-        ax = msno.matrix(temp_df, fontsize=20, figsize=(16, 12), label_rotation=0)
+        ax = msno.matrix(temp_df, fontsize=20, figsize=(20, 12), label_rotation=0, freq="M")
         plt.xlabel("Transformers", fontsize=20)
         plt.ylabel("Sample Points", fontsize=20)
         plt.savefig(missing_dir_matrix + "City-" + index[0] + "-" + "District-" + index[1] +'-matrix.png', dpi=600)
