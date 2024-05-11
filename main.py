@@ -8,10 +8,10 @@ from scipy.spatial.distance import cdist
 
 # Import modules
 #import script.analysis as analysis
-#import script.imputation as imputation
-import script.missing_value as missing_value
+import script.imputation as imputation
+#import script.missing_value as missing_value
 #import script.profiling as profiling
-#import script.basic_statistics as basic_statistics
+import script.basic_statistics as basic_statistics
 #import script.resample as resample
 #import script.uniform as uniform
 
@@ -120,12 +120,12 @@ if __name__ == "__main__":
     raw_data_df = raw_data_df.loc[(raw_data_df['Datetime'] >= start_time) & (raw_data_df['Datetime'] <= end_time)]
     raw_data_df = raw_data_df.reset_index(drop=True)
     raw_data_df['Datetime'] = pd.to_datetime(raw_data_df['Datetime'])
-    raw_data_df.set_index("Datetime", inplace=True)
+    #raw_data_df.set_index("Datetime", inplace=True)
     
     ####################################################################################################
     # Missing value
 
-    missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
+    #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
 
     ####################################################################################################
     # Profiling
@@ -136,32 +136,29 @@ if __name__ == "__main__":
     """
     ####################################################################################################
     # Adjust by deleting (Manually)
-    """
+
     # Delete the columns whose missing value takes up more than 20%
     raw_data_adjusted_df = pd.read_excel("./data/raw_data_adjusted.xlsx")
     raw_data_adjusted_df = raw_data_adjusted_df.loc[(raw_data_adjusted_df['Datetime'] >= start_time) & (raw_data_adjusted_df['Datetime'] <= end_time)]
-    raw_data_adjusted_df = raw_data_adjusted_df.reset_index()
+    raw_data_adjusted_df = raw_data_adjusted_df.reset_index(drop=True)
     basic_statistics.basic_statistics(raw_data_adjusted_df, "./result/basic_statistics/adjusted")
-    """
+
     ####################################################################################################
     # Imputation
 
     #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
-    #for method in imputation_methods:
-        #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method=method)
-        #imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")
-        #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/" + method)
-    
-    #imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method="BiScaler")
-    #imputed_df = pd.read_excel("./result/imputation/imputed_data_BiScaler.xlsx")
-    #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/BiScaler")
-    """
+    imputation_methods = ["Forward-Backward"]
+    for method in imputation_methods:
+        imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method=method)
+        imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")
+        basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/" + method)
+
     imputation.imputation_visualization(raw_data_df, '2022-01-01 00:00:00', '2022-01-08 00:00:00', 
                                         ["Linear", "Forward", "Backward", "Forward-Backward"],
                                         "0-0-0",
                                         "./result/imputation/")
-    """
-    imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
+
+    #imputed_df = pd.read_excel("./result/imputation/imputed_data_Forward-Backward.xlsx")
     ####################################################################################################
     # Resample
 
@@ -171,8 +168,8 @@ if __name__ == "__main__":
     ####################################################################################################
     # Seasonality decomposition
 
-    district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
-    city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
+    #district_df = district_aggregate(imputed_df, 2, "./result/aggregate/")
+    #city_df = district_aggregate(imputed_df, 1,"./result/aggregate/")
 
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 24, "additive")
     #analysis.seasonality_decomposition(imputed_df, "./result/seasonality/additive/", 168, "additive")

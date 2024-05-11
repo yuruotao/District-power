@@ -75,17 +75,13 @@ def imputation(input_df, imputation_method, save_path):
           
     elif imputation_method == "Forward-Backward":
         forward_df = input_df.shift(-7*24)
-        backward_df = input_df.shift(-7*24)
+        backward_df = input_df.shift(7*24)
         
-        # Assuming df1 and df2 are your DataFrames
-        result_df = forward_df.copy()  # Initialize result_df with df2's values
-
-        # Divide by 2 where both elements are not NaN
-        result_df[(backward_df.notna()) & (forward_df.notna())] = (backward_df[(backward_df.notna()) & (forward_df.notna())] + forward_df[(backward_df.notna()) & (forward_df.notna())]) / 2
-
-        # Fill NaN values conditionally based on the presence of NaNs in backward_df and forward_df
-        result_df[backward_df.notna()] = backward_df[backward_df.notna()]  # Fill non-NaN values from backward_df to result_df
-        temp_df = input_df.fillna(result_df)
+        average_values = (forward_df + backward_df) / 2
+        temp_df = input_df.copy()
+        temp_df[temp_df.isna() & forward_df.notna() & backward_df.notna()] = average_values[temp_df.isna() & forward_df.notna() & backward_df.notna()]
+        temp_df[temp_df.isna() & forward_df.notna() & backward_df.isna()] = forward_df[temp_df.isna() & forward_df.notna() & backward_df.isna()]
+        temp_df[temp_df.isna() & backward_df.notna() & forward_df.isna()] = backward_df[temp_df.isna() & backward_df.notna() & forward_df.isna()]
 
         temp_df = pd.concat([datetime_column, temp_df], axis=1)
         temp_df.set_index('Datetime', inplace=True)
@@ -111,7 +107,7 @@ def imputation(input_df, imputation_method, save_path):
             temp_df[column] = temp_df.apply(lambda row: fill_missing_values(row.name, column, mean_values), axis=1)
 
         temp_df = temp_df.reset_index()
-        imputed_df = temp_df.drop(columns=["Datetime", "index"])
+        imputed_df = temp_df.drop(columns=["Datetime"])
 
     elif imputation_method == "Forward":
         imputed_df = input_df.fillna(input_df.shift(-7*24))
