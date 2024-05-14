@@ -145,15 +145,14 @@ if __name__ == "__main__":
 
     ####################################################################################################
     # Imputation
-
-    #imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
-    imputation_methods = ["Forward-Backward"]
+    """
+    imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
     for method in imputation_methods:
         imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method=method)
-        #imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")
-        #basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/" + method)
-
-    imputation.imputation_visualization(raw_data_adjusted_df, '2022-01-01 00:00:00', '2022-01-08 00:00:00', 
+        imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")
+        basic_statistics.basic_statistics(imputed_df, "./result/basic_statistics/imputation/" + method)
+    """
+    imputation.imputation_visualization(raw_data_adjusted_df, '2022-06-15 00:00:00', '2022-06-22 00:00:00', 
                                         ["Linear", "Forward", "Backward", "Forward-Backward"],
                                         "0-0-0",
                                         "./result/imputation/")
