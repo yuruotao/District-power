@@ -47,13 +47,13 @@ Here contains the raw data and scripts for data processing and visualization for
 
 The sources of data are summarized here.
 
-|            Data            |                                            Data Source                                            |
-| :------------------------: | :------------------------------------------------------------------------------------------------: |
-| Weather Stations Meta Data |               [NOAA](https://www.ncei.noaa.gov/data/global-summary-of-the-day/access/)               |
-|        Weather Data        |                                               [NOAA]()                                               |
-|          Festival          |                                      Collected from Internet                                      |
-|      Extreme Weather      | [Collected from media](http://news.gxnews.com.cn/staticpages/20240110/newgx659e5917-21404408.shtml#/) |
-|      Transformer Data      |                                     China Southern Power Grid                                     |
+|            Data            |                                               Data Source                                               |
+| :------------------------: | :-----------------------------------------------------------------------------------------------------: |
+| Weather Stations Meta Data |                  [NOAA](https://www.ncei.noaa.gov/data/global-summary-of-the-day/access/)                  |
+|        Weather Data        |                                                  [NOAA]()                                                  |
+|          Festival          |                                       Collected from the Internet                                       |
+|      Extreme Weather      | [Collected from the media](http://news.gxnews.com.cn/staticpages/20240110/newgx659e5917-21404408.shtml#/) |
+|      Transformer Data      |                                        China Southern Power Grid                                        |
 
 ## Usage Note
 
