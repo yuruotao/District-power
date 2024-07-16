@@ -12,9 +12,47 @@ from autoimpute.imputations import SingleImputer, MultipleImputer
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.dates as mdates
 
 sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
 sns.set_theme(style="white")
+
+def lineplot_breaknans(data, break_at_nan=True, break_at_inf=True, **kwargs):
+    """Make lineplot break at nans
+
+    Args:
+        data (dataframe): data to be plotted
+        break_at_nan (bool, optional): whether to break at nan. Defaults to True.
+        break_at_inf (bool, optional): whether to break at inf. Defaults to True.
+
+    Raises:
+        ValueError: dataframe do not contain any column
+
+    Returns:
+        ax
+    """
+    
+    # Automatically detect the y column and use index as x
+    if 'y' not in kwargs:
+        columns = data.columns
+        if len(columns) >= 1:
+            kwargs['y'] = columns[0]
+        else:
+            raise ValueError("DataFrame must contain at least one column for y detection.")
+    
+    # Reset index to have a column for the x-axis
+    data_reset = data.reset_index()
+    kwargs['x'] = data_reset.columns[0]
+
+    # Create a cumulative sum of NaNs and infs to use as units
+    cum_num_nans_infs = np.zeros(len(data_reset))
+    if break_at_nan: cum_num_nans_infs += np.cumsum(np.isnan(data_reset[kwargs['y']]))
+    if break_at_inf: cum_num_nans_infs += np.cumsum(np.isinf(data_reset[kwargs['y']]))
+
+    # Plot using seaborn's lineplot
+    ax = sns.lineplot(data=data_reset, **kwargs, units=cum_num_nans_infs, estimator=None)  # estimator must be None when specifying units
+    return ax
 
 def imputation(input_df, imputation_method, save_path):
     """carry out the imputation for raw data with missing values
@@ -215,8 +253,9 @@ def imputation_visualization(raw_data_df, start_time, end_time, method_list, col
     Returns:
         None
     """
-    sns.set_theme(style="whitegrid")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    sns.set_theme(style="white")
+    mpl.rcParams['font.family'] = 'Times New Roman'
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -238,26 +277,36 @@ def imputation_visualization(raw_data_df, start_time, end_time, method_list, col
     time_series_df = pd.merge(time_series_df, raw_data_df, on='Datetime', how="left")
     time_series_df = time_series_df.set_index("Datetime")
     
-    plt.figure(figsize=(20, 12))
-    ax = sns.lineplot(data=time_series_df, markers=True, linewidth=4)
+    plt.figure(figsize=(8, 5))
+    ax = lineplot_breaknans(data=time_series_df, y="Raw", markers=True, linewidth=1.5, break_at_nan=True)
+    
+    columns_to_plot = [col for col in time_series_df.columns if col != "Raw" and col != "Forward-Backward"]
+    temp_time_series_df = time_series_df[columns_to_plot]
+    sns.lineplot(data=temp_time_series_df, ax=ax, markers=True, linewidth=1.5)   
+    
     missing_mask = time_series_df['raw'].isna().values.astype(int)
     ax.set_xlim(time_series_df.index[0], time_series_df.index[-1])
     ax.pcolorfast(ax.get_xlim(), ax.get_ylim(),
                   missing_mask[np.newaxis], cmap='Blues', alpha=0.2)
-    # Set x-axis limits
+
+    if "Forward-Backward" in time_series_df.columns:
+        sns.lineplot(data=time_series_df["Forward-Backward"], ax=ax, color='#000000', linewidth=1.5, label="Forward-Backward")
     
-    plt.rc('legend', fontsize=22)
+    plt.rc('legend', fontsize=10.5)
     box = ax.get_position()
     ax.set_position([box.x0, box.y0 + box.height * 0.1,
                  box.width, box.height * 0.9])
+    
+    # Set the date format on the x-axis to show minutes
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
 
     # Put a legend below current axis
-    ax.legend(loc='lower left', mode="expand", bbox_to_anchor=(0, 1.02, 1, 0.2), ncol=5)
+    ax.legend(loc='lower left', mode="expand", bbox_to_anchor=(0, 1.02, 1, 0.2), ncol=4, frameon=False)
     
     ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
-    ax.tick_params(labelsize=22)
-    plt.xlabel("Time", fontsize=22)
-    plt.ylabel("Power(kW)", fontsize=22)
+    ax.tick_params(labelsize=10.5)
+    plt.xlabel("Time", fontsize=10.5)
+    plt.ylabel("Power (kW)", fontsize=10.5)
         
     #plt.tight_layout()
     plt.savefig(output_path + "imputation_methods.png", dpi=600)

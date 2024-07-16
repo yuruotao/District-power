@@ -7,13 +7,13 @@ import seaborn as sns
 from scipy.spatial.distance import cdist
 
 # Import modules
-#import script.analysis as analysis
+import script.analysis as analysis
 import script.imputation as imputation
-#import script.missing_value as missing_value
-#import script.profiling as profiling
+import script.missing_value as missing_value
+import script.profiling as profiling
 import script.basic_statistics as basic_statistics
-#import script.resample as resample
-#import script.uniform as uniform
+import script.resample as resample
+import script.uniform as uniform
 
 
 def time_series_dataframe_create(start_time, stop_time, time_interval):
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     ####################################################################################################
     # Missing value
 
-    #missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
+    missing_value.missing_value_visualization(raw_data_df, "./result/missing_value")
 
     ####################################################################################################
     # Profiling
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     ####################################################################################################
     # Imputation
     """
-    imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average", "MICE", "BiScaler", "AutoML"]
+    imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward", "Average"]
     for method in imputation_methods:
         imputed_df = imputation.imputation(raw_data_adjusted_df, save_path="./result/imputation", imputation_method=method)
         imputed_df = pd.read_excel("./result/imputation/imputed_data_" + method + ".xlsx")

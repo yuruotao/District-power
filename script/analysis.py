@@ -1495,9 +1495,6 @@ def extreme_normal_comparison_plot(input_df, weather_data_path, start_time, end_
                 ax.set(xlabel="", ylabel="")
                 
                 event_num = event_num + 1
-                
-                
-
     
     # Hide the empty subplots
     for ax in axs[7:]:

@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import missingno as msno
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 import seaborn as sns
 sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
@@ -16,6 +17,10 @@ def missing_value_visualization(input_df, save_path):
     Returns:
         None
     """
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    sns.set_theme(style="white")
+    mpl.rcParams['font.family'] = 'Times New Roman'
+    
     column_list = input_df.columns.values.tolist()
 
     missing_dir_matrix = save_path + "/matrix/"
@@ -55,16 +60,18 @@ def missing_value_visualization(input_df, save_path):
         temp_df.columns = temp_df.columns.str.split('-').str[-1]
         
         # Matrix plot
-        ax = msno.matrix(temp_df, fontsize=20, figsize=(20, 12), label_rotation=0, freq="M")
-        plt.xlabel("Transformers", fontsize=20)
-        plt.ylabel("Sample Points", fontsize=20)
+        ax = msno.matrix(temp_df, fontsize=10.5, figsize=(8, 6), label_rotation=0, freq="M")
+        ax.tick_params(labelsize=10.5)
+        plt.xlabel("Transformers", fontsize=10.5)
+        plt.ylabel("Sample points", fontsize=10.5)
         plt.savefig(missing_dir_matrix + "City-" + index[0] + "-" + "District-" + index[1] +'-matrix.png', dpi=600)
         plt.close()
         
         # Bar plot
-        ax = msno.bar(temp_df, fontsize=20, figsize=(16, 12), label_rotation=0)
-        plt.xlabel("Transformers", fontsize=20)
-        plt.ylabel("Sample Points", fontsize=20)
+        ax = msno.bar(temp_df, fontsize=10.5, figsize=(8, 6), label_rotation=0)
+        ax.tick_params(labelsize=10.5)
+        plt.xlabel("Transformers", fontsize=10.5)
+        plt.ylabel("Sample points", fontsize=10.5)
         plt.savefig(missing_dir_bar + "City-" + index[0] + "-" + "District-" + index[1] +'-bar.png', dpi=600)
         plt.close()
     

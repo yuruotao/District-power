@@ -4,8 +4,9 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from datetime import datetime
+import matplotlib as mpl
 
-sns.set_theme(style="whitegrid")
+sns.set_theme(style="white")
 sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
 
 
@@ -23,6 +24,10 @@ def resample(input_df, output_path, freq_list):
     print("Resample begin")
     datetime_column = input_df["Datetime"]
     temp_df = input_df.set_index(["Datetime"])
+    
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    sns.set_theme(style="white")
+    mpl.rcParams['font.family'] = 'Times New Roman'
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -66,17 +71,17 @@ def resample_visualization(input_df, resample_df_list, output_path):
 
         # Plot for DataFrame 1
         sns.lineplot(data=input_df, x='Datetime', y=column, ax=axes[0]).set(xlabel=None)
-        axes[0].set_title('1 Hour')
+        axes[0].set_title('1 hour')
         axes[0].set_xticks([])
 
         # Plot for DataFrame 2
         sns.lineplot(data=resample_df_list[0], x='Datetime', y=column, ax=axes[1]).set(xlabel=None)
-        axes[1].set_title('6 Hours')
+        axes[1].set_title('6 hours')
         axes[1].set_xticks([])
 
         # Plot for DataFrame 3
         sns.lineplot(data=resample_df_list[1], x='Datetime', y=column, ax=axes[2]).set(xlabel=None)
-        axes[2].set_title('1 Day')
+        axes[2].set_title('1 day')
         n = 15  # Set the desired frequency of ticks
         ticks = resample_df_list[1].iloc[::n, 0]  # Select every nth tick from the 'Date' column
         axes[2].set_xticks(ticks)
