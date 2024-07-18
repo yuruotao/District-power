@@ -265,11 +265,8 @@ def NCDC_weather_data_obtain(meta_df, start_year, stop_year):
     return weather_df
 ##################################################################################################
 # 2. Transformer data
-
-
 ##################################################################################################
 # 3. Extreme weather from the internet
-
 ##################################################################################################
 # 4. Calculated extreme weather
 # Heat Index
@@ -466,7 +463,6 @@ def extreme_weather_detect(weather_meta_df, weather_df, start_year, end_year):
     return final_df
 ##################################################################################################
 # 5. Holidays
-
 ##################################################################################################
 
 if __name__ == "__main__":
@@ -483,7 +479,6 @@ if __name__ == "__main__":
     ##################################################################################################
     # 1. Weather data and weather meta data
     # 1.1 Obtain the NCDC data
-    """
     weather_meta_df = NCDC_weather_meta_data_obtain("./data/isd-history.csv", 2022, 2023)
     weather_meta_gdf = df_to_gdf(weather_meta_df, "LON", "LAT")
     # 1.2 Filter by region
@@ -500,10 +495,8 @@ if __name__ == "__main__":
     # 1.4 Store them in a database
     provincial_weather_meta_df.to_sql('weather_meta', con=engine, if_exists='replace', index=False)
     weather_df.to_sql('weather', con=engine, if_exists='replace', index=False)
-    """
     ##################################################################################################
     # 2. Transformer data
-    """
     # 2.1 Load the transformer meta data and transformer data
     transformer_meta_df = pd.read_excel("./data/transformer_meta.xlsx")
     transformer_meta_df["TRANSFORMER_ID"] = transformer_meta_df.apply(lambda row: str(int(row["City"])) + '-' + str(int(row["District"]))
@@ -526,17 +519,14 @@ if __name__ == "__main__":
     # 2.2 Store them in a database
     transformer_meta_df.to_sql('transformer_meta', con=engine, if_exists='replace', index=False)
     final_df.to_sql('transformer_raw', con=engine, if_exists='replace', index=False)
-    """
     ##################################################################################################
     # 3. Extreme weather data from internet
-    """
     # 3.1 Import the data and save to database
     extreme_weather_internet_df = pd.read_excel("./data/extreme_weather_internet.xlsx")
     extreme_weather_internet_df = pd.merge(time_df, extreme_weather_internet_df, on="Datetime", how="left")
     extreme_weather_internet_df.columns = extreme_weather_internet_df.columns.str.upper()
     extreme_weather_internet_df = extreme_weather_internet_df.rename({"EVENT": "HAZARD"}, axis=1)
     extreme_weather_internet_df.to_sql('extreme_weather_internet', con=engine, if_exists='replace', index=False)
-    """
     ##################################################################################################
     # 4. Calculated extreme weather
     provincial_weather_meta_df_query = "SELECT * FROM weather_meta"
@@ -548,11 +538,9 @@ if __name__ == "__main__":
     extreme_weather_detect_df.to_sql('extreme_weather_calculated', con=engine, if_exists='replace', index=False)
     ##################################################################################################
     # 5. Holiday data
-    """
     # 5.1 Import the data and save to database
     holiday_df = pd.read_excel("./data/holiday.xlsx")
     holiday_df = pd.merge(time_df, holiday_df, on="Datetime", how="left")
     holiday_df.columns = holiday_df.columns.str.upper()
     holiday_df.to_sql('holiday', con=engine, if_exists='replace', index=False)
-    """
     ##################################################################################################
