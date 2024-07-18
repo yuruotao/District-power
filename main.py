@@ -205,16 +205,16 @@ if __name__ == "__main__":
         holiday_query = 'SELECT * FROM holiday'
         holiday_df = pd.read_sql(holiday_query, engine)
         holiday_df = holiday_df.astype({'DATETIME':"datetime64[ns]"})
-        holiday_plot(province_df, "all", holiday_df, "2022-01-01 00:00:00", '2022-12-31 23:00:00', "./result/holiday/")
+        holiday_plot(province_df, "all", holiday_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/holiday/")
     
     # 4.3 Extreme weather
     extreme_weather = True
     if extreme_weather:
         # For the whole region
-        extreme_weather_query = 'SELECT * FROM extreme_weather_online'
+        extreme_weather_query = 'SELECT * FROM extreme_weather_internet'
         extreme_weather_df = pd.read_sql(extreme_weather_query, engine)
         extreme_weather_df = extreme_weather_df.astype({'DATETIME':"datetime64[ns]"})
-        extreme_weather_plot(province_df, "all", extreme_weather_df, "2022-01-01 00:00:00", '2022-12-31 23:00:00', "./result/extreme_weather/")
+        extreme_weather_plot(province_df, "all", extreme_weather_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/extreme_weather/")
         
         # For each city
         extreme_weather_calculated_query = 'SELECT * FROM extreme_weather_calculated'
@@ -241,7 +241,7 @@ if __name__ == "__main__":
                                         "./result/extreme_weather/")
         
         # Comparison plot for one city
-        guilin_df = city_df[["Datetime", "2"]]
+        guilin_df = city_df[["DATETIME", "2"]]
         guilin_df = guilin_df.rename(columns={"2": "LOAD"})
         guilin_extreme_weather_df = extreme_weather_calculated_df[extreme_weather_calculated_df["STATION_ID"] == "2"]
         extreme_normal_comparison_plot(guilin_df,

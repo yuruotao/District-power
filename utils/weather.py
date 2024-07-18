@@ -141,16 +141,6 @@ def weather_correlation(input_df, output_path, city_num):
 
 
 
-
-
-
-
-
-
-
-
-
-
 def holiday_plot(input_df, city, weather_df, start_time, end_time, output_path):
     """Plot the extreme weather
 
@@ -188,10 +178,12 @@ def holiday_plot(input_df, city, weather_df, start_time, end_time, output_path):
                     'Mid-autumn festival':          '#fdc500',
                     'National Day':                 '#e09f3e',
                     'Qingming':                     '#8b949a',
-                    'Spring Festival':              '#e01e37',}
+                    'Spring Festival':              '#e01e37',
+                    'None':                         "#FFFFFF"
+                    }
     
 
-    fig, ax = plt.subplots(figsize=(14, 8), layout='constrained')
+    fig, ax = plt.subplots(figsize=(14, 6), layout='constrained')
     ax.tick_params(axis='both', which='major', labelsize=10.5)
     ax.plot(time_series_df.index, time_series_df['LOAD'], color='#274c77')
     
@@ -208,7 +200,7 @@ def holiday_plot(input_df, city, weather_df, start_time, end_time, output_path):
         end_idx = None
         
         for idx in subset.index[1:]:
-            if (idx - start_idx).days > 1:
+            if (idx - start_idx).days >= 1:
                 # End of current part found
                 dfs.append(subset.loc[start_idx:end_idx])
                 start_idx = idx
@@ -240,19 +232,19 @@ def holiday_plot(input_df, city, weather_df, start_time, end_time, output_path):
     plt.xlabel("Time", fontsize=10.5)
     plt.ylabel("Power (kW)", fontsize=10.5)
     
-    fig.legend(loc='outside center right')
+    fig.legend(loc='outside center right', frameon=False)
     plt.savefig(output_path + "holiday_" + city + ".png", dpi=600)
     plt.close()
     
     return None
 
-def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time, output_path):
+def extreme_weather_plot(input_df, city, weather_df, start_time, end_time, output_path):
     """Plot the extreme weather
 
     Args:
         input_df (dataframe): contain the power data
         city (string): city to plot (all)
-        weather_data_path (string): path to the extreme weather data
+        weather_df (dataframe): extreme weather data
         start_time (string): the start date of extreme weather
         end_date (string): the end date of extreme weather
         output_path (string): path to save the plot
@@ -262,8 +254,6 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
     """
     sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
-    
-    weather_df = pd.read_excel(weather_data_path)
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -293,7 +283,7 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
                     'None':                         "#FFFFFF"}
     
 
-    fig, ax = plt.subplots(figsize=(14, 10), layout='constrained')
+    fig, ax = plt.subplots(figsize=(14, 6), layout='constrained')
     ax.tick_params(axis='both', which='major', labelsize=10.5)
     ax.plot(time_series_df.index, time_series_df['LOAD'], color='#274c77')
 
@@ -333,10 +323,10 @@ def extreme_weather_plot(input_df, city, weather_data_path, start_time, end_time
                         df_num = df_num + 1
     
 
-    fig.legend(loc='outside center right')
+    fig.legend(loc='outside center right', frameon=False)
 
     ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=0)        
     ax.set(xlabel="", ylabel="")
     
     plt.xlabel("Time", fontsize=10.5)
@@ -406,7 +396,7 @@ def extreme_weather_city_plot(input_df, city, weather_df, start_time, end_time, 
                     }
     
 
-    fig, ax = plt.subplots(figsize=(14, 10), layout='constrained')
+    fig, ax = plt.subplots(figsize=(14, 6), layout='constrained')
     ax.tick_params(axis='both', which='major', labelsize=10.5)
     ax.plot(time_series_df.index, time_series_df['LOAD'], color='#274c77')
 
@@ -446,10 +436,10 @@ def extreme_weather_city_plot(input_df, city, weather_df, start_time, end_time, 
                         df_num = df_num + 1
     
 
-    fig.legend(loc='outside center right')
+    fig.legend(loc='outside center right', frameon=False)
 
     ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)        
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=0)        
     ax.set(xlabel="", ylabel="")
     
     plt.xlabel("Time", fontsize=10.5)
@@ -518,7 +508,7 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                     }
     
     alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
-    fig, axs = plt.subplots(3, 3, figsize=(14, 10))
+    fig, axs = plt.subplots(3, 3, figsize=(14, 6))
     # Flatten the axes array for easy iteration
     axs = axs.flatten()
     
@@ -574,7 +564,7 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                 ax.set_title("(" + alphabet_list[event_num] + ") " + event, fontsize=10.5)
                 ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
                 ax.tick_params(axis='both', which='major', labelsize=10.5)
-                ax.set_xticklabels(ax.get_xticklabels(), rotation=45) 
+                ax.set_xticklabels(ax.get_xticklabels(), rotation=0) 
                 ax.set(xlabel="", ylabel="")
                 
                 event_num = event_num + 1
@@ -583,7 +573,7 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
     for ax in axs[7:]:
         ax.axis('off')
 
-    fig.legend(loc='lower right', fontsize=10.5, bbox_to_anchor=(0.6, 0.13))
+    fig.legend(loc='lower right', fontsize=10.5, bbox_to_anchor=(0.6, 0.13), frameon=False)
     # Adjust layout
     plt.tight_layout()
     # Show the plot
