@@ -139,8 +139,6 @@ def weather_correlation(input_df, output_path, city_num):
 
     return None
 
-
-
 def holiday_plot(input_df, city, weather_df, start_time, end_time, output_path):
     """Plot the extreme weather
 
@@ -393,6 +391,7 @@ def extreme_weather_city_plot(input_df, city, weather_df, start_time, end_time, 
                     #"WIND_LEVEL_12": "#007f5f",
                     "PRECIPITATION_50": "#d5c7bc",
                     "PRECIPITATION_100": "#785964",
+                    "None":"#FFFFFF"
                     }
     
 
@@ -508,7 +507,7 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                     }
     
     alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
-    fig, axs = plt.subplots(3, 3, figsize=(14, 6))
+    fig, axs = plt.subplots(3, 3, figsize=(14, 6), sharey=True)
     # Flatten the axes array for easy iteration
     axs = axs.flatten()
     
@@ -528,7 +527,7 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                 if found == 1:
                     break
                 
-                if (idx - start_idx).days > 1:
+                if (idx - start_idx).days >= 1:
                     # End of current part found
                     start_time = start_idx
                     end_time = start_idx + pd.Timedelta(days=1)
