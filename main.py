@@ -10,10 +10,12 @@ import matplotlib.dates as mdates
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import time
 
 from utils.load_missing import *
 from utils.diversity_factor import *
 from utils.load_profile import *
+from utils.weather import *
 
 def district_aggregate(input_df, level):
     """aggregate the data by different levels
@@ -74,15 +76,6 @@ if __name__ == "__main__":
     
     transformer_meta_query = 'SELECT * FROM transformer_meta'
     transformer_meta_df = pd.read_sql(transformer_meta_query, engine)
-    
-    weather_meta_query = 'SELECT * FROM weather_meta'
-    weather_meta_df = pd.read_sql(weather_meta_query, engine)
-    
-    weather_query = 'SELECT * FROM weather'
-    weather_df = pd.read_sql(weather_query, engine)
-    
-    holiday_query = 'SELECT * FROM holiday'
-    holiday_df = pd.read_sql(holiday_query, engine)
     ############################################################################################################
     # 2. Missing data, filter, imputation
     transformer_pivot_df = transformer_raw_df.pivot(index='DATETIME', columns='TRANSFORMER_ID', values='LOAD')
@@ -96,10 +89,10 @@ if __name__ == "__main__":
         load_missing_value_visualization(transformer_pivot_df, "./result/load_missing")
 
     # Filter by the percentage of missing data
-    filtered_transformer_meta_df = transformer_missing_filter(transformer_meta_df, transformer_pivot_df, 30)
+    #filtered_transformer_meta_df = transformer_missing_filter(transformer_meta_df, transformer_pivot_df, 30)
     
     # Imputation
-    imputed_transformer_df = transformer_data_imputation(filtered_transformer_meta_df, transformer_raw_df)
+    #imputed_transformer_df = transformer_data_imputation(filtered_transformer_meta_df, transformer_raw_df)
 
     # Imputation visualization
     imputation_visualization_flag = False
@@ -138,7 +131,7 @@ if __name__ == "__main__":
     if city_profile_flag:
         average_load_profiles(city_df, "./result/load_profile/")
     # 3.3 City load profile in different scales
-    select_city_profile_flag = True
+    select_city_profile_flag = False
     if select_city_profile_flag:
         select_df = district_df[["DATETIME", "0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
         select_df = select_df.rename(columns={
@@ -161,11 +154,42 @@ if __name__ == "__main__":
                                             '2022-08-01 00:00:00', '2022-08-31 23:00:00', 
                                             "Month", "./result/load_profile/")
     # 3.4 Seasonality decomposition
-    
+    seasonality_flag = False
+    if seasonality_flag:
+        seasonality_decomposition(city_df, "./result/seasonality/", 24, "additive")
+        seasonality_decomposition(city_df, "./result/seasonality/", 168, "additive")
+
+        seasonality_decomposition(city_df, "./result/seasonality/", 24, "multiplicative")
+        seasonality_decomposition(city_df, "./result/seasonality/", 168, "multiplicative")
     ############################################################################################################
     # 4. Weather and holidays
     # 4.1 Weather correlation
+    time_index = pd.date_range(start="2022-01-01 00:00:00", end="2022-12-31 23:00:00", freq="H")
+    datetime_df = pd.DataFrame()
+    datetime_df["DATETIME"] = time_index
+    
+    weather_meta_query = 'SELECT * FROM weather_meta'
+    weather_meta_df = pd.read_sql(weather_meta_query, engine)
+    
+    weather_query = 'SELECT * FROM weather'
+    weather_df = pd.read_sql(weather_query, engine)
+    weather_df = weather_df.astype({"DATETIME":"datetime64[ns]"})
+    temp_weather_df = weather_df[["DATETIME", "STATION_ID", "TEMP"]]
+    weather_pivot_df = temp_weather_df.pivot(index='DATETIME', columns='STATION_ID', values='TEMP')
+    weather_pivot_df = datetime_df.merge(weather_pivot_df, on="DATETIME", how="left")
+    filtered_meta_df = weather_missing_filter(weather_meta_df, weather_pivot_df, 30)
+
     weather_correlation_flag = True
+    
+    print(filtered_meta_df)
+    imputed_weather_df = NCDC_weather_data_imputation(filtered_meta_df, weather_df)
+    print(imputed_weather_df)
+    
+    time.sleep(100)
+
+    holiday_query = 'SELECT * FROM holiday'
+    holiday_df = pd.read_sql(holiday_query, engine)
+    
     
     # 4.2 Holidays
     holiday_flag = True
