@@ -28,8 +28,8 @@ def district_aggregate(input_df, level):
         dataframe: the aggregated dataframe
     """
 
-    datetime_column = input_df["DATETIME"]
-    input_df = input_df.drop(columns=["DATETIME"])
+    datetime_column = input_df['DATETIME']
+    input_df = input_df.drop(columns=['DATETIME'])
     
     if level == 2:
         # Step 1: Extract common prefix
@@ -54,7 +54,7 @@ def district_aggregate(input_df, level):
     elif level == 0:
         output_df = input_df.sum(axis=1)
         output_df = output_df.to_frame()
-        output_df.rename(columns={output_df.columns[0]: "Power" }, inplace = True)
+        output_df.rename(columns={output_df.columns[0]: "LOAD" }, inplace = True)
         
     output_df = pd.concat([datetime_column, output_df], axis=1)
     
@@ -65,14 +65,14 @@ if __name__ == "__main__":
     # 1. Initialization and import data from database
     time_index = pd.date_range(start="2022-01-01 00:00:00", end="2023-11-11 23:00:00", freq="H")
     datetime_df = pd.DataFrame()
-    datetime_df["DATETIME"] = time_index
+    datetime_df['DATETIME'] = time_index
     
     db_address = 'sqlite:///./data/Transformer_DB/Transformer_DB.db'
     engine = create_engine(db_address)
 
     transformer_raw_query = 'SELECT * FROM transformer_raw'
     transformer_raw_df = pd.read_sql(transformer_raw_query, engine)
-    transformer_raw_df = transformer_raw_df.astype({"DATETIME":"datetime64[ms]"})
+    transformer_raw_df = transformer_raw_df.astype({'DATETIME':"datetime64[ms]"})
     
     transformer_meta_query = 'SELECT * FROM transformer_meta'
     transformer_meta_df = pd.read_sql(transformer_meta_query, engine)
@@ -89,15 +89,15 @@ if __name__ == "__main__":
         load_missing_value_visualization(transformer_pivot_df, "./result/load_missing")
 
     # Filter by the percentage of missing data
-    #filtered_transformer_meta_df = transformer_missing_filter(transformer_meta_df, transformer_pivot_df, 30)
+    filtered_transformer_meta_df = transformer_missing_filter(transformer_meta_df, transformer_pivot_df, 30)
     
     # Imputation
-    #imputed_transformer_df = transformer_data_imputation(filtered_transformer_meta_df, transformer_raw_df)
+    imputed_transformer_df = transformer_data_imputation(filtered_transformer_meta_df, transformer_raw_df)
 
     # Imputation visualization
     imputation_visualization_flag = False
     if imputation_visualization_flag:
-        single_transformer_df = transformer_pivot_df[["DATETIME", "0-0-0"]]
+        single_transformer_df = transformer_pivot_df[['DATETIME', "0-0-0"]]
         imputation_methods = ["Linear", "Forward", "Backward", "Forward-Backward"]
         for method in imputation_methods:
             imputed_df = imputation(single_transformer_df, save_path="./result/load_imputation", imputation_method=method, save_flag=True)
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     diversity_flag = False
     imputed_transformer_pivot_df = imputed_transformer_df.pivot(index='DATETIME', columns='TRANSFORMER_ID', values='LOAD')
     imputed_transformer_pivot_df = datetime_df.merge(imputed_transformer_pivot_df, on='DATETIME', how='left')
-    imputed_transformer_pivot_df = imputed_transformer_pivot_df.astype({"DATETIME":"datetime64[ms]"})
+    imputed_transformer_pivot_df = imputed_transformer_pivot_df.astype({'DATETIME':"datetime64[ms]"})
     if diversity_flag:
         DF_df = diversity_factor_all(imputed_transformer_pivot_df, filtered_transformer_meta_df, "")
         diversity_heatmap(DF_df, "all", "./result/diversity_factor/")
@@ -126,6 +126,7 @@ if __name__ == "__main__":
             diversity_heatmap(temp_DF_df, district, "./result/diversity_factor/district/")
     # 3.2 City load profile visualization
     city_profile_flag = False
+    province_df = district_aggregate(imputed_transformer_pivot_df, 0)
     city_df = district_aggregate(imputed_transformer_pivot_df, 1)
     district_df = district_aggregate(imputed_transformer_pivot_df, 2)
     if city_profile_flag:
@@ -133,14 +134,14 @@ if __name__ == "__main__":
     # 3.3 City load profile in different scales
     select_city_profile_flag = False
     if select_city_profile_flag:
-        select_df = district_df[["DATETIME", "0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
+        select_df = district_df[['DATETIME', "0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
         select_df = select_df.rename(columns={
             "0-0":"0", "1-0":"1", "2-0":"2", 
             "3-0":"3", "4-0":"4", "5-0":"5", 
             "6-0":"6", "7-0":"7", "8-0":"8", 
             "9-0":"9"
         })
-        select_df = select_df[["DATETIME", "0", "2", "3", "5", "9"]]
+        select_df = select_df[['DATETIME', "0", "2", "3", "5", "9"]]
         
         specific_load_profile_plot(select_df, '2022-07-04 00:00:00', '2022-07-04 23:00:00', 
                                             '2022-07-10 00:00:00', '2022-07-10 23:00:00', 
@@ -166,34 +167,86 @@ if __name__ == "__main__":
     # 4.1 Weather correlation
     time_index = pd.date_range(start="2022-01-01 00:00:00", end="2022-12-31 23:00:00", freq="H")
     datetime_df = pd.DataFrame()
-    datetime_df["DATETIME"] = time_index
+    datetime_df['DATETIME'] = time_index
     
     weather_meta_query = 'SELECT * FROM weather_meta'
     weather_meta_df = pd.read_sql(weather_meta_query, engine)
     
     weather_query = 'SELECT * FROM weather'
     weather_df = pd.read_sql(weather_query, engine)
-    weather_df = weather_df.astype({"DATETIME":"datetime64[ns]"})
-    temp_weather_df = weather_df[["DATETIME", "STATION_ID", "TEMP"]]
-    weather_pivot_df = temp_weather_df.pivot(index='DATETIME', columns='STATION_ID', values='TEMP')
-    weather_pivot_df = datetime_df.merge(weather_pivot_df, on="DATETIME", how="left")
-    filtered_meta_df = weather_missing_filter(weather_meta_df, weather_pivot_df, 30)
+    weather_df = weather_df.astype({'DATETIME':"datetime64[ns]"})
 
-    weather_correlation_flag = True
-    
-    print(filtered_meta_df)
-    imputed_weather_df = NCDC_weather_data_imputation(filtered_meta_df, weather_df)
-    print(imputed_weather_df)
-    
-    time.sleep(100)
-
-    holiday_query = 'SELECT * FROM holiday'
-    holiday_df = pd.read_sql(holiday_query, engine)
-    
-    
+    weather_correlation_flag = False
+    if weather_correlation_flag:
+        station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
+        
+        for element in station_set:
+            print(element)
+            temp_weather_df = weather_df[weather_df["STATION_ID"] == str(element)]
+            temp_weather_df = temp_weather_df[["DATETIME", "TEMP", "DEWP", "WDSP", "PRCP"]]
+            temp_weather_df['DATETIME'] = pd.to_datetime(temp_weather_df['DATETIME'])
+            temp_weather_df = datetime_df.merge(temp_weather_df, on='DATETIME', how='left')
+            city = transformer_meta_df.loc[transformer_meta_df['CLOSEST_STATION'] == element]
+            city_num = set(city["CITY"]).pop()
+            print("CITY", city_num)
+            
+            temp_city_df = city_df[['DATETIME', str(city_num)]]
+            temp_city_df = temp_city_df.rename(columns={str(city_num):"LOAD"})
+            
+            # Group by day and aggregate values
+            temp_weather_df = pd.merge(temp_weather_df, temp_city_df, on='DATETIME', how="left")
+            temp_weather_df = temp_weather_df[~temp_weather_df.isin([np.nan, np.inf]).any(axis=1)]
+            temp_weather_df = temp_weather_df.drop(['DATETIME'], axis=1)
+            
+            weather_correlation(temp_weather_df, "./result/weather_correlation/", str(city_num))
     # 4.2 Holidays
     holiday_flag = True
+    if holiday_flag:
+        holiday_query = 'SELECT * FROM holiday'
+        holiday_df = pd.read_sql(holiday_query, engine)
+        holiday_df = holiday_df.astype({'DATETIME':"datetime64[ns]"})
+        holiday_plot(province_df, "all", holiday_df, "2022-01-01 00:00:00", '2022-12-31 23:00:00', "./result/holiday/")
+    
     # 4.3 Extreme weather
     extreme_weather = True
+    if extreme_weather:
+        # For the whole region
+        extreme_weather_query = 'SELECT * FROM extreme_weather_online'
+        extreme_weather_df = pd.read_sql(extreme_weather_query, engine)
+        extreme_weather_df = extreme_weather_df.astype({'DATETIME':"datetime64[ns]"})
+        extreme_weather_plot(province_df, "all", extreme_weather_df, "2022-01-01 00:00:00", '2022-12-31 23:00:00', "./result/extreme_weather/")
+        
+        # For each city
+        extreme_weather_calculated_query = 'SELECT * FROM extreme_weather_calculated'
+        extreme_weather_calculated_df = pd.read_sql(extreme_weather_calculated_query, engine)
+        extreme_weather_calculated_df = extreme_weather_calculated_df.astype({'DATETIME':"datetime64[ns]"})
+        station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
+        for element in station_set:
+            print(element)
+            city = transformer_meta_df.loc[transformer_meta_df['CLOSEST_STATION'] == element]
+            city_num = set(city["CITY"]).pop()
+            print("CITY", city_num)
+            
+            temp_city_df = city_df[['DATETIME', str(city_num)]]
+            temp_city_df = temp_city_df.rename(columns={str(city_num):"LOAD"})
+            
+            temp_extreme_weather_df = extreme_weather_calculated_df[extreme_weather_calculated_df["STATION_ID"] == str(element)]
+            temp_extreme_weather_df['DATETIME'] = pd.to_datetime(temp_extreme_weather_df['DATETIME'])
+            temp_extreme_weather_df = datetime_df.merge(temp_extreme_weather_df, on='DATETIME', how='left')
+            temp_extreme_weather_df = temp_extreme_weather_df.drop(columns=["STATION_ID"])
+            
+            extreme_weather_city_plot(temp_city_df, str(city_num), 
+                                        temp_extreme_weather_df,
+                                        "2022-01-01 00:00:00", '2022-12-31 23:00:00', 
+                                        "./result/extreme_weather/")
+        
+        # Comparison plot for one city
+        guilin_df = city_df[["Datetime", "2"]]
+        guilin_df = guilin_df.rename(columns={"2": "LOAD"})
+        guilin_extreme_weather_df = extreme_weather_calculated_df[extreme_weather_calculated_df["STATION_ID"] == "2"]
+        extreme_normal_comparison_plot(guilin_df,
+                                        guilin_extreme_weather_df,
+                                        "2022-01-01 00:00:00", '2022-12-31 23:00:00', 
+                                        "./result/extreme_weather/")
     ############################################################################################################
     

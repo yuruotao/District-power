@@ -519,6 +519,7 @@ if __name__ == "__main__":
     # 2.2 Store them in a database
     transformer_meta_df.to_sql('transformer_meta', con=engine, if_exists='replace', index=False)
     final_df.to_sql('transformer_raw', con=engine, if_exists='replace', index=False)
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!")
     ##################################################################################################
     # 3. Extreme weather data from internet
     # 3.1 Import the data and save to database
