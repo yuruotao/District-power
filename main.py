@@ -12,7 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from utils.load_missing import *
-
+from utils.diversity_factor import *
 
 if __name__ == "__main__":
     # 1. Initialization and import data from database
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     filtered_transformer_meta_df = transformer_missing_filter(transformer_meta_df, transformer_pivot_df, 30)
     
     # Imputation
-    #imputed_transformer_df = transformer_data_imputation(filtered_transformer_meta_df, transformer_raw_df)
+    imputed_transformer_df = transformer_data_imputation(filtered_transformer_meta_df, transformer_raw_df)
 
     # Imputation visualization
     imputation_visualization_flag = False
@@ -62,4 +62,22 @@ if __name__ == "__main__":
     ############################################################################################################
     # 3. Analysis
     # 3.1 Diversity factor plot
+    diversity_flag = False
+    if diversity_flag:
+        imputed_transformer_pivot_df = imputed_transformer_df.pivot(index='DATETIME', columns='TRANSFORMER_ID', values='LOAD')
+        imputed_transformer_pivot_df = datetime_df.merge(imputed_transformer_pivot_df, on='DATETIME', how='left')
+        imputed_transformer_pivot_df = imputed_transformer_pivot_df.astype({"DATETIME":"datetime64[ms]"})
+        DF_df = diversity_factor_all(imputed_transformer_pivot_df, filtered_transformer_meta_df, "")
+        diversity_heatmap(DF_df, "all", "./result/diversity_factor/")
+        
+        year_DF_heatmap(imputed_transformer_pivot_df, filtered_transformer_meta_df, "./result/diversity_factor/", "")
+        # For each district
+        district_DF_df = diversity_factor(imputed_transformer_pivot_df, filtered_transformer_meta_df, "")
+        district_set = set(district_DF_df["DISTRICT"].to_list())
+        for district in district_set:
+            temp_DF_df = district_DF_df[district_DF_df["DISTRICT"] == district]
+            diversity_heatmap(temp_DF_df, district, "./result/diversity_factor/district/")
+    # 3.2 
+
+
     
