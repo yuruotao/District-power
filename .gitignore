@@ -7,3 +7,4 @@
 *.csv
 *.db
 *.png
+database_chart.py
