@@ -1,5 +1,5 @@
 # Coding: utf-8
-
+# Calculate the correlation between weather and power, as well as the extreme weather
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -42,7 +42,6 @@ def NCDC_weather_data_imputation(filtered_meta_df, merged_df):
     Args:
         filtered_meta_df (dataframe): meta dataframe
         merged_df (dataframe): dataframe containing merged weather data
-        engine (sqlalchemy_engine): engine used for database creation
 
     Returns:
         None

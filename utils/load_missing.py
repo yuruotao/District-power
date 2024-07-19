@@ -1,4 +1,5 @@
 # Coding: utf-8
+# Handling missing data and imputation
 import pandas as pd
 import os
 import missingno as msno
@@ -90,7 +91,6 @@ def transformer_missing_filter(meta_df, merged_df, threshold):
         meta_df (dataframe): dataframe containing the NCDC station meta data
         merged_df (merged_df): raw data merged_df
         threshold (float): threshold for deletion
-        engine (sqlalchemy_engine): engine to save the filtered meta dataframe
 
     Returns:
         None
@@ -165,6 +165,7 @@ def imputation(input_df, imputation_method, save_path, save_flag):
         input_df (dataframe): the dataframe containing raw data
         imputation_method (string): specify the method of imputation
         save_path (string): specify the folder to save the imputed data
+        save_flag (Bool): whether to save the imputed result
 
     Returns:
         dataframe: dataframe containing the imputed data

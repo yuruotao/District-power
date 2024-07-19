@@ -1,4 +1,5 @@
 # Coding: utf-8
+# Calculating diversity factor and visualize
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
@@ -50,7 +51,6 @@ def diversity_factor(input_df, meta_df, type):
     Args:
         input_df (dataframe): the dataframe containing all transformers' load profile
         meta_df (dataframe): the dataframe containing rated capacity for transformers
-        output_path (string): path to store the output xlsx
         type (string): specify the definition of max_load. "Rated_capacity" for meta.xlsx reference
 
     Returns:
