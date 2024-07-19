@@ -60,7 +60,6 @@ def district_aggregate(input_df, level):
     
     return output_df
 
-
 if __name__ == "__main__":
     # 1. Initialization and import data from database
     time_index = pd.date_range(start="2022-01-01 00:00:00", end="2023-11-11 23:00:00", freq="H")
@@ -200,7 +199,7 @@ if __name__ == "__main__":
             
             weather_correlation(temp_weather_df, "./result/weather_correlation/", str(city_num))
     # 4.2 Holidays
-    holiday_flag = True
+    holiday_flag = False
     if holiday_flag:
         holiday_query = 'SELECT * FROM holiday'
         holiday_df = pd.read_sql(holiday_query, engine)
@@ -214,38 +213,60 @@ if __name__ == "__main__":
         extreme_weather_query = 'SELECT * FROM extreme_weather_internet'
         extreme_weather_df = pd.read_sql(extreme_weather_query, engine)
         extreme_weather_df = extreme_weather_df.astype({'DATETIME':"datetime64[ns]"})
-        extreme_weather_plot(province_df, "all", extreme_weather_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/extreme_weather/")
+        #extreme_weather_plot(province_df, "all", extreme_weather_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/extreme_weather/")
         
         # For each city
         extreme_weather_calculated_query = 'SELECT * FROM extreme_weather_calculated'
         extreme_weather_calculated_df = pd.read_sql(extreme_weather_calculated_query, engine)
         extreme_weather_calculated_df = extreme_weather_calculated_df.astype({'DATETIME':"datetime64[ns]"})
-        station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
-        for element in station_set:
-            print(element)
-            city = transformer_meta_df.loc[transformer_meta_df['CLOSEST_STATION'] == element]
-            city_num = set(city["CITY"]).pop()
-            print("CITY", city_num)
+        extreme_city_flag = False
+        if extreme_city_flag:
+            station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
+            for element in station_set:
+                print(element)
+                city = transformer_meta_df.loc[transformer_meta_df['CLOSEST_STATION'] == element]
+                city_num = set(city["CITY"]).pop()
+                print("CITY", city_num)
+                
+                temp_city_df = city_df[['DATETIME', str(city_num)]]
+                temp_city_df = temp_city_df.rename(columns={str(city_num):"LOAD"})
+                temp_city_df = temp_city_df.reset_index(drop=True)
+                
+                temp_extreme_weather_df = extreme_weather_calculated_df[extreme_weather_calculated_df["STATION_ID"] == str(element)]
+                temp_extreme_weather_df['DATETIME'] = pd.to_datetime(temp_extreme_weather_df['DATETIME'])
+                if len(temp_extreme_weather_df) != 0:
+                    hourly_datetime = pd.date_range(start=temp_extreme_weather_df['DATETIME'].min(), end=temp_extreme_weather_df['DATETIME'].max() + pd.Timedelta(days=1) - pd.Timedelta(hours=1), freq='H')
+                    repeated_values = {col: temp_extreme_weather_df[col].repeat(24).reset_index(drop=True) for col in temp_extreme_weather_df.columns if col != 'DATETIME'}
+                    temp_extreme_weather_df = pd.DataFrame({
+                        'DATETIME': hourly_datetime,
+                        **repeated_values})
+                    
+                    temp_extreme_weather_df = datetime_df.merge(temp_extreme_weather_df, on='DATETIME', how='left')
+                    temp_extreme_weather_df = temp_extreme_weather_df.drop(columns=["STATION_ID"])
+                    temp_extreme_weather_df = temp_extreme_weather_df.reset_index(drop=True)
+                    
+                    extreme_weather_city_plot(temp_city_df, str(city_num), 
+                                                temp_extreme_weather_df,
+                                                "2022-01-01 00:00:00", '2022-12-31 23:00:00', 
+                                                "./result/extreme_weather/")
             
-            temp_city_df = city_df[['DATETIME', str(city_num)]]
-            temp_city_df = temp_city_df.rename(columns={str(city_num):"LOAD"})
-            
-            temp_extreme_weather_df = extreme_weather_calculated_df[extreme_weather_calculated_df["STATION_ID"] == str(element)]
-            temp_extreme_weather_df['DATETIME'] = pd.to_datetime(temp_extreme_weather_df['DATETIME'])
-            temp_extreme_weather_df = datetime_df.merge(temp_extreme_weather_df, on='DATETIME', how='left')
-            temp_extreme_weather_df = temp_extreme_weather_df.drop(columns=["STATION_ID"])
-            
-            extreme_weather_city_plot(temp_city_df, str(city_num), 
-                                        temp_extreme_weather_df,
-                                        "2022-01-01 00:00:00", '2022-12-31 23:00:00', 
-                                        "./result/extreme_weather/")
-        
         # Comparison plot for one city
         guilin_df = city_df[["DATETIME", "2"]]
         guilin_df = guilin_df.rename(columns={"2": "LOAD"})
-        guilin_extreme_weather_df = extreme_weather_calculated_df[extreme_weather_calculated_df["STATION_ID"] == "2"]
+        temp_extreme_weather_df = extreme_weather_calculated_df[extreme_weather_calculated_df["STATION_ID"] == "57957099999"]
+        temp_extreme_weather_df['DATETIME'] = pd.to_datetime(temp_extreme_weather_df['DATETIME'])
+        hourly_datetime = pd.date_range(start=temp_extreme_weather_df['DATETIME'].min(), end=temp_extreme_weather_df['DATETIME'].max() + pd.Timedelta(days=1) - pd.Timedelta(hours=1), freq='H')
+        repeated_values = {col: temp_extreme_weather_df[col].repeat(24).reset_index(drop=True) for col in temp_extreme_weather_df.columns if col != 'DATETIME'}
+        temp_extreme_weather_df = pd.DataFrame({
+            'DATETIME': hourly_datetime,
+            **repeated_values})
+        
+        temp_extreme_weather_df = datetime_df.merge(temp_extreme_weather_df, on='DATETIME', how='left')
+        temp_extreme_weather_df = temp_extreme_weather_df.drop(columns=["STATION_ID"])
+        temp_extreme_weather_df = temp_extreme_weather_df.reset_index(drop=True)
+        
         extreme_normal_comparison_plot(guilin_df,
-                                        guilin_extreme_weather_df,
+                                        temp_extreme_weather_df,
                                         "2022-01-01 00:00:00", '2022-12-31 23:00:00', 
                                         "./result/extreme_weather/")
     ############################################################################################################

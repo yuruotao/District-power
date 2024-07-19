@@ -1,4 +1,4 @@
-
+# Coding: utf-8
 
 import pandas as pd
 import numpy as np
@@ -6,6 +6,7 @@ import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import os
+import matplotlib.dates as mdates
 from scipy.stats import pearsonr
 
 def weather_missing_filter(meta_df, merged_df, threshold):
@@ -159,11 +160,19 @@ def holiday_plot(input_df, city, weather_df, start_time, end_time, output_path):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     
+    hourly_datetime = pd.date_range(start=weather_df['DATETIME'].min(), end=weather_df['DATETIME'].max() + pd.Timedelta(days=1) - pd.Timedelta(hours=1), freq='H')
+    repeated_values = {col: weather_df[col].repeat(24).reset_index(drop=True) for col in weather_df.columns if col != 'DATETIME'}
+    weather_df = pd.DataFrame({
+        'DATETIME': hourly_datetime,
+        **repeated_values})
+    
     time_index = pd.date_range(start=start_time, end=end_time, freq="h")
     # Create a DataFrame with the time series column
     time_series_df = pd.DataFrame({'DATETIME': time_index})
     weather_df = pd.merge(time_series_df, weather_df, on='DATETIME', how="left")
     # Filter out missing values from weather_df
+    weather_df.replace(to_replace=[""], value=np.nan, inplace=True)
+    weather_df.replace(to_replace=[None], value=np.nan, inplace=True)
     weather_df_filtered = weather_df.fillna("None")
     
     time_series_df = pd.merge(time_series_df, input_df, on='DATETIME', how="left")
@@ -224,7 +233,7 @@ def holiday_plot(input_df, city, weather_df, start_time, end_time, output_path):
                     df_num = df_num + 1
 
     ax.set_xlim(time_series_df.index.min(), time_series_df.index.max())
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
     ax.set(xlabel="", ylabel="")
     
     plt.xlabel("Time", fontsize=10.5)
@@ -255,12 +264,20 @@ def extreme_weather_plot(input_df, city, weather_df, start_time, end_time, outpu
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
+        
+    hourly_datetime = pd.date_range(start=weather_df['DATETIME'].min(), end=weather_df['DATETIME'].max() + pd.Timedelta(days=1) - pd.Timedelta(hours=1), freq='H')
+    repeated_values = {col: weather_df[col].repeat(24).reset_index(drop=True) for col in weather_df.columns if col != 'DATETIME'}
+    weather_df = pd.DataFrame({
+        'DATETIME': hourly_datetime,
+        **repeated_values})
     
     time_index = pd.date_range(start=start_time, end=end_time, freq="h")
     # Create a DataFrame with the time series column
     time_series_df = pd.DataFrame({'DATETIME': time_index})
     weather_df = pd.merge(time_series_df, weather_df, on='DATETIME', how="left")
     # Filter out missing values from weather_df
+    weather_df.replace(to_replace=[""], value=np.nan, inplace=True)
+    weather_df.replace(to_replace=[None], value=np.nan, inplace=True)
     weather_df_filtered = weather_df.fillna("None")
     
     time_series_df = pd.merge(time_series_df, input_df, on='DATETIME', how="left")
@@ -360,6 +377,8 @@ def extreme_weather_city_plot(input_df, city, weather_df, start_time, end_time, 
     time_series_df = pd.DataFrame({'DATETIME': time_index})
     weather_df = pd.merge(time_series_df, weather_df, on='DATETIME', how="left")
     # Filter out missing values from weather_df
+    weather_df.replace(to_replace=[""], value=np.nan, inplace=True)
+    weather_df.replace(to_replace=[None], value=np.nan, inplace=True)
     weather_df_filtered = weather_df.fillna("None")
     
     time_series_df = pd.merge(time_series_df, input_df, on='DATETIME', how="left")
@@ -391,7 +410,6 @@ def extreme_weather_city_plot(input_df, city, weather_df, start_time, end_time, 
                     #"WIND_LEVEL_12": "#007f5f",
                     "PRECIPITATION_50": "#d5c7bc",
                     "PRECIPITATION_100": "#785964",
-                    "None":"#FFFFFF"
                     }
     
 
@@ -464,6 +482,7 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
     """
     sns.set_theme(style="white")
     sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    mpl.rcParams['font.family'] = 'Times New Roman'
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -473,6 +492,8 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
     time_series_df = pd.DataFrame({'DATETIME': time_index})
     weather_df = pd.merge(time_series_df, weather_df, on='DATETIME', how="left")
     # Filter out missing values from weather_df
+    weather_df.replace(to_replace=[""], value=np.nan, inplace=True)
+    weather_df.replace(to_replace=[None], value=np.nan, inplace=True)
     weather_df_filtered = weather_df.fillna("None")
     
     time_series_df = pd.merge(time_series_df, input_df, on='DATETIME', how="left")
@@ -502,12 +523,12 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                     #"WIND_LEVEL_10": "#55a630",
                     #"WIND_LEVEL_11": "#2b9348",
                     #"WIND_LEVEL_12": "#007f5f",
-                    "PRECIPITATION_50": "#d5c7bc",
+                    #"PRECIPITATION_50": "#d5c7bc",
                     "PRECIPITATION_100": "#785964",
                     }
     
     alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
-    fig, axs = plt.subplots(3, 3, figsize=(14, 6), sharey=True)
+    fig, axs = plt.subplots(2, 3, figsize=(12, 8), sharey=True)
     # Flatten the axes array for easy iteration
     axs = axs.flatten()
     
@@ -560,21 +581,37 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                     ax.plot(extreme_df_before.index, extreme_df_before['LOAD'], color='#274c77', linewidth=1.5)
                     ax.plot(extreme_df_after.index, extreme_df_after['LOAD'], color='#fca311', linewidth=1.5)
                 
+                if event == "HEAT_INDEX_EXTREME_CAUTION":
+                    event = "Heat index extreme caution"
+                elif event == "HIGH_TEMPERATURE":
+                    event = "High temperature"
+                elif event == "LOW_TEMPERATURE":
+                    event = "Low temperature"
+                elif event == "HIGH_HUMIDITY":
+                    event = "High humidity"
+                elif event == "WIND_LEVEL_5":
+                    event = "Level 5 wind"
+                elif event == "PRECIPITATION_100":
+                    event = "Precipitation 100mm"
+                
                 ax.set_title("(" + alphabet_list[event_num] + ") " + event, fontsize=10.5)
                 ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
                 ax.tick_params(axis='both', which='major', labelsize=10.5)
-                ax.set_xticklabels(ax.get_xticklabels(), rotation=0) 
+                ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+                ax.set_xticklabels(ax.get_xticklabels(), rotation=45) 
                 ax.set(xlabel="", ylabel="")
                 
                 event_num = event_num + 1
     
     # Hide the empty subplots
-    for ax in axs[7:]:
+    for ax in axs[6:]:
         ax.axis('off')
 
-    fig.legend(loc='lower right', fontsize=10.5, bbox_to_anchor=(0.6, 0.13), frameon=False)
     # Adjust layout
-    plt.tight_layout()
+    plt.tight_layout(rect=[0.02, 0.05, 1, 1])
+    # Add ylabel to the entire figure
+    fig.text(0.004, 0.5, 'Power (kW)', va='center', rotation='vertical', fontsize=10.5)
+    fig.legend(loc='lower center', ncol=3, frameon=False, fontsize=10.5)
     # Show the plot
     plt.savefig(output_path + "extreme_weather_sub_all.png", dpi=600)
     plt.close()
