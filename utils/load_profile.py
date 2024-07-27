@@ -154,11 +154,11 @@ def specific_load_profile_plot(input_df, start_time, end_time, start_time_1, end
         ax.axis('off')
 
     if time_type == "Day":
-        fig.legend(loc='lower right', fontsize=10.5, bbox_to_anchor=(0.8, 0.2))
+        fig.legend(loc='lower center', bbox_to_anchor=(0, 0, 1, 0.5), fontsize=10.5, frameon=False, ncol=2)
     elif time_type == "Week":
-        fig.legend(loc='lower right', fontsize=10.5, bbox_to_anchor=(0.85, 0.2))
+        fig.legend(loc='lower center', bbox_to_anchor=(0, 0, 1, 0.5), fontsize=10.5, frameon=False, ncol=2)
     elif time_type == "Month":
-        fig.legend(loc='lower right', fontsize=10.5, bbox_to_anchor=(0.8, 0.2))
+        fig.legend(loc='lower center', bbox_to_anchor=(0, 0, 1, 0.5), fontsize=10.5, frameon=False, ncol=2)
     
     # Adjust layout
     plt.tight_layout(rect=[0.02, 0.05, 1, 1])

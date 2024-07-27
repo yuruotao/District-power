@@ -132,7 +132,7 @@ if __name__ == "__main__":
     if city_profile_flag:
         average_load_profiles(city_df, "./result/load_profile/")
     # 3.3 City load profile in different scales
-    select_city_profile_flag = False
+    select_city_profile_flag = True
     if select_city_profile_flag:
         select_df = district_df[['DATETIME', "0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
         select_df = select_df.rename(columns={
@@ -141,7 +141,7 @@ if __name__ == "__main__":
             "6-0":"6", "7-0":"7", "8-0":"8", 
             "9-0":"9"
         })
-        select_df = select_df[['DATETIME', "0", "2", "3", "5", "9"]]
+        select_df = select_df[['DATETIME', "0", "2", "3", "5", "6", "9"]]
         
         specific_load_profile_plot(select_df, '2022-07-04 00:00:00', '2022-07-04 23:00:00', 
                                             '2022-07-10 00:00:00', '2022-07-10 23:00:00', 
@@ -154,6 +154,7 @@ if __name__ == "__main__":
         specific_load_profile_plot(select_df, '2022-07-01 00:00:00', '2022-07-31 23:00:00', 
                                             '2022-08-01 00:00:00', '2022-08-31 23:00:00', 
                                             "Month", "./result/load_profile/")
+        
     # 3.4 Seasonality decomposition
     seasonality_flag = False
     if seasonality_flag:
