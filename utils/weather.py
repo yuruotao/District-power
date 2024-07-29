@@ -114,12 +114,12 @@ def weather_correlation(input_df, output_path, city_num):
         ax = plt.gca()
         ax.tick_params(bottom=False, top=False, left=False, right=False, axis="both", which="major", labelsize=10.5)
         sns.despine(ax=ax, bottom=True, top=True, left=True, right=True)
-        r, _ = pearsonr(x, y)
+        r, p = pearsonr(x, y)
         facecolor = cmap(norm(r))
         ax.set_facecolor(facecolor)
         lightness = (max(facecolor[:3]) + min(facecolor[:3]) ) / 2
         # Correlation number on the plot
-        ax.annotate(f"{r:.2f}", xy=(.5, .5), xycoords=ax.transAxes,
+        ax.annotate(f"{r:.2f}\n({p:.2g})", xy=(.5, .5), xycoords=ax.transAxes,
                 color='white' if lightness < 0.7 else 'black', size=26, ha='center', va='center')
 
     plt.figure(figsize=(8, 8))

@@ -38,10 +38,10 @@ The sources of data are summarized here.
 | :------------------------: | :-----------------------------------------------------------------------------------------------------: |
 | Weather Stations Meta Data |                  [NOAA](https://www.ncei.noaa.gov/data/global-summary-of-the-day/access/)                  |
 |        Weather Data        |                                                  [NOAA]()                                                  |
-|          Festival          |                                       Collected from the Internet                                       |
+|          Holiday          |                                       Collected from the Internet                                       |
 |  Extreme Weather Internet  | [Collected from the media](http://news.gxnews.com.cn/staticpages/20240110/newgx659e5917-21404408.shtml#/) |
 | Extreme Weather Calculated |                                    Calculated from the weather data                                    |
-|      Transformer Data      |                                        China Southern Power Grid                                        |
+|      Transformer Data      |                                               Power Grid                                               |
 
 ## Usage Note
 
