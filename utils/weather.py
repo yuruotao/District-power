@@ -98,7 +98,7 @@ def weather_correlation(input_df, output_path, city_num):
     
     input_df =input_df.rename(columns = {"TEMP":"Temperature(C)",
                                                           "DEWP":"Dew Point(C)", 
-                                                          "PRCP":"Precipitation(m)",
+                                                          #"PRCP":"Precipitation(m)",
                                                           "LOAD":"Power(kW)"
                                                           })
     

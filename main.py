@@ -132,7 +132,7 @@ if __name__ == "__main__":
     if city_profile_flag:
         average_load_profiles(city_df, "./result/load_profile/")
     # 3.3 City load profile in different scales
-    select_city_profile_flag = True
+    select_city_profile_flag = False
     if select_city_profile_flag:
         select_df = district_df[['DATETIME', "0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
         select_df = select_df.rename(columns={
@@ -177,14 +177,14 @@ if __name__ == "__main__":
     weather_df = pd.read_sql(weather_query, engine)
     weather_df = weather_df.astype({'DATETIME':"datetime64[ns]"})
 
-    weather_correlation_flag = True
+    weather_correlation_flag = False
     if weather_correlation_flag:
         station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
         
         for element in station_set:
             print(element)
             temp_weather_df = weather_df[weather_df["STATION_ID"] == str(element)]
-            temp_weather_df = temp_weather_df[["DATETIME", "TEMP", "DEWP", "WDSP", "PRCP"]]
+            temp_weather_df = temp_weather_df[["DATETIME", "TEMP", "DEWP", "WDSP"]]
             temp_weather_df['DATETIME'] = pd.to_datetime(temp_weather_df['DATETIME'])
             temp_weather_df = datetime_df.merge(temp_weather_df, on='DATETIME', how='left')
             city = transformer_meta_df.loc[transformer_meta_df['CLOSEST_STATION'] == element]
@@ -209,7 +209,7 @@ if __name__ == "__main__":
         holiday_plot(province_df, "all", holiday_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/holiday/")
     
     # 4.3 Extreme weather
-    extreme_weather = False
+    extreme_weather = True
     if extreme_weather:
         # For the whole region
         extreme_weather_query = 'SELECT * FROM extreme_weather_internet'
@@ -221,14 +221,13 @@ if __name__ == "__main__":
         extreme_weather_calculated_query = 'SELECT * FROM extreme_weather_calculated'
         extreme_weather_calculated_df = pd.read_sql(extreme_weather_calculated_query, engine)
         extreme_weather_calculated_df = extreme_weather_calculated_df.astype({'DATETIME':"datetime64[ns]"})
-        extreme_city_flag = False
+        extreme_city_flag = True
         if extreme_city_flag:
-            station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
-            for element in station_set:
-                print(element)
-                city = transformer_meta_df.loc[transformer_meta_df['CLOSEST_STATION'] == element]
-                city_num = set(city["CITY"]).pop()
+            for city_num in range(10):
                 print("CITY", city_num)
+                element_df = transformer_meta_df.loc[transformer_meta_df['CITY'] == city_num]
+                element = set(element_df['CLOSEST_STATION']).pop()
+                print(element)
                 
                 temp_city_df = city_df[['DATETIME', str(city_num)]]
                 temp_city_df = temp_city_df.rename(columns={str(city_num):"LOAD"})

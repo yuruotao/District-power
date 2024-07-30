@@ -8,3 +8,7 @@
 *.db
 *.png
 database_chart.py
+*.sbn
+*.sbx
+*.CPG
+*.xml
