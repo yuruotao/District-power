@@ -109,7 +109,7 @@ if __name__ == "__main__":
     ############################################################################################################
     # 3. Analysis
     # 3.1 Diversity factor plot
-    diversity_flag = False
+    diversity_flag = True
     imputed_transformer_pivot_df = imputed_transformer_df.pivot(index='DATETIME', columns='TRANSFORMER_ID', values='LOAD')
     imputed_transformer_pivot_df = datetime_df.merge(imputed_transformer_pivot_df, on='DATETIME', how='left')
     imputed_transformer_pivot_df = imputed_transformer_pivot_df.astype({'DATETIME':"datetime64[ms]"})
@@ -117,13 +117,27 @@ if __name__ == "__main__":
         DF_df = diversity_factor_all(imputed_transformer_pivot_df, filtered_transformer_meta_df, "")
         diversity_heatmap(DF_df, "all", "./result/diversity_factor/")
         
-        year_DF_heatmap(imputed_transformer_pivot_df, filtered_transformer_meta_df, "./result/diversity_factor/", "")
+        extreme_weather_query = 'SELECT * FROM extreme_weather_internet'
+        extreme_weather_df = pd.read_sql(extreme_weather_query, engine)
+        extreme_weather_df = extreme_weather_df.astype({'DATETIME':"datetime64[ns]"})
+        holiday_query = 'SELECT * FROM holiday'
+        holiday_df = pd.read_sql(holiday_query, engine)
+        holiday_df = holiday_df.astype({'DATETIME':"datetime64[ns]"})
+        other_df = pd.merge(extreme_weather_df, holiday_df, on='DATETIME', how='outer')
+        other_df['HAZARD'].replace('', pd.NA, inplace=True)
+        other_df['HOLIDAY'].replace('', pd.NA, inplace=True)
+        other_df['HAZARD'] = other_df['HAZARD'].notna().astype(int)
+        other_df['HOLIDAY'] = other_df['HOLIDAY'].notna().astype(int)
+    
+        year_DF_heatmap(imputed_transformer_pivot_df, filtered_transformer_meta_df, "./result/diversity_factor/", "", other_df)
         # For each district
-        district_DF_df = diversity_factor(imputed_transformer_pivot_df, filtered_transformer_meta_df, "")
-        district_set = set(district_DF_df["DISTRICT"].to_list())
-        for district in district_set:
-            temp_DF_df = district_DF_df[district_DF_df["DISTRICT"] == district]
-            diversity_heatmap(temp_DF_df, district, "./result/diversity_factor/district/")
+        sub_DF_plot_flag = False
+        if sub_DF_plot_flag:
+            district_DF_df = diversity_factor(imputed_transformer_pivot_df, filtered_transformer_meta_df, "")
+            district_set = set(district_DF_df["DISTRICT"].to_list())
+            for district in district_set:
+                temp_DF_df = district_DF_df[district_DF_df["DISTRICT"] == district]
+                diversity_heatmap(temp_DF_df, district, "./result/diversity_factor/district/")
     # 3.2 City load profile visualization
     city_profile_flag = False
     province_df = district_aggregate(imputed_transformer_pivot_df, 0)
@@ -177,14 +191,14 @@ if __name__ == "__main__":
     weather_df = pd.read_sql(weather_query, engine)
     weather_df = weather_df.astype({'DATETIME':"datetime64[ns]"})
 
-    weather_correlation_flag = False
+    weather_correlation_flag = True
     if weather_correlation_flag:
         station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
         
         for element in station_set:
             print(element)
             temp_weather_df = weather_df[weather_df["STATION_ID"] == str(element)]
-            temp_weather_df = temp_weather_df[["DATETIME", "TEMP", "DEWP", "WDSP"]]
+            temp_weather_df = temp_weather_df[["DATETIME", "TEMP", "DEWP"]]
             temp_weather_df['DATETIME'] = pd.to_datetime(temp_weather_df['DATETIME'])
             temp_weather_df = datetime_df.merge(temp_weather_df, on='DATETIME', how='left')
             city = transformer_meta_df.loc[transformer_meta_df['CLOSEST_STATION'] == element]
@@ -209,7 +223,7 @@ if __name__ == "__main__":
         holiday_plot(province_df, "all", holiday_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/holiday/")
     
     # 4.3 Extreme weather
-    extreme_weather = True
+    extreme_weather = False
     if extreme_weather:
         # For the whole region
         extreme_weather_query = 'SELECT * FROM extreme_weather_internet'
@@ -221,7 +235,7 @@ if __name__ == "__main__":
         extreme_weather_calculated_query = 'SELECT * FROM extreme_weather_calculated'
         extreme_weather_calculated_df = pd.read_sql(extreme_weather_calculated_query, engine)
         extreme_weather_calculated_df = extreme_weather_calculated_df.astype({'DATETIME':"datetime64[ns]"})
-        extreme_city_flag = True
+        extreme_city_flag = False
         if extreme_city_flag:
             for city_num in range(10):
                 print("CITY", city_num)

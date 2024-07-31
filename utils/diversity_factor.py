@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import seaborn as sns
 import matplotlib.dates as mdates
+import matplotlib.patches as patches
+import datetime
+from dateutil.relativedelta import relativedelta
 import calplot
 
 sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
@@ -168,7 +171,7 @@ def diversity_heatmap(input_df, name, output_path):
     
     return None
 
-def year_DF_heatmap(input_df, meta_df, output_path, type):
+def year_DF_heatmap(input_df, meta_df, output_path, type, other_df):
     """Plot the Github style heatmap for diversity factor
     https://python.plainenglish.io/interactive-calendar-heatmaps-with-plotly-the-easieast-way-youll-find-5fc322125db7
 
@@ -187,10 +190,10 @@ def year_DF_heatmap(input_df, meta_df, output_path, type):
     temp_df = input_df.drop(columns=["DATETIME"])
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-    
+
     # Calculate total load for each day by summing across all transformers
     total_load_per_day = temp_df.sum(axis=1)
-    
+
     if type == "Rated_capacity":
         max_load = 24 * meta_df["YXRL"].sum()
     else:
@@ -200,12 +203,65 @@ def year_DF_heatmap(input_df, meta_df, output_path, type):
     # Calculate diversity factor for each day
     diversity_factor = total_load_per_day / max_load
     diversity_factor_df = pd.DataFrame(diversity_factor, columns=['Diversity Factor'])
-    diversity_factor_df.reset_index()
+    diversity_factor_df.reset_index(inplace=True)
     diversity_factor_df = pd.concat([DATETIME_column, diversity_factor_df], axis=1)
 
     diversity_factor_df = diversity_factor_df.set_index("DATETIME")
-    calplot.calplot(diversity_factor_df["Diversity Factor"], cmap="Blues")
+
+    # Load other dataframe and merge
+    other_df = other_df.set_index('DATETIME')
+    combined_df = diversity_factor_df.join(other_df)
+
+    # Plotting
+    fig, axes = calplot.calplot(combined_df["Diversity Factor"], cmap="Blues")
+    
+    def get_grid_position(date, start_weekday):
+        # Calculate the grid position of the given date
+        # Here, assuming a week-based grid
+        day_of_week = 6 - date.weekday()
+        day_of_year = int(date.strftime('%j'))
+        week_of_year = (day_of_year + start_weekday-1) // 7
+        return (week_of_year, day_of_week)
+        
+    year_num = 0
+    for ax in axes:
+        if year_num == 0:
+            year = 2022
+            year_num += 1
+        else:
+            year = 2023
+
+        start_weekday = datetime.datetime(year, 1, 1).weekday()
+        for i, row in combined_df.iterrows():
+            date = row.name
+            if date.year == year:
+                edge_color = None
+                if row['HOLIDAY'] == 1:
+                    edge_color = '#fb8500'
+                    print("holiday", date)
+                elif row['HAZARD'] == 1:
+                    edge_color = '#c60000'
+                
+                # Get grid position
+                x, y = get_grid_position(date, start_weekday)
+                
+                # Define the vertices of the cell
+                P = [
+                    (x, y),
+                    (x + 1, y),
+                    (x + 1, y + 1),
+                    (x, y + 1)
+                ]
+                if edge_color != None:
+                    print(x, y)
+                    # Create and add the Polygon patch
+                    poly = patches.Polygon(P, edgecolor=edge_color, facecolor='None',
+                                    linewidth=1, zorder=20, clip_on=False)
+                    ax.add_patch(poly)
+
     plt.savefig(output_path + "DF_daily_all.png", dpi=600)
     plt.close()
     
     return None 
+
+
