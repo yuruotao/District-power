@@ -546,15 +546,17 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
             for idx in subset.index[1:]:
                 
                 if found == 1:
-                    break
-                
+                    #break
+                    pass
+                    
                 if (idx - start_idx).days >= 1:
                     # End of current part found
-                    start_time = start_idx
-                    end_time = start_idx + pd.Timedelta(days=1)
-                    
+                    print(start_idx)
+                    if found == 0:
+                        start_time = start_idx
+                        end_time = start_idx + pd.Timedelta(days=1)
+                        
                     dfs.append(subset.loc[start_idx:end_idx])
-                    
                     start_idx = idx
                     end_idx = None
                     found = 1
@@ -564,39 +566,74 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
             if dfs:
                 ax = axs[event_num]
                 
-                extreme_df = time_series_df.loc[(time_series_df.index >= start_time) & (time_series_df.index <= end_time)]
+                if event == "HEAT_INDEX_EXTREME_CAUTION":
+                    event = "Heat index extreme caution"
+                    start_time = pd.Timestamp('2022-07-29 00:00:00')
+                    end_time = start_time + pd.Timedelta(days=1)
+                elif event == "HIGH_TEMPERATURE":
+                    event = "High temperature"
+                    start_time = pd.Timestamp('2022-09-06 00:00:00')
+                    end_time = start_time + pd.Timedelta(days=1)
+                elif event == "LOW_TEMPERATURE":
+                    event = "Low temperature"
+                    start_time = pd.Timestamp('2022-12-01 00:00:00')
+                    end_time = start_time + pd.Timedelta(days=1)
+                elif event == "HIGH_HUMIDITY":
+                    event = "High humidity"
+                    start_time = pd.Timestamp('2022-07-03 00:00:00')
+                    end_time = start_time + pd.Timedelta(days=1)
+                elif event == "WIND_LEVEL_5":
+                    event = "Level 5 wind"
+                    start_time = pd.Timestamp('2022-02-27 00:00:00')
+                    end_time = start_time + pd.Timedelta(days=1)
+                
+                elif event == "PRECIPITATION_100":
+                    event = "Precipitation 100mm"
+                    start_time = pd.Timestamp('2022-06-04 00:00:00')
+                    end_time = start_time + pd.Timedelta(days=1)
+                
+                extreme_df = time_series_df.loc[(time_series_df.index >= start_time) & (time_series_df.index < end_time)]
+                
                 extreme_df_before = time_series_df.loc[(time_series_df.index >= start_time - pd.Timedelta(days=1)) & 
-                (time_series_df.index <= end_time - pd.Timedelta(days=1))]
+                (time_series_df.index < end_time - pd.Timedelta(days=1))]
                 extreme_df_before = extreme_df_before.shift(freq="24H")
+                
                 extreme_df_after = time_series_df.loc[(time_series_df.index >= start_time + pd.Timedelta(days=1)) & 
-                (time_series_df.index <= end_time + pd.Timedelta(days=1))]
+                (time_series_df.index < end_time + pd.Timedelta(days=1))]
                 extreme_df_after = extreme_df_after.shift(freq="-24H")
                 
+                extreme_df_week_before = time_series_df.loc[(time_series_df.index >= start_time - pd.Timedelta(days=7)) & 
+                (time_series_df.index <= end_time - pd.Timedelta(days=7))]
+                extreme_df_week_before = extreme_df_week_before.shift(freq="168H")
+                """
+                extreme_df_week_average = time_series_df.loc[(time_series_df.index >= start_time - pd.Timedelta(days=3)) & 
+                (time_series_df.index < end_time + pd.Timedelta(days=3))]
+                extreme_df_week_average = extreme_df_week_average[["LOAD"]]
+
+                # Group by time of day and calculate the mean for each time slot
+                average_by_time_of_day = extreme_df_week_average.groupby(extreme_df_week_average.index.time).mean()
+                extreme_df_week_average = pd.DataFrame({"DATETIME": extreme_df.index,
+                                                        "LOAD": average_by_time_of_day["LOAD"]})
+                extreme_df_week_average = extreme_df_week_average.set_index("DATETIME")
+                print(extreme_df_week_average)
+                """
+    
                 if event_num == 0:
                     ax.plot(extreme_df.index, extreme_df['LOAD'], color="#ba181b", label="Extreme", linewidth=1.5)
                     ax.plot(extreme_df_before.index, extreme_df_before['LOAD'], color='#274c77', label="Previous Day", linewidth=1.5)
-                    ax.plot(extreme_df_after.index, extreme_df_after['LOAD'], color='#fca311', label="Next Day", linewidth=1.5)
+                    #ax.plot(extreme_df_after.index, extreme_df_after['LOAD'], color='#fca311', label="Next Day", linewidth=1.5)
+                    ax.plot(extreme_df_week_before.index, extreme_df_week_before['LOAD'], color='#0096c7', label="Same Day Last Week", linewidth=1.5)
                 else:
                     ax.plot(extreme_df.index, extreme_df['LOAD'], color="#ba181b", linewidth=1.5)
                     ax.plot(extreme_df_before.index, extreme_df_before['LOAD'], color='#274c77', linewidth=1.5)
-                    ax.plot(extreme_df_after.index, extreme_df_after['LOAD'], color='#fca311', linewidth=1.5)
+                    #ax.plot(extreme_df_after.index, extreme_df_after['LOAD'], color='#fca311', linewidth=1.5)
+                    ax.plot(extreme_df_week_before.index, extreme_df_week_before['LOAD'], color='#0096c7', linewidth=1.5)
                 
-                if event == "HEAT_INDEX_EXTREME_CAUTION":
-                    event = "Heat index extreme caution"
-                elif event == "HIGH_TEMPERATURE":
-                    event = "High temperature"
-                elif event == "LOW_TEMPERATURE":
-                    event = "Low temperature"
-                elif event == "HIGH_HUMIDITY":
-                    event = "High humidity"
-                elif event == "WIND_LEVEL_5":
-                    event = "Level 5 wind"
-                elif event == "PRECIPITATION_100":
-                    event = "Precipitation 100mm"
-                
+                ax.tick_params(top=False, bottom=True, left=False, right=False)
+                ax.tick_params(which='both', direction='in', length=2)
                 ax.set_title("(" + alphabet_list[event_num] + ") " + event, fontsize=10.5)
                 ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
-                ax.tick_params(axis='both', which='major', labelsize=10.5)
+                ax.tick_params(axis='both', labelsize=10.5)
                 ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
                 ax.set_xticklabels(ax.get_xticklabels(), rotation=45) 
                 ax.set(xlabel="", ylabel="")
@@ -618,3 +655,11 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
     
     return None
 
+
+if __name__ == "__main__":
+    guilin_df = pd.read_excel("./guilin.xlsx")
+    temp_extreme_weather_df = pd.read_excel("./temp_extreme.xlsx")
+    extreme_normal_comparison_plot(guilin_df,
+                                    temp_extreme_weather_df,
+                                    "2022-01-01 00:00:00", '2023-10-31 23:00:00', 
+                                    "./result/extreme_weather/")

@@ -109,7 +109,7 @@ if __name__ == "__main__":
     ############################################################################################################
     # 3. Analysis
     # 3.1 Diversity factor plot
-    diversity_flag = True
+    diversity_flag = False
     imputed_transformer_pivot_df = imputed_transformer_df.pivot(index='DATETIME', columns='TRANSFORMER_ID', values='LOAD')
     imputed_transformer_pivot_df = datetime_df.merge(imputed_transformer_pivot_df, on='DATETIME', how='left')
     imputed_transformer_pivot_df = imputed_transformer_pivot_df.astype({'DATETIME':"datetime64[ms]"})
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     weather_df = pd.read_sql(weather_query, engine)
     weather_df = weather_df.astype({'DATETIME':"datetime64[ns]"})
 
-    weather_correlation_flag = True
+    weather_correlation_flag = False
     if weather_correlation_flag:
         station_set = set(transformer_meta_df["CLOSEST_STATION"].to_list())
         
@@ -223,7 +223,7 @@ if __name__ == "__main__":
         holiday_plot(province_df, "all", holiday_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/holiday/")
     
     # 4.3 Extreme weather
-    extreme_weather = False
+    extreme_weather = True
     if extreme_weather:
         # For the whole region
         extreme_weather_query = 'SELECT * FROM extreme_weather_internet'
@@ -282,7 +282,7 @@ if __name__ == "__main__":
         
         extreme_normal_comparison_plot(guilin_df,
                                         temp_extreme_weather_df,
-                                        "2022-01-01 00:00:00", '2022-12-31 23:00:00', 
+                                        "2022-05-01 00:00:00", '2022-12-31 23:00:00', 
                                         "./result/extreme_weather/")
     ############################################################################################################
     
