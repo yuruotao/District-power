@@ -568,11 +568,11 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                 
                 if event == "HEAT_INDEX_EXTREME_CAUTION":
                     event = "Heat index extreme caution"
-                    start_time = pd.Timestamp('2022-07-29 00:00:00')
+                    start_time = pd.Timestamp('2022-06-30 00:00:00')
                     end_time = start_time + pd.Timedelta(days=1)
                 elif event == "HIGH_TEMPERATURE":
                     event = "High temperature"
-                    start_time = pd.Timestamp('2022-09-06 00:00:00')
+                    start_time = pd.Timestamp('2022-10-04 00:00:00')
                     end_time = start_time + pd.Timedelta(days=1)
                 elif event == "LOW_TEMPERATURE":
                     event = "Low temperature"
@@ -580,11 +580,11 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                     end_time = start_time + pd.Timedelta(days=1)
                 elif event == "HIGH_HUMIDITY":
                     event = "High humidity"
-                    start_time = pd.Timestamp('2022-07-03 00:00:00')
+                    start_time = pd.Timestamp('2022-03-24 00:00:00')
                     end_time = start_time + pd.Timedelta(days=1)
                 elif event == "WIND_LEVEL_5":
                     event = "Level 5 wind"
-                    start_time = pd.Timestamp('2022-02-27 00:00:00')
+                    start_time = pd.Timestamp('2022-03-25 00:00:00')
                     end_time = start_time + pd.Timedelta(days=1)
                 
                 elif event == "PRECIPITATION_100":
