@@ -70,7 +70,6 @@ def load_missing_value_visualization(input_df, save_path):
         ax = msno.matrix(temp_df, fontsize=10.5, figsize=(8, 6), label_rotation=0, freq="M")
         ax.tick_params(labelsize=10.5)
         plt.xlabel("Transformers", fontsize=10.5)
-        plt.ylabel("Sample points", fontsize=10.5)
         plt.savefig(missing_dir_matrix + "City-" + index[0] + "-" + "District-" + index[1] +'-matrix.png', dpi=600)
         plt.close()
         
@@ -78,7 +77,6 @@ def load_missing_value_visualization(input_df, save_path):
         ax = msno.bar(temp_df, fontsize=10.5, figsize=(8, 6), label_rotation=0)
         ax.tick_params(labelsize=10.5)
         plt.xlabel("Transformers", fontsize=10.5)
-        plt.ylabel("Sample points", fontsize=10.5)
         plt.savefig(missing_dir_bar + "City-" + index[0] + "-" + "District-" + index[1] +'-bar.png', dpi=600)
         plt.close()
     

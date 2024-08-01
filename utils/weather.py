@@ -400,7 +400,7 @@ def extreme_weather_city_plot(input_df, city, weather_df, start_time, end_time, 
                     #"WIND_LEVEL_2": "#9d4edd",
                     #"WIND_LEVEL_3": "#7b2cbf",
                     #"WIND_LEVEL_4": "#5a189a",
-                    "WIND_LEVEL_5": "#e0aaff",
+                    #"WIND_LEVEL_5": "#e0aaff",
                     "WIND_LEVEL_6": "#c77dff",
                     "WIND_LEVEL_7": "#9d4edd",
                     "WIND_LEVEL_8": "#7b2cbf",
@@ -408,7 +408,7 @@ def extreme_weather_city_plot(input_df, city, weather_df, start_time, end_time, 
                     #"WIND_LEVEL_10": "#55a630",
                     #"WIND_LEVEL_11": "#2b9348",
                     #"WIND_LEVEL_12": "#007f5f",
-                    "PRECIPITATION_50": "#d5c7bc",
+                    #"PRECIPITATION_50": "#d5c7bc",
                     "PRECIPITATION_100": "#785964",
                     }
     
@@ -635,7 +635,7 @@ def extreme_normal_comparison_plot(input_df, weather_df, start_time, end_time, o
                 ax.set_xlim(extreme_df.index.min(), extreme_df.index.max())
                 ax.tick_params(axis='both', labelsize=10.5)
                 ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-                ax.set_xticklabels(ax.get_xticklabels(), rotation=45) 
+                #ax.set_xticklabels(ax.get_xticklabels(), rotation=45) 
                 ax.set(xlabel="", ylabel="")
                 
                 event_num = event_num + 1

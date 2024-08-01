@@ -139,15 +139,16 @@ if __name__ == "__main__":
                 temp_DF_df = district_DF_df[district_DF_df["DISTRICT"] == district]
                 diversity_heatmap(temp_DF_df, district, "./result/diversity_factor/district/")
     # 3.2 City load profile visualization
-    city_profile_flag = False
     province_df = district_aggregate(imputed_transformer_pivot_df, 0)
     city_df = district_aggregate(imputed_transformer_pivot_df, 1)
     district_df = district_aggregate(imputed_transformer_pivot_df, 2)
+    city_profile_flag = True
     if city_profile_flag:
         average_load_profiles(city_df, "./result/load_profile/")
     # 3.3 City load profile in different scales
-    select_city_profile_flag = False
+    select_city_profile_flag = True
     if select_city_profile_flag:
+        """
         select_df = district_df[['DATETIME', "0-0", "1-0", "2-0", "3-0", "4-0", "5-0", "6-0", "7-0", "8-0", "9-0"]]
         select_df = select_df.rename(columns={
             "0-0":"0", "1-0":"1", "2-0":"2", 
@@ -155,6 +156,8 @@ if __name__ == "__main__":
             "6-0":"6", "7-0":"7", "8-0":"8", 
             "9-0":"9"
         })
+        """
+        select_df = city_df[['DATETIME', "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]]
         select_df = select_df[['DATETIME', "0", "2", "3", "5", "6", "9"]]
         
         specific_load_profile_plot(select_df, '2022-07-04 00:00:00', '2022-07-04 23:00:00', 
@@ -168,6 +171,10 @@ if __name__ == "__main__":
         specific_load_profile_plot(select_df, '2022-07-01 00:00:00', '2022-07-31 23:00:00', 
                                             '2022-08-01 00:00:00', '2022-08-31 23:00:00', 
                                             "Month", "./result/load_profile/")
+
+        month_distribution_plot(select_df, 
+                                '2022-01-01 00:00:00', '2022-12-31 23:00:00',
+                                "./result/load_profile/")
         
     # 3.4 Seasonality decomposition
     seasonality_flag = False
@@ -177,6 +184,7 @@ if __name__ == "__main__":
 
         seasonality_decomposition(city_df, "./result/seasonality/", 24, "multiplicative")
         seasonality_decomposition(city_df, "./result/seasonality/", 168, "multiplicative")
+    
     ############################################################################################################
     # 4. Weather and holidays
     # 4.1 Weather correlation
@@ -223,7 +231,7 @@ if __name__ == "__main__":
         holiday_plot(province_df, "all", holiday_df, "2022-01-01 00:00:00", '2023-11-01 00:00:00', "./result/holiday/")
     
     # 4.3 Extreme weather
-    extreme_weather = True
+    extreme_weather = False
     if extreme_weather:
         # For the whole region
         extreme_weather_query = 'SELECT * FROM extreme_weather_internet'
@@ -235,7 +243,7 @@ if __name__ == "__main__":
         extreme_weather_calculated_query = 'SELECT * FROM extreme_weather_calculated'
         extreme_weather_calculated_df = pd.read_sql(extreme_weather_calculated_query, engine)
         extreme_weather_calculated_df = extreme_weather_calculated_df.astype({'DATETIME':"datetime64[ns]"})
-        extreme_city_flag = False
+        extreme_city_flag = True
         if extreme_city_flag:
             for city_num in range(10):
                 print("CITY", city_num)
@@ -282,7 +290,7 @@ if __name__ == "__main__":
         
         extreme_normal_comparison_plot(guilin_df,
                                         temp_extreme_weather_df,
-                                        "2022-05-01 00:00:00", '2022-12-31 23:00:00', 
+                                        "2022-01-01 00:00:00", '2022-12-31 23:00:00', 
                                         "./result/extreme_weather/")
     ############################################################################################################
     

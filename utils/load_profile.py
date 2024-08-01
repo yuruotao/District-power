@@ -48,10 +48,14 @@ def average_load_profiles(input_df, output_path):
     # Plot each column
     for i, column in enumerate(input_df.columns[1:]):  # Exclude the DATETIME column
         ax = axs[i]
-        ax.plot(input_df['DATETIME'], input_df[column], color="#0466c8", linewidth=1.5)
+        ax.plot(input_df['DATETIME'], input_df[column], color="#0582ca", linewidth=1.5)
         ax.set_title("(" + alphabet_list[i] + ") City " + column, fontsize=10.5)
         ax.set_xlim(input_df['DATETIME'].min(), input_df['DATETIME'].max())
         ax.tick_params(axis='both', which='major', labelsize=10.5)
+        ax.tick_params(top=False, bottom=True, left=False, right=False)
+        ax.tick_params(which='both', direction='in', length=2)
+        
+        ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
         # Set xticks
         xticklabels = ax.get_xticklabels()
         xtickpositions = ax.get_xticks()
@@ -59,7 +63,7 @@ def average_load_profiles(input_df, output_path):
         filtered_xticklabels = [label.get_text() for i, label in enumerate(xticklabels) if i % step_size_x == 0]
         filtered_xtickpositions = [position for i, position in enumerate(xtickpositions) if i % step_size_x == 0]
         ax.set_xticks(filtered_xtickpositions)
-        ax.set_xticklabels(filtered_xticklabels, rotation=45)  
+        ax.set_xticklabels(filtered_xticklabels)
         ax.grid(False)
 
     # Hide the empty subplots
@@ -144,8 +148,20 @@ def specific_load_profile_plot(input_df, start_time, end_time, start_time_1, end
             ax.plot(input_df_1['DATETIME'], input_df_1[column], color="#d90429", linewidth=1.5)
         ax.set_title("(" + alphabet_list[alphabet_num] + ") City " + column, fontsize=10.5)
         ax.set_xlim(input_df_0['DATETIME'].min(), input_df_0['DATETIME'].max())
-        ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%d %H:%M'))
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=45)   
+        if str(column) == "0":
+            ax.set_ylim(490, 4000)
+        elif str(column) == "2":
+            ax.set_ylim(490, 5500)
+        
+        if time_type == "Day":
+            ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%H:%M'))
+        elif time_type == "Week":
+            ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%a'))
+        else:
+            ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%d %H:%M'))
+        ax.tick_params(top=False, bottom=True, left=False, right=False)
+        ax.tick_params(which='both', direction='in', length=2)
+        #ax.set_xticklabels(ax.get_xticklabels(), rotation=45)   
         ax.grid(False)
         alphabet_num = alphabet_num + 1
 
@@ -166,6 +182,83 @@ def specific_load_profile_plot(input_df, start_time, end_time, start_time_1, end
     fig.text(0.004, 0.5, 'Power (kW)', va='center', rotation='vertical', fontsize=10.5)
     # Show the plot
     plt.savefig(output_path + "city_load_profile_" + time_type + ".png", dpi=600)
+    plt.close()
+    
+    return None
+
+def month_distribution_plot(input_df, start_time, end_time, output_path):
+    """Plot the peak distribution among months
+
+    Args:
+        input_df (dataframe): dataframe containing data to be plotted
+        start_time (string): start time for time interval
+        end_time (string): end time for time interval
+        output_path (string): path to save the plot
+
+    Returns:
+        None
+    """
+    
+    sns.set_theme(style="white")
+    sns.set_style({'font.family':'serif', 'font.serif':'Times New Roman'})
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        
+    alphabet_list = [chr(chNum) for chNum in list(range(ord('a'),ord('z')+1))]
+    
+    # Filter by name
+    input_df = input_df.loc[(input_df['DATETIME'] >= pd.to_datetime(start_time)) & (input_df['DATETIME'] <= pd.to_datetime(end_time))]
+    df_melted = input_df.melt(id_vars=['DATETIME'], var_name='a', value_name='value')
+    df_melted['month'] = df_melted['DATETIME'].dt.month
+    df_melted['day'] = df_melted['DATETIME'].dt.day
+    df_daily_max = df_melted.groupby(['a','month', 'day'])['value'].max().reset_index()
+
+    # Define the values of `a` for which you want to create subplots
+    a_values = [0, 2, 3, 5, 6, 9]
+    
+    # Create a figure and axes
+    fig, axs = plt.subplots(2, 3, figsize=(14, 10))
+
+    # Flatten the axes array for easy iteration
+    axs = axs.flatten()
+    
+    mpl.rc('xtick', labelsize=10.5)
+    mpl.rc('ytick', labelsize=10.5)
+    plt.rc('legend', fontsize=10.5)
+    
+    month_labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+    # Plot each column
+    alphabet_num = 0
+    for i in range(6):  # Exclude the datetime column
+        ax = axs[i]
+        a = a_values[i]
+        
+        if str(a) == "0":
+            ax.set_ylim(490, 4000)
+        elif str(a) == "2":
+            ax.set_ylim(490, 5500)
+        
+        data_filtered = df_daily_max[df_daily_max['a'] == str(a)]
+        sns.boxplot(x='month', y='value', data=data_filtered, ax=ax, palette="Spectral", whis=(0, 100))
+        sns.stripplot(x='month', y='value', data=data_filtered, ax=ax, size=2, color="#495057")
+        
+        ax.tick_params(axis='both', which='major', labelsize=10.5)
+        ax.set_title("(" + alphabet_list[alphabet_num] + ") City " + str(a), fontsize=10.5)
+        #ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
+        ax.grid(False)
+        ax.set_xlabel("")
+        ax.set_ylabel("")
+        ax.set_xticklabels(month_labels)
+        alphabet_num = alphabet_num + 1
+
+    # Hide the empty subplots
+    for ax in axs[len(input_df.columns)-1:]:
+        ax.axis('off')
+
+    plt.tight_layout(rect=[0.02, 0.05, 1, 1])
+    plt.savefig(output_path + "month_peak_distribution.png", dpi=600)
     plt.close()
     
     return None
@@ -245,3 +338,11 @@ def seasonality_decomposition(input_df, output_path, period_num, model):
             pass
     
     return None
+
+if __name__ == "__main__":
+    district_df = pd.read_excel("./city.xlsx")
+    district_df = district_df.rename({"Datetime":"DATETIME"}, axis=1)
+    district_df["DATETIME"] = district_df["DATETIME"].astype({'DATETIME':"datetime64[ns]"})
+    month_distribution_plot(district_df, 
+                                '2022-01-01 00:00:00', '2022-12-31 23:00:00',
+                                "./result/load_profile/")
