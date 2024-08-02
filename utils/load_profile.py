@@ -152,6 +152,8 @@ def specific_load_profile_plot(input_df, start_time, end_time, start_time_1, end
             ax.set_ylim(490, 4000)
         elif str(column) == "2":
             ax.set_ylim(490, 5500)
+        elif str(column) == "5":
+            ax.set_ylim(3500, 13000)
         
         if time_type == "Day":
             ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%H:%M'))
@@ -239,6 +241,8 @@ def month_distribution_plot(input_df, start_time, end_time, output_path):
             ax.set_ylim(490, 4000)
         elif str(a) == "2":
             ax.set_ylim(490, 5500)
+        elif str(a) == "5":
+            ax.set_ylim(3500, 13000)
         
         data_filtered = df_daily_max[df_daily_max['a'] == str(a)]
         sns.boxplot(x='month', y='value', data=data_filtered, ax=ax, palette="Spectral", whis=(0, 100))
