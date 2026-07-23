@@ -108,7 +108,6 @@ pandas=2.1.4=pypi_0
 parso=0.8.3=pypi_0
 patsy=0.5.6=pypi_0
 phik=0.12.4=pypi_0
-pillow=10.2.0=pypi_0
 pip=23.3.1=py311haa95532_0
 pipreqs=0.4.13=pypi_0
 plotly=5.18.0=pypi_0
