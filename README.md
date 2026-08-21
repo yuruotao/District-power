@@ -47,10 +47,12 @@ The sources of data are summarized here.
 
 To run the code, you need to first download the code and data from figshare, move the figshare data into folder "data" (or in this case just download all Github files), install the dependencies in "requirements.txt", then run script "main.py".
 
+**Note that The YXRL values for both transformers 2-0-2 and 2-0-3 should be 630 kVA, rather than 200 kVA. And the YXRL is the rated capacity.** Thanks to Dr. Rahul from Jadavpur University for pointing this out.
+
 This repository is under MIT License, please feel free to use. If you find this repository helpful, please cite the following bibtex entry:
 
 ```
-@Article{Li2025,
+@Article{2025,
     author={Li, Bo
         and Yu, Ruotao
         and Gan, Kaiye
